@@ -1,0 +1,63 @@
+PODS:
+  - libwebp (0.5.1):
+    - libwebp/core (= 0.5.1)
+    - libwebp/dec (= 0.5.1)
+    - libwebp/demux (= 0.5.1)
+    - libwebp/dsp (= 0.5.1)
+    - libwebp/enc (= 0.5.1)
+    - libwebp/mux (= 0.5.1)
+    - libwebp/utils (= 0.5.1)
+    - libwebp/webp (= 0.5.1)
+  - libwebp/core (0.5.1):
+    - libwebp/webp
+  - libwebp/dec (0.5.1):
+    - libwebp/core
+  - libwebp/demux (0.5.1):
+    - libwebp/core
+  - libwebp/dsp (0.5.1):
+    - libwebp/core
+  - libwebp/enc (0.5.1):
+    - libwebp/core
+  - libwebp/mux (0.5.1):
+    - libwebp/core
+  - libwebp/utils (0.5.1):
+    - libwebp/core
+  - libwebp/webp (0.5.1)
+  - RxBlocking (3.4.0):
+    - RxSwift (~> 3.4)
+  - RxCocoa (3.4.0):
+    - RxSwift (~> 3.4)
+  - RxSwift (3.4.0)
+  - RxTest (3.4.0):
+    - RxSwift (~> 3.4)
+  - SDWebImage/Core (4.0.0)
+  - SDWebImage/WebP (4.0.0):
+    - libwebp
+    - SDWebImage/Core
+  - SwiftUtilities/Main (1.0.9):
+    - RxCocoa (~> 3.0)
+    - RxSwift (~> 3.0)
+  - SwiftUtilitiesTests/Main (1.0.9):
+    - RxBlocking (~> 3.0)
+    - RxCocoa (~> 3.0)
+    - RxSwift (~> 3.0)
+    - RxTest (~> 3.0)
+
+DEPENDENCIES:
+  - SDWebImage/WebP
+  - SwiftUtilities/Main
+  - SwiftUtilitiesTests/Main
+
+SPEC CHECKSUMS:
+  libwebp: b9126f8982a95370cf4eaad9bb3fefd57f052c15
+  RxBlocking: 1797b8c1a3ad7b08965145e6e2294c2e101515aa
+  RxCocoa: d14ef6b6029e1ddc6e966508c09289090de68ff9
+  RxSwift: 3789a1af753002a14edecdb698a2424624296a9c
+  RxTest: beb6beb882cf1dcac5fc9fdbd4760a5254e7f3a6
+  SDWebImage: 76a6348bdc74eb5a55dd08a091ef298e56b55e41
+  SwiftUtilities: ebf33c5482d86faa0662e169bed17399dd550ec9
+  SwiftUtilitiesTests: 2fc9ce0b9bf0930e32331772903ae029f7c33801
+
+PODFILE CHECKSUM: b70fd3a81ab994a0d1ab5ec553bb4699a094f9d3
+
+COCOAPODS: 1.2.1
