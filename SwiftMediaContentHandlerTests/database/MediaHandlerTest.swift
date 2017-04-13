@@ -1,5 +1,5 @@
 //
-//  ImageHandlerTest.swift
+//  MediaHandlerTest.swift
 //  SwiftMediaContentHandler
 //
 //  Created by Hai Pham on 4/12/17.
@@ -49,7 +49,7 @@ class ImageHandlerTest: XCTestCase {
     
     func test_mock_loadLocalImage_shouldCallCorrectMethods() {
         // Setup
-        let request = LocalImageRequest.builder().with(media: Media.blank).build()
+        let request = LocalImageRequest.builder().with(media: LocalMedia.blank).build()
         
         // When
         mediaHandler.requestMedia(with: request, andThen: {_,_ in})
@@ -83,7 +83,7 @@ class ImageHandlerTest: XCTestCase {
     
     func test_mock_rxLoadLocalImage_shouldCallCorrectMethods() {
         // Setup
-        let request = LocalImageRequest.builder().with(media: Media.blank).build()
+        let request = LocalImageRequest.builder().with(media: LocalMedia.blank).build()
         let scheduler = TestScheduler(initialClock: 0)
         let observer = scheduler.createObserver(Any.self)
         

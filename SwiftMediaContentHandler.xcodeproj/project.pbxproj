@@ -15,7 +15,7 @@
 		D312860C1E9F366200F2AB64 /* MediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* MediaDatabase.swift */; };
 		D312860D1E9F366200F2AB64 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286061E9F366200F2AB64 /* Album.swift */; };
 		D312860E1E9F366200F2AB64 /* ImageSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286071E9F366200F2AB64 /* ImageSize.swift */; };
-		D312860F1E9F366200F2AB64 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* Media.swift */; };
+		D312860F1E9F366200F2AB64 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* LocalMedia.swift */; };
 		D31286101E9F366200F2AB64 /* ImageViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D312860A1E9F366200F2AB64 /* ImageViewProtocol.swift */; };
 		D31286141E9F366C00F2AB64 /* MediaHandlerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286121E9F366C00F2AB64 /* MediaHandlerTest.swift */; };
 		D31286151E9F366C00F2AB64 /* TestMediaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286131E9F366C00F2AB64 /* TestMediaHandler.swift */; };
@@ -23,10 +23,12 @@
 		D312861A1E9F380E00F2AB64 /* MediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* MediaDatabase.swift */; };
 		D312861B1E9F380E00F2AB64 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286061E9F366200F2AB64 /* Album.swift */; };
 		D312861C1E9F380E00F2AB64 /* ImageSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286071E9F366200F2AB64 /* ImageSize.swift */; };
-		D312861D1E9F380E00F2AB64 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* Media.swift */; };
+		D312861D1E9F380E00F2AB64 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* LocalMedia.swift */; };
 		D312861E1E9F380E00F2AB64 /* ImageViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D312860A1E9F366200F2AB64 /* ImageViewProtocol.swift */; };
 		D3C87B8A1E9F9AF0000BAB62 /* MediaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */; };
 		D3C87B931E9FB82A000BAB62 /* MediaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */; };
+		D3C87B9A1E9FDC3B000BAB62 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B991E9FDC3B000BAB62 /* MediaType.swift */; };
+		D3C87B9E1EA00282000BAB62 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B991E9FDC3B000BAB62 /* MediaType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,12 +55,13 @@
 		D31286041E9F366200F2AB64 /* MediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabase.swift; sourceTree = "<group>"; };
 		D31286061E9F366200F2AB64 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		D31286071E9F366200F2AB64 /* ImageSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSize.swift; sourceTree = "<group>"; };
-		D31286081E9F366200F2AB64 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		D31286081E9F366200F2AB64 /* LocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMedia.swift; sourceTree = "<group>"; };
 		D312860A1E9F366200F2AB64 /* ImageViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewProtocol.swift; sourceTree = "<group>"; };
 		D31286121E9F366C00F2AB64 /* MediaHandlerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHandlerTest.swift; sourceTree = "<group>"; };
 		D31286131E9F366C00F2AB64 /* TestMediaHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestMediaHandler.swift; sourceTree = "<group>"; };
 		D31286161E9F36A800F2AB64 /* SwiftUtilitiesTests.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUtilitiesTests.framework; path = "Pods/../build/Debug-iphoneos/SwiftUtilitiesTests/SwiftUtilitiesTests.framework"; sourceTree = "<group>"; };
 		D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaRequest.swift; sourceTree = "<group>"; };
+		D3C87B991E9FDC3B000BAB62 /* MediaType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaType.swift; sourceTree = "<group>"; };
 		F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftMediaContentHandlerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F57CDB865D90241C9000FB50 /* Pods-SwiftMediaContentHandler.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandler.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandler/Pods-SwiftMediaContentHandler.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -161,7 +164,8 @@
 			children = (
 				D31286061E9F366200F2AB64 /* Album.swift */,
 				D31286071E9F366200F2AB64 /* ImageSize.swift */,
-				D31286081E9F366200F2AB64 /* Media.swift */,
+				D31286081E9F366200F2AB64 /* LocalMedia.swift */,
+				D3C87B991E9FDC3B000BAB62 /* MediaType.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -382,8 +386,9 @@
 				D312860E1E9F366200F2AB64 /* ImageSize.swift in Sources */,
 				D312860B1E9F366200F2AB64 /* MediaHandler.swift in Sources */,
 				D312860C1E9F366200F2AB64 /* MediaDatabase.swift in Sources */,
+				D3C87B9A1E9FDC3B000BAB62 /* MediaType.swift in Sources */,
 				D312860D1E9F366200F2AB64 /* Album.swift in Sources */,
-				D312860F1E9F366200F2AB64 /* Media.swift in Sources */,
+				D312860F1E9F366200F2AB64 /* LocalMedia.swift in Sources */,
 				D3C87B8A1E9F9AF0000BAB62 /* MediaRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -392,12 +397,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3C87B9E1EA00282000BAB62 /* MediaType.swift in Sources */,
 				D3C87B931E9FB82A000BAB62 /* MediaRequest.swift in Sources */,
 				D31286191E9F380E00F2AB64 /* MediaHandler.swift in Sources */,
 				D312861A1E9F380E00F2AB64 /* MediaDatabase.swift in Sources */,
 				D312861B1E9F380E00F2AB64 /* Album.swift in Sources */,
 				D312861C1E9F380E00F2AB64 /* ImageSize.swift in Sources */,
-				D312861D1E9F380E00F2AB64 /* Media.swift in Sources */,
+				D312861D1E9F380E00F2AB64 /* LocalMedia.swift in Sources */,
 				D312861E1E9F380E00F2AB64 /* ImageViewProtocol.swift in Sources */,
 				D31286151E9F366C00F2AB64 /* TestMediaHandler.swift in Sources */,
 				D31286141E9F366C00F2AB64 /* MediaHandlerTest.swift in Sources */,

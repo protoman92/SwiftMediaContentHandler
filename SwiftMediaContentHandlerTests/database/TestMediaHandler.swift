@@ -1,5 +1,5 @@
 //
-//  TestImageHandler.swift
+//  TestMediaHandler.swift
 //  SwiftMediaContentHandler
 //
 //  Created by Hai Pham on 4/12/17.

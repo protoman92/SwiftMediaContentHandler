@@ -1,6 +1,6 @@
 //
-//  BaseImageDownloaded.swift
-//  Heartland Chefs
+//  MediaHandler
+//  SwiftMediaContentHandler
 //
 //  Created by Hai Pham on 8/6/16.
 //  Copyright © 2016 Swiften. All rights reserved.
@@ -252,20 +252,40 @@ public extension MediaHandler {
     ///
     /// - Parameters:
     ///   - status: The authorization status being checked.
-    ///   - completion: Completion closure.
-    public func checkAuthorization(status: PHAuthorizationStatus,
-                                   completion: ((Bool) -> Void)?) {
-        switch status {
-        case .authorized:
+    ///
+    /// - Returns: An Observable instance.
+    public func rxCheckAuthorization(status: PHAuthorizationStatus)
+        -> Observable<Bool>
+    {
+        return Observable
+            .create({
+                switch status {
+                case .authorized:
+                    $0.onNext(true)
+                    
+                default:
+                    $0.onNext(false)
+                }
+                
+                $0.onCompleted()
+                return Disposables.create()
+            })
+            .doOnNext(onPermissionChecked)
+    }
+    
+    fileprivate func onPermissionChecked(_ granted: Bool) {
+        if granted && phManager == nil {
             phManager = PHImageManager()
-            
-        case .denied, .restricted:
-            phManager = nil
-            
-        default:
-            break
         }
     }
 }
 
-extension MediaHandler: MediaHandlerProtocol {}
+extension MediaHandler: MediaHandlerProtocol {
+    /// Check permission to access Medias SDK.
+    ///
+    /// - Parameters:
+    ///   - status: The current authorization status.
+    ///   - completion: Completion closure.
+    public func checkAuthorization(status: PHAuthorizationStatus,
+                                   completion: ((Bool) -> Void)?) {}
+}

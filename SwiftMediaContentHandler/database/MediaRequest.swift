@@ -68,9 +68,9 @@ public final class WebImageRequest: WebRequest {
 public class LocalRequest: MediaRequest {
     
     /// If this variable is set, local source.
-    fileprivate var media: Media?
+    fileprivate var media: LocalMedia?
     
-    var mediaAsset: Media? {
+    var mediaAsset: LocalMedia? {
         return media
     }
 }
@@ -85,7 +85,7 @@ public class LocalBuilder: MediaRequest.BaseBuilder {
     /// - Parameter photo: A Media instance.
     /// - Returns: The current Builder instance.
     @discardableResult
-    public func with(media: Media) -> LocalBuilder {
+    public func with(media: LocalMedia) -> LocalBuilder {
         localRequest?.media = media
         return self
     }

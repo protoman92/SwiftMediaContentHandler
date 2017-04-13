@@ -1,6 +1,6 @@
 //
-//  Media.swift
-//  Heartland Chefs
+//  LocalMedia.swift
+//  SwiftLocalMediaContentHandler
 //
 //  Created by Hai Pham on 1/16/17.
 //  Copyright © 2017 Swiften. All rights reserved.
@@ -9,9 +9,9 @@
 import Photos
 import SwiftUtilities
 
-/// This struct hides PHAsset implementation.
-public class Media {
-    public static let blank = Media()
+/// This class hides PHAsset implementation.
+public class LocalMedia {
+    public static let blank = LocalMedia()
     
     public var asset: PHAsset?
     
@@ -26,13 +26,13 @@ public class Media {
     }
     
     public class Builder {
-        fileprivate let media: Media
+        fileprivate let media: LocalMedia
         
         fileprivate init() {
-            media = Media()
+            media = LocalMedia()
         }
         
-        /// Set the Media's asset instance.
+        /// Set the LocalMedia's asset instance.
         ///
         /// - Parameter asset: A PHAsset instance.
         /// - Returns: The current Builder instance.
@@ -41,26 +41,26 @@ public class Media {
             return self
         }
         
-        public func build() -> Media {
+        public func build() -> LocalMedia {
             return media
         }
     }
 }
 
-public extension Media {
+public extension LocalMedia {
     public static func builder() -> Builder {
         return Builder()
     }
 }
 
-public protocol MediaProtocol {
+public protocol LocalMediaProtocol {
     var asset: PHAsset? { get }
 }
 
-extension Media: MediaProtocol {}
+extension LocalMedia: LocalMediaProtocol {}
 
-extension Media: CustomComparisonProtocol {
-    public func equals(object: Media?) -> Bool {
+extension LocalMedia: CustomComparisonProtocol {
+    public func equals(object: LocalMedia?) -> Bool {
         return object?.id == id
     }
 }
@@ -71,13 +71,13 @@ extension PHAsset: CustomComparisonProtocol {
     }
 }
 
-extension Media: Equatable {}
+extension LocalMedia: Equatable {}
 
-public func ==(first: Media, second: Media) -> Bool {
+public func ==(first: LocalMedia, second: LocalMedia) -> Bool {
     return first.id == second.id
 }
 
-extension Array where Element: MediaProtocol {
+extension Array where Element: LocalMediaProtocol {
     public var assets: [PHAsset] {
         return flatMap({$0.asset})
     }

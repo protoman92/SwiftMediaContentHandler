@@ -1,6 +1,6 @@
 //
 //  MediaDatabase.swift
-//  Sellfie
+//  SwiftMediaContentHandler
 //
 //  Created by Hai Pham on 4/9/16.
 //  Copyright © 2016 Anh Vu Mai. All rights reserved.
@@ -18,22 +18,26 @@ public class MediaDatabase: NSObject {
     }
     
     /// Return all Photo instances fetched from PHPhotoLibrary.
-    public var allPhotos: [Media] {
+    public var allPhotos: [LocalMedia] {
         return allPhotos(from: albums)
     }
     
     /// We can use this imageHandler instance to cache and load images.
     public var imageHandler: MediaHandlerProtocol?
     
+    /// We can add media types to fetch with PHFetchRequest.
+    fileprivate var mediaTypes: [MediaType]
+    
     /// When a Photo library change is detected, call onNext.
-    fileprivate let photoLibraryListener: PublishSubject<Any>
+    fileprivate let photoLibraryListener: PublishSubject<[MediaType]>
     
     /// This Album array contains PHAsset instances that can be queried later
     /// using MediaHandler.
     fileprivate var albums = [Album]()
     
     fileprivate override init() {
-        photoLibraryListener = PublishSubject<Any>()
+        photoLibraryListener = PublishSubject<[MediaType]>()
+        mediaTypes = []
         super.init()
         PHPhotoLibrary.shared().register(self)
     }
@@ -46,8 +50,8 @@ public class MediaDatabase: NSObject {
     ///
     /// - Parameter albums: An Array of Album instances.
     /// - Returns: An Array of Photo instances.
-    fileprivate func allPhotos(from albums: [Album]) -> [Media] {
-        return albums.map({$0.medias}).reduce([Media](), +)
+    fileprivate func allPhotos(from albums: [Album]) -> [LocalMedia] {
+        return albums.map({$0.medias}).reduce([LocalMedia](), +)
     }
     
     /// Cache full-sized images from the album Array.
@@ -69,6 +73,16 @@ public class MediaDatabase: NSObject {
             return self
         }
         
+        /// Add a new MediaType to the set of acceptable media types. If this
+        /// type already exists, do nothing.
+        ///
+        /// - Parameter mediaType: A MediaType instance.
+        /// - Returns: The current Builder instance.
+        public func add(mediaType: MediaType) -> Builder {
+            database.mediaTypes.append(uniqueElement: mediaType)
+            return self
+        }
+        
         public func build() -> MediaDatabase {
             return database
         }
@@ -78,6 +92,13 @@ public class MediaDatabase: NSObject {
 public extension MediaDatabase {
     public static func builder() -> Builder {
         return Builder()
+    }
+}
+
+// MARK: - Error messages
+public extension MediaDatabase {
+    public static var permissionNotGranted: String {
+        return "media.error.permissionNotGranted".localized
     }
 }
 
@@ -96,7 +117,7 @@ public extension MediaDatabase {
         
         switch status {
         case .authorized:
-            loadSmartAlbumsInBackground()
+            loadSmartAlbums()
             
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization(loadAlbumWithPermission)
@@ -106,36 +127,42 @@ public extension MediaDatabase {
         }
     }
     
-    /// Load smart albums asynchronously.
-    fileprivate func loadSmartAlbumsInBackground() {
-        guard PHPhotoLibrary.authorizationStatus() == .authorized else {
-            return
-        }
+    /// Reload smart albums using the listener Subject.
+    public func loadSmartAlbums() {
+        photoLibraryListener.onNext(mediaTypes)
     }
     
     /// Load smart albums.
     ///
     /// - Returns: An Observable instance.
-    public func rxLoadSmartAlbums() -> Observable<Album> {
+    public func rxLoadSmartAlbums(withTypes types: [MediaType])
+        -> Observable<Album>
+    {
+        guard PHPhotoLibrary.authorizationStatus() == .authorized else {
+            let error = Exception(MediaDatabase.permissionNotGranted)
+            return Observable.error(error)
+        }
+        
         let fetch = PHAssetCollection.fetchAssetCollections(
             with: .smartAlbum,
             subtype: .any,
             options: nil)
         
-        return rxLoadAlbums(fetch: fetch)
+        return rxLoadAlbums(fetch: fetch, forTypes: types)
     }
     
     /// Load albums from a PHFetchResult.
     ///
     /// - Parameter fetch: A PHFetchResult instance.
     /// - Returns: An Observable instance.
-    fileprivate func rxLoadAlbums(fetch: PHFetchResult<PHAssetCollection>)
+    fileprivate func rxLoadAlbums(fetch: PHFetchResult<PHAssetCollection>,
+                                  forTypes types: [MediaType])
         -> Observable<Album>
     {
         let options = PHFetchOptions()
         
         options.predicate = NSPredicate(format: "mediaType = %i",
-                                        PHAssetMediaType.image.rawValue)
+                                        types.assetTypeRawValues)
         
         options.sortDescriptors = [
             NSSortDescriptor(key: "creationDate", ascending: false)
@@ -207,6 +234,6 @@ extension MediaDatabase: PHPhotoLibraryChangeObserver {
 //        }
 //        
 //        self.fetchResult = changed.fetchResultAfterChanges
-        loadSmartAlbumsInBackground()
+        loadSmartAlbums()
     }
 }

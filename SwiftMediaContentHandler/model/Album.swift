@@ -1,6 +1,6 @@
 //
 //  Album.swift
-//  Sellfie
+//  SwiftMediaContentHandler
 //
 //  Created by Hai Pham on 7/31/16.
 //  Copyright © 2016 Anh Vu Mai. All rights reserved.
@@ -22,12 +22,12 @@ public class Album: Collection {
         return Swift.min(i + 1, endIndex)
     }
     
-    public subscript(index: Int) -> Media {
+    public subscript(index: Int) -> LocalMedia {
         return medias[index]
     }
     
     public var name: String
-    public var medias: [Media]
+    public var medias: [LocalMedia]
     
     fileprivate init() {
         name = ""
@@ -54,7 +54,7 @@ public class Album: Collection {
         ///
         /// - Parameter photos: An Array of Photo instances.
         /// - Returns: The current Builder instance.
-        public func add(medias: [Media]) -> Builder {
+        public func add(medias: [LocalMedia]) -> Builder {
             album.medias.append(uniqueContentsOf: medias)
             return self
         }
@@ -66,7 +66,7 @@ public class Album: Collection {
         /// - Returns: The current Builder instance.
         public func add(assets: [PHAsset]) -> Builder {
             return add(medias: assets.map({
-                Media.builder().with(asset: $0).build()
+                LocalMedia.builder().with(asset: $0).build()
             }))
         }
         
@@ -85,7 +85,7 @@ public extension Album {
 public protocol AlbumProtocol: class {
     var name: String { get set }
     
-    var medias: [Media] { get set }
+    var medias: [LocalMedia] { get set }
 }
 
 extension Album: AlbumProtocol {}
