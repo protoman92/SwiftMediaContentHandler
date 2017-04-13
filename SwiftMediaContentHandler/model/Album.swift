@@ -26,43 +26,69 @@ public class Album: Collection {
         return photos[index]
     }
     
-    public let name: String
+    public var name: String
     public var photos: [Photo]
     
-    /// Construct an Album instance.
-    ///
-    /// - Parameters:
-    ///   - name: The Album's name.
-    ///   - photos: The Array of PHAsset to populate the Album's photos Array.
-    public convenience init(name: String, photos: [PHAsset]) {
-        self.init(name: name, photos: photos.flatMap({Photo(asset: $0)}))
+    fileprivate init() {
+        name = ""
+        photos = []
     }
     
-    /// Construct an Album instance.
-    ///
-    /// - Parameters:
-    ///   - name: The Album's name.
-    ///   - photos: The Array of Photo to populate the Album's photos Array.
-    public init(name: String, photos: [Photo]) {
-        self.name = name
-        self.photos = photos
-    }
-    
-    /// Same as above, but uses an empty Photo Array.
-    ///
-    ///   - name: The Album's name.
-    public convenience init(name: String) {
-        self.init(name: name, photos: [Photo]())
+    public class Builder {
+        fileprivate let album: Album
+        
+        fileprivate init() {
+            album = Album()
+        }
+        
+        /// Set the album's name.
+        ///
+        /// - Parameter name: A String value.
+        /// - Returns: The current Builder instance.
+        public func with(name: String) -> Builder {
+            album.name = name
+            return self
+        }
+        
+        /// Add photos to the album's photos Array.
+        ///
+        /// - Parameter photos: An Array of Photo instances.
+        /// - Returns: The current Builder instance.
+        public func add(photos: [Photo]) -> Builder {
+            album.photos.append(uniqueContentsOf: photos)
+            return self
+        }
+        
+        /// Add assets, wrapped in Photo instances, to the album's photos 
+        /// Array.
+        ///
+        /// - Parameter assets: An Array of PHAsset instances.
+        /// - Returns: The current Builder instance.
+        public func add(assets: [PHAsset]) -> Builder {
+            return add(photos: assets.map({
+                Photo.builder().with(asset: $0).build()
+            }))
+        }
+        
+        public func build() -> Album {
+            return album
+        }
     }
 }
 
-extension Album: AlbumProtocol {}
+public extension Album {
+    public static func builder() -> Builder {
+        return Builder()
+    }
+}
 
 public protocol AlbumProtocol: class {
-    var name: String { get }
+    var name: String { get set }
     
     var photos: [Photo] { get set }
 }
+
+extension Album: AlbumProtocol {}
 
 public extension Array where Element: AlbumProtocol {
     

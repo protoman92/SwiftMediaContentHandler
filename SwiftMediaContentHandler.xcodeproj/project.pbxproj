@@ -19,7 +19,6 @@
 		D31286101E9F366200F2AB64 /* ImageViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D312860A1E9F366200F2AB64 /* ImageViewProtocol.swift */; };
 		D31286141E9F366C00F2AB64 /* ImageHandlerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286121E9F366C00F2AB64 /* ImageHandlerTest.swift */; };
 		D31286151E9F366C00F2AB64 /* TestImageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286131E9F366C00F2AB64 /* TestImageHandler.swift */; };
-		D31286171E9F36A800F2AB64 /* SwiftUtilitiesTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D31286161E9F36A800F2AB64 /* SwiftUtilitiesTests.framework */; };
 		D31286191E9F380E00F2AB64 /* ImageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286031E9F366200F2AB64 /* ImageHandler.swift */; };
 		D312861A1E9F380E00F2AB64 /* MediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* MediaDatabase.swift */; };
 		D312861B1E9F380E00F2AB64 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286061E9F366200F2AB64 /* Album.swift */; };
@@ -74,7 +73,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D31286171E9F36A800F2AB64 /* SwiftUtilitiesTests.framework in Frameworks */,
 				D31285F21E9F356D00F2AB64 /* SwiftMediaContentHandler.framework in Frameworks */,
 				85B923ED0AE7A8EB847C3317 /* Pods_SwiftMediaContentHandlerTests.framework in Frameworks */,
 			);

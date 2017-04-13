@@ -10,21 +10,46 @@ import Photos
 import SwiftUtilities
 
 /// This struct hides PHAsset implementation.
-public struct Photo {
-    public static let blank = Photo(asset: nil)
+public class Photo {
+    public static let blank = Photo()
     
-    public let asset: PHAsset?
+    public var asset: PHAsset?
     
     public var id: String {
         return asset?.localIdentifier ?? ""
     }
     
-    public init(asset: PHAsset?) {
-        self.asset = asset
-    }
+    fileprivate init() {}
     
     public func hasLocalAsset() -> Bool {
         return asset != nil
+    }
+    
+    public class Builder {
+        fileprivate let photo: Photo
+        
+        fileprivate init() {
+            photo = Photo()
+        }
+        
+        /// Set the photo's asset instance.
+        ///
+        /// - Parameter asset: A PHAsset instance.
+        /// - Returns: The current Builder instance.
+        public func with(asset: PHAsset?) -> Builder {
+            photo.asset = asset
+            return self
+        }
+        
+        public func build() -> Photo {
+            return photo
+        }
+    }
+}
+
+public extension Photo {
+    public static func builder() -> Builder {
+        return Builder()
     }
 }
 

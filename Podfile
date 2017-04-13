@@ -8,12 +8,11 @@ target 'SwiftMediaContentHandler' do
   # Pods for SwiftMediaContentHandler
   pod 'SDWebImage/WebP'
   pod 'SwiftUtilities/Main'
-  pod 'SwiftUtilitiesTests/Main'
 
   target 'SwiftMediaContentHandlerTests' do
     inherit! :search_paths
     # Pods for testing
-#    pod 'SwiftUtilitiesTests/Main'
+    pod 'SwiftUtilitiesTests/Main'
   end
 
 end

@@ -179,8 +179,13 @@ public extension MediaDatabase {
             else {
                 return
             }
+            
+            let album = Album.builder()
+                .with(name: title)
+                .add(assets: assets)
+                .build()
 
-            result.append(Album(name: title, photos: assets))
+            result.append(album)
         })
 
         return result
@@ -191,7 +196,8 @@ public extension MediaDatabase {
     /// - Parameter fetch: The PHFetchResult to pull assets from.
     /// - Returns: An Array of PHAsset.
     fileprivate func extractAsset(from fetch: PHFetchResult<PHAsset>)
-        -> [PHAsset]? {
+        -> [PHAsset]?
+    {
         guard fetch.count > 0 else {
             return nil
         }

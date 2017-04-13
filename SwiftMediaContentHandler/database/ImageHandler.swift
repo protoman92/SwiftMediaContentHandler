@@ -86,7 +86,7 @@ public class ImageHandler: NSObject {
         }
     }
     
-    public override init() {
+    override init() {
         fastOptions = PHImageRequestOptions()
         super.init()
         fastOptions.isSynchronous = false
@@ -128,6 +128,34 @@ public class ImageHandler: NSObject {
     
     /// Stop caching UIimage objects.
     public func stopAssetCache() {}
+    
+    /// Reactively request an image and emit an UIImage, or an Error.
+    ///
+    /// - Parameter request: A Request instance.
+    /// - Returns: An Observable instance.
+    public func rxRequest(with request: Request) -> Observable<UIImage> {
+        return Observable
+            .create({(observer) in
+                let completion: (UIImage?, Error?) -> Void = {
+                    if let image = $0.0 {
+                        observer.onNext(image)
+                        observer.onCompleted()
+                    } else if let error = $0.1 {
+                        observer.onError(error)
+                    } else {
+                        observer.onCompleted()
+                    }
+                }
+                
+                self.request(with: request.builder()
+                    .with(request: request)
+                    .with(completion: completion)
+                    .build())
+                
+                return Disposables.create()
+            })
+            .applyCommonSchedulers()
+    }
     
     public class Builder {
         fileprivate let handler: ImageHandler
@@ -353,45 +381,17 @@ public extension ImageHandler {
     /// of request.
     ///
     /// - Parameter request: A Request instance.
-    public func request(with request: Request) {
-        switch request {
+    public func request(with imageRequest: Request) {
+        switch imageRequest {
         case let webRequest as WebRequest:
-            self.request(with: webRequest)
+            self.requestRemotely(with: webRequest)
             
         case let localRequest as LocalRequest:
-            self.request(with: localRequest)
+            self.requestLocally(with: localRequest)
             
         default:
             debugException()
         }
-    }
-    
-    /// Reactively request an image and emit an UIImage, or an Error.
-    ///
-    /// - Parameter request: A Request instance.
-    /// - Returns: An Observable instance.
-    public func rxRequest(with request: Request) -> Observable<UIImage> {
-        return Observable
-            .create({(observer) in
-                let completion: (UIImage?, Error?) -> Void = {
-                    if let image = $0.0 {
-                        observer.onNext(image)
-                        observer.onCompleted()
-                    } else if let error = $0.1 {
-                        observer.onError(error)
-                    } else {
-                        observer.onCompleted()
-                    }
-                }
-                
-                self.request(with: request.builder()
-                    .with(request: request)
-                    .with(completion: completion)
-                    .build())
-                
-                return Disposables.create()
-            })
-            .applyCommonSchedulers()
     }
 }
 
