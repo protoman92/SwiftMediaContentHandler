@@ -10,10 +10,12 @@ import RxSwift
 import SwiftUtilities
 import SwiftUtilitiesTests
 
-class TestImageHandler: ImageHandler {
+class TestMediaHandler: MediaHandler {
     let request_withBaseRequest: FakeDetails
     let request_withWebRequest: FakeDetails
+    let request_withWebImageRequest: FakeDetails
     let request_withLocalRequest: FakeDetails
+    let request_withLocaImageRequest: FakeDetails
     let rxRequest_withBaseRequest: FakeDetails
     
     var fetchActualData: Bool
@@ -27,40 +29,51 @@ class TestImageHandler: ImageHandler {
         super.init()
     }
     
-    override func request(with request: ImageHandler.Request) {
+    override func requestMedia(with request: MediaRequest,
+                               andThen complete: @escaping MediaCallback) {
         request_withBaseRequest.incrementMethodCount()
         request_withBaseRequest.addParameters(request)
-        super.request(with: request)
+        super.requestMedia(with: request, andThen: complete)
     }
     
-    override func requestRemotely(with request: ImageHandler.WebRequest) {
+    override func requestWebMedia(with request: WebRequest,
+                                  andThen complete: @escaping MediaCallback) {
         request_withWebRequest.incrementMethodCount()
         request_withWebRequest.addParameters(request)
-        
-        if (fetchActualData) {
-            super.requestRemotely(with: request)
-        }
+        super.requestWebMedia(with: request, andThen: complete)
     }
     
-    override func requestLocally(with request: ImageHandler.LocalRequest) {
+    override func requestLocalMedia(with request: LocalRequest,
+                                    andThen complete: @escaping MediaCallback) {
         request_withLocalRequest.incrementMethodCount()
         request_withLocalRequest.addParameters(request)
+        super.requestLocalMedia(with: request, andThen: complete)
+    }
+    
+    override func requestLocalImage(with request: LocalImageRequest,
+                                    andThen complete: @escaping MediaCallback) {
+        request_withLocaImageRequest.incrementMethodCount()
+        request_withLocaImageRequest.addParameters(request)
         
         if fetchActualData {
-            super.requestLocally(with: request)
+            super.requestLocalImage(with: request, andThen: complete)
         }
     }
     
-    override func rxRequest(with request: ImageHandler.Request)
-        -> Observable<UIImage>
-    {
+    override func requestWebImage(with request: WebImageRequest,
+                                  andThen complete: @escaping MediaCallback) {
+        request_withWebImageRequest.incrementMethodCount()
+        request_withWebImageRequest.addParameters(request)
+    }
+    
+    override func rxRequest(with request: MediaRequest) -> Observable<Any> {
         rxRequest_withBaseRequest.incrementMethodCount()
         rxRequest_withBaseRequest.addParameters(request)
         return super.rxRequest(with: request)
     }
 }
 
-extension TestImageHandler: FakeProtocol {
+extension TestMediaHandler: FakeProtocol {
     func reset() {
         [
             request_withBaseRequest,

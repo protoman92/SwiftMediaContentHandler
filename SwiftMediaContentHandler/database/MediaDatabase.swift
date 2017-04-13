@@ -18,26 +18,25 @@ public class MediaDatabase: NSObject {
     }
     
     /// Return all Photo instances fetched from PHPhotoLibrary.
-    public var allPhotos: [Photo] {
+    public var allPhotos: [Media] {
         return allPhotos(from: albums)
     }
     
     /// We can use this imageHandler instance to cache and load images.
-    public var imageHandler: ImageHandlerProtocol?
+    public var imageHandler: MediaHandlerProtocol?
     
-    fileprivate var albums = [Album]() {
-        willSet {
-            imageHandler?.stopAssetCache()
-        }
-        
-        didSet {
-            imageHandler?.cache(assets: allPhotos(from: albums),
-                                targetSize: ImageSize.SQUARED_MEDIUM)
-        }
+    /// When a Photo library change is detected, call onNext.
+    fileprivate let photoLibraryListener: PublishSubject<Any>
+    
+    /// This Album array contains PHAsset instances that can be queried later
+    /// using MediaHandler.
+    fileprivate var albums = [Album]()
+    
+    fileprivate override init() {
+        photoLibraryListener = PublishSubject<Any>()
+        super.init()
+        PHPhotoLibrary.shared().register(self)
     }
-    
-    /// A PHFetchResult instance.
-    fileprivate var fetchResult: PHFetchResult<PHAssetCollection>?
     
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
@@ -47,15 +46,12 @@ public class MediaDatabase: NSObject {
     ///
     /// - Parameter albums: An Array of Album instances.
     /// - Returns: An Array of Photo instances.
-    fileprivate func allPhotos(from albums: [Album]) -> [Photo] {
-        return albums.map({$0.photos}).reduce([Photo](), +)
+    fileprivate func allPhotos(from albums: [Album]) -> [Media] {
+        return albums.map({$0.medias}).reduce([Media](), +)
     }
     
     /// Cache full-sized images from the album Array.
-    public func cacheHighQualityPhotos() {
-        imageHandler?.cache(assets: allPhotos(from: albums),
-                            targetSize: ImageSize.SQUARED_FULL)
-    }
+    public func cacheHighQualityPhotos() {}
     
     public class Builder {
         fileprivate let database: MediaDatabase
@@ -68,7 +64,7 @@ public class MediaDatabase: NSObject {
         ///
         /// - Parameter imageHandler: An ImageHandler instance.
         /// - Returns: The current Builder instance.
-        public func with(imageHandler: ImageHandlerProtocol) -> Builder {
+        public func with(imageHandler: MediaHandlerProtocol) -> Builder {
             database.imageHandler = imageHandler
             return self
         }
@@ -115,100 +111,85 @@ public extension MediaDatabase {
         guard PHPhotoLibrary.authorizationStatus() == .authorized else {
             return
         }
-        
-        background(.background) {
-            self.loadSmartAlbums()
-        }
     }
-
+    
     /// Load smart albums.
-    fileprivate func loadSmartAlbums() {
-        let library = PHPhotoLibrary.shared()
-        library.unregisterChangeObserver(self)
-        library.register(self)
-        
+    ///
+    /// - Returns: An Observable instance.
+    public func rxLoadSmartAlbums() -> Observable<Album> {
         let fetch = PHAssetCollection.fetchAssetCollections(
             with: .smartAlbum,
             subtype: .any,
             options: nil)
         
-        self.fetchResult = fetch
-        
-        if let albums = loadImages(from: fetch) {
-            self.albums = albums
-        }
+        return rxLoadAlbums(fetch: fetch)
     }
-
-//    func loadAlbums() {
-//        let albumOptions = PHFetchOptions()
-//
-//        albumOptions.predicate = NSPredicate(format: "estimatedAssetCount > 0")
-//        
-//        let allAlbums = PHAssetCollection.fetchAssetCollectionsWithType(
-//            .Album,
-//            subtype: .Any,
-//            options: albumOptions)
-//    }
     
-    /// Load images from a PHFetchResult.
+    /// Load albums from a PHFetchResult.
     ///
-    /// - Parameter fetch: The PHFetchResult to fetch images from.
-    /// - Returns: An Array of Album instances.
-    fileprivate func loadImages(from fetch: PHFetchResult<PHAssetCollection>)
-        -> [Album]? {
-        guard fetch.count > 0 else {
-            return nil
-        }
-    
-        var result = [Album]()
+    /// - Parameter fetch: A PHFetchResult instance.
+    /// - Returns: An Observable instance.
+    fileprivate func rxLoadAlbums(fetch: PHFetchResult<PHAssetCollection>)
+        -> Observable<Album>
+    {
         let options = PHFetchOptions()
-            
+        
         options.predicate = NSPredicate(format: "mediaType = %i",
                                         PHAssetMediaType.image.rawValue)
-            
-        options.sortDescriptors = [NSSortDescriptor(key: "creationDate",
-                                                    ascending: false)]
-
-        fetch.enumerateObjects({
-            let fetchResult = PHAsset.fetchAssets(in: $0.0, options: options)
-
-            guard
-                fetchResult.count > 0,
-                let title = $0.0.localizedTitle,
-                let assets = self.extractAsset(from: fetchResult)
-            else {
-                return
-            }
-            
-            let album = Album.builder()
-                .with(name: title)
-                .add(assets: assets)
-                .build()
-
-            result.append(album)
-        })
-
-        return result
+        
+        options.sortDescriptors = [
+            NSSortDescriptor(key: "creationDate", ascending: false)
+        ]
+        
+        return Observable<PHAssetCollection>
+            .create({observer in
+                fetch.enumerateObjects({
+                    observer.onNext($0.0)
+                    
+                    if $0.1 == fetch.count - 1 {
+                        observer.onCompleted()
+                    }
+                })
+                
+                return Disposables.create()
+            })
+            .flatMap({
+                self.rxLoadAlbums(collection: $0, options: options)
+            })
     }
     
-    /// Extract all PHAsset from a PHFetchResult.
+    
+    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
     ///
-    /// - Parameter fetch: The PHFetchResult to pull assets from.
-    /// - Returns: An Array of PHAsset.
-    fileprivate func extractAsset(from fetch: PHFetchResult<PHAsset>)
-        -> [PHAsset]?
+    /// - Parameters:
+    ///   - collection: The PHAssetCollection to get PHAsset instances.
+    ///   - options: The PHFetchOptions to use for the fetching.
+    /// - Returns: An Observable instance.
+    fileprivate
+    func rxLoadAlbums(collection: PHAssetCollection, options: PHFetchOptions)
+        -> Observable<Album>
     {
-        guard fetch.count > 0 else {
-            return nil
-        }
-
-        var result = [PHAsset]()
+        let result = PHAsset.fetchAssets(in: collection, options: options)
             
-        fetch.enumerateObjects({
-            result.append($0.0)
-        })
-            
-        return result
+        return Observable<PHAsset>
+            .create({observer in
+                result.enumerateObjects({
+                    observer.onNext($0.0)
+                    
+                    if $0.1 == result.count - 1 {
+                        observer.onCompleted()
+                    }
+                })
+                
+                return Disposables.create()
+            })
+            .toArray()
+            .map({Album.builder()
+                /// If the album does not have a title, leave empty and
+                /// delegate to caller.
+                .with(name: collection.localizedTitle ?? "")
+                .add(assets: $0)
+                .build()})
     }
 }
 

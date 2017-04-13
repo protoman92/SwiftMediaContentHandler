@@ -11,27 +11,27 @@ import SwiftUtilities
 
 public class Album: Collection {
     public var startIndex: Int {
-        return photos.startIndex
+        return medias.startIndex
     }
     
     public var endIndex: Int {
-        return photos.endIndex
+        return medias.endIndex
     }
     
     public func index(after i: Int) -> Int {
         return Swift.min(i + 1, endIndex)
     }
     
-    public subscript(index: Int) -> Photo {
-        return photos[index]
+    public subscript(index: Int) -> Media {
+        return medias[index]
     }
     
     public var name: String
-    public var photos: [Photo]
+    public var medias: [Media]
     
     fileprivate init() {
         name = ""
-        photos = []
+        medias = []
     }
     
     public class Builder {
@@ -54,8 +54,8 @@ public class Album: Collection {
         ///
         /// - Parameter photos: An Array of Photo instances.
         /// - Returns: The current Builder instance.
-        public func add(photos: [Photo]) -> Builder {
-            album.photos.append(uniqueContentsOf: photos)
+        public func add(medias: [Media]) -> Builder {
+            album.medias.append(uniqueContentsOf: medias)
             return self
         }
         
@@ -65,8 +65,8 @@ public class Album: Collection {
         /// - Parameter assets: An Array of PHAsset instances.
         /// - Returns: The current Builder instance.
         public func add(assets: [PHAsset]) -> Builder {
-            return add(photos: assets.map({
-                Photo.builder().with(asset: $0).build()
+            return add(medias: assets.map({
+                Media.builder().with(asset: $0).build()
             }))
         }
         
@@ -85,7 +85,7 @@ public extension Album {
 public protocol AlbumProtocol: class {
     var name: String { get set }
     
-    var photos: [Photo] { get set }
+    var medias: [Media] { get set }
 }
 
 extension Album: AlbumProtocol {}
@@ -100,7 +100,7 @@ public extension Array where Element: AlbumProtocol {
             let index = index(where: {$0.name == album.name}),
             let existing = element(at: index)
         {
-            existing.photos.appendOrReplace(uniqueContentsOf: album.photos)
+            existing.medias.appendOrReplace(uniqueContentsOf: album.medias)
         } else {
             self.append(album)
         }

@@ -1,5 +1,5 @@
 //
-//  Photo.swift
+//  Media.swift
 //  Heartland Chefs
 //
 //  Created by Hai Pham on 1/16/17.
@@ -10,8 +10,8 @@ import Photos
 import SwiftUtilities
 
 /// This struct hides PHAsset implementation.
-public class Photo {
-    public static let blank = Photo()
+public class Media {
+    public static let blank = Media()
     
     public var asset: PHAsset?
     
@@ -26,41 +26,41 @@ public class Photo {
     }
     
     public class Builder {
-        fileprivate let photo: Photo
+        fileprivate let media: Media
         
         fileprivate init() {
-            photo = Photo()
+            media = Media()
         }
         
-        /// Set the photo's asset instance.
+        /// Set the Media's asset instance.
         ///
         /// - Parameter asset: A PHAsset instance.
         /// - Returns: The current Builder instance.
         public func with(asset: PHAsset?) -> Builder {
-            photo.asset = asset
+            media.asset = asset
             return self
         }
         
-        public func build() -> Photo {
-            return photo
+        public func build() -> Media {
+            return media
         }
     }
 }
 
-public extension Photo {
+public extension Media {
     public static func builder() -> Builder {
         return Builder()
     }
 }
 
-public protocol PhotoProtocol {
+public protocol MediaProtocol {
     var asset: PHAsset? { get }
 }
 
-extension Photo: PhotoProtocol {}
+extension Media: MediaProtocol {}
 
-extension Photo: CustomComparisonProtocol {
-    public func equals(object: Photo?) -> Bool {
+extension Media: CustomComparisonProtocol {
+    public func equals(object: Media?) -> Bool {
         return object?.id == id
     }
 }
@@ -71,13 +71,13 @@ extension PHAsset: CustomComparisonProtocol {
     }
 }
 
-extension Photo: Equatable {}
+extension Media: Equatable {}
 
-public func ==(first: Photo, second: Photo) -> Bool {
+public func ==(first: Media, second: Media) -> Bool {
     return first.id == second.id
 }
 
-extension Array where Element: PhotoProtocol {
+extension Array where Element: MediaProtocol {
     public var assets: [PHAsset] {
         return flatMap({$0.asset})
     }
