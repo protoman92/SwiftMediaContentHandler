@@ -40,9 +40,11 @@ class ImageHandlerTest: XCTestCase {
         mediaHandler.requestMedia(with: request, andThen: {_,_ in})
         
         // Then
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCallCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCallCount, 1)
-        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCallCount, 0)
+        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withWebImageRequest.methodCount, 1)
+        XCTAssertTrue(mediaHandler.request_withLocalRequest.methodNotCalled)
+        XCTAssertTrue(mediaHandler.request_withLocaImageRequest.methodNotCalled)
     }
     
     func test_mock_loadLocalImage_shouldCallCorrectMethods() {
@@ -53,9 +55,11 @@ class ImageHandlerTest: XCTestCase {
         mediaHandler.requestMedia(with: request, andThen: {_,_ in})
         
         // Then
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCallCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCallCount, 0)
-        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCallCount, 1)
+        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
+        XCTAssertTrue(mediaHandler.request_withWebRequest.methodNotCalled)
+        XCTAssertTrue(mediaHandler.request_withWebImageRequest.methodNotCalled)
     }
     
     func test_mock_rxLoadWebImage_shouldCallCorrectMethods() {
@@ -69,9 +73,12 @@ class ImageHandlerTest: XCTestCase {
         scheduler.start()
         
         // Then
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCallCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCallCount, 1)
-        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCallCount, 0)
+        XCTAssertEqual(mediaHandler.rxRequest_withBaseRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withWebImageRequest.methodCount, 1)
+        XCTAssertTrue(mediaHandler.request_withLocalRequest.methodNotCalled)
+        XCTAssertTrue(mediaHandler.request_withLocaImageRequest.methodNotCalled)
     }
     
     func test_mock_rxLoadLocalImage_shouldCallCorrectMethods() {
@@ -85,8 +92,10 @@ class ImageHandlerTest: XCTestCase {
         scheduler.start()
         
         // Then
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCallCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCallCount, 0)
-        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCallCount, 1)
+        XCTAssertEqual(mediaHandler.rxRequest_withBaseRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCount, 1)
+        XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
+        XCTAssertTrue(mediaHandler.request_withWebRequest.methodNotCalled)
+        XCTAssertTrue(mediaHandler.request_withWebImageRequest.methodNotCalled)
     }
 }

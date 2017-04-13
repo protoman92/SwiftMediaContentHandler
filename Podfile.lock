@@ -37,7 +37,7 @@ PODS:
   - SwiftUtilities/Main (1.1.1):
     - RxCocoa (~> 3.0)
     - RxSwift (~> 3.0)
-  - SwiftUtilitiesTests/Main (1.1.1):
+  - SwiftUtilitiesTests/Main (1.1.2):
     - RxBlocking (~> 3.0)
     - RxCocoa (~> 3.0)
     - RxSwift (~> 3.0)
@@ -56,7 +56,7 @@ SPEC CHECKSUMS:
   RxTest: beb6beb882cf1dcac5fc9fdbd4760a5254e7f3a6
   SDWebImage: 76a6348bdc74eb5a55dd08a091ef298e56b55e41
   SwiftUtilities: 6215474d9fdd6480bbc99a335e3c6dde0ec19555
-  SwiftUtilitiesTests: 966c737530b32134d0901f5c0020d22255e65eff
+  SwiftUtilitiesTests: 4b38b684b67f3166b5e58158023d4ba33f1d6ffd
 
 PODFILE CHECKSUM: 8fc304f3980f4e59cf8fc27d16796a6d3140bc9c
 
