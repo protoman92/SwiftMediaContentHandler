@@ -53,6 +53,12 @@ public extension LocalMedia {
     }
 }
 
+extension LocalMedia: CustomStringConvertible {
+    public var description: String {
+        return String(describing: asset)
+    }
+}
+
 public protocol LocalMediaProtocol {
     var asset: PHAsset? { get }
 }

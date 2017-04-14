@@ -22,8 +22,8 @@ public class MediaDatabase: NSObject {
         return allPhotos(from: albums)
     }
     
-    /// We can use this imageHandler instance to cache and load images.
-    public var imageHandler: MediaHandlerProtocol?
+    /// We can use this mediaHandler instance to cache and load media.
+    public var mediaHandler: MediaHandlerProtocol?
     
     /// We can add media types to fetch with PHFetchRequest.
     fileprivate var mediaTypes: [MediaType]
@@ -64,12 +64,12 @@ public class MediaDatabase: NSObject {
             database = MediaDatabase()
         }
         
-        /// Set the database's imageHandler instance.
+        /// Set the database's mediaHandler instance.
         ///
-        /// - Parameter imageHandler: An ImageHandler instance.
+        /// - Parameter mediaHandler: An mediaHandler instance.
         /// - Returns: The current Builder instance.
-        public func with(imageHandler: MediaHandlerProtocol) -> Builder {
-            database.imageHandler = imageHandler
+        public func with(mediaHandler: MediaHandlerProtocol) -> Builder {
+            database.mediaHandler = mediaHandler
             return self
         }
         
@@ -95,41 +95,39 @@ public extension MediaDatabase {
     }
 }
 
-// MARK: - Error messages
-public extension MediaDatabase {
-    public static var permissionNotGranted: String {
-        return "media.error.permissionNotGranted".localized
-    }
-}
-
 public extension MediaDatabase {
     
-    /// Load all albums from PHPhotoLibrary with an authorization status.
-    public func loadAlbumWithPermission() {
-        loadAlbumWithPermission(status: PHPhotoLibrary.authorizationStatus())
-    }
-    
-    /// Load all albums from PHPhotoLibrary with an authorization status.
-    ///
-    /// - Parameter status: The active authorization status.
-    fileprivate func loadAlbumWithPermission(status: PHAuthorizationStatus) {
-        imageHandler?.checkAuthorization(status: status, completion: nil)
-        
-        switch status {
-        case .authorized:
-            loadSmartAlbums()
-            
-        case .notDetermined:
-            PHPhotoLibrary.requestAuthorization(loadAlbumWithPermission)
-            
-        default:
-            break
-        }
-    }
-    
-    /// Reload smart albums using the listener Subject.
+    /// Reload smart albums if the user has authorized access to 
+    /// PHPhotoLibrary.
     public func loadSmartAlbums() {
         photoLibraryListener.onNext(mediaTypes)
+    }
+    
+    /// Check for PHPhotoLibrary permission, and then load albums reactively
+    /// if authorized.
+    ///
+    /// - Returns: An Observable instance.
+    public func rxLoadSmartAlbums() -> Observable<Album> {
+        return photoLibraryListener
+            .flatMap({types in
+                self.rxAuthorize()
+                    .filter({$0 == .authorized})
+                    .throwIfEmpty(MediaError.permissionNotGranted)
+                    .flatMap({_ in self.rxLoadSmartAlbums(withTypes: types)})
+            })
+    }
+    
+    /// Check PHPhotoLibrary authorization.
+    ///
+    /// - Returns: An Observable instance.
+    public func rxAuthorize() -> Observable<PHAuthorizationStatus> {
+        return Observable<PHAuthorizationStatus>.create({observer in
+            PHPhotoLibrary.requestAuthorization() {
+                observer.onNext($0)
+            }
+            
+            return Disposables.create()
+        })
     }
     
     /// Load smart albums.
@@ -139,7 +137,7 @@ public extension MediaDatabase {
         -> Observable<Album>
     {
         guard PHPhotoLibrary.authorizationStatus() == .authorized else {
-            let error = Exception(MediaDatabase.permissionNotGranted)
+            let error = Exception(MediaError.permissionNotGranted)
             return Observable.error(error)
         }
         

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		59CAC75C7F574DD8369A6A69 /* Pods_SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EC7FDA16E624E604E71DEFF /* Pods_SwiftMediaContentHandler.framework */; };
 		85B923ED0AE7A8EB847C3317 /* Pods_SwiftMediaContentHandlerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */; };
+		D30D54521EA060BD00DD29D6 /* MediaError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30D54511EA060BD00DD29D6 /* MediaError.swift */; };
 		D31285F21E9F356D00F2AB64 /* SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */; };
 		D31285F91E9F356D00F2AB64 /* SwiftMediaContentHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = D31285EB1E9F356C00F2AB64 /* SwiftMediaContentHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D312860B1E9F366200F2AB64 /* MediaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286031E9F366200F2AB64 /* MediaHandler.swift */; };
@@ -25,6 +26,8 @@
 		D312861C1E9F380E00F2AB64 /* ImageSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286071E9F366200F2AB64 /* ImageSize.swift */; };
 		D312861D1E9F380E00F2AB64 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* LocalMedia.swift */; };
 		D312861E1E9F380E00F2AB64 /* ImageViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D312860A1E9F366200F2AB64 /* ImageViewProtocol.swift */; };
+		D313E5CA1EA0B64F0063F91F /* MediaError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30D54511EA060BD00DD29D6 /* MediaError.swift */; };
+		D313E5CC1EA0C8A80063F91F /* TestLocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */; };
 		D3C87B8A1E9F9AF0000BAB62 /* MediaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */; };
 		D3C87B931E9FB82A000BAB62 /* MediaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */; };
 		D3C87B9A1E9FDC3B000BAB62 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B991E9FDC3B000BAB62 /* MediaType.swift */; };
@@ -46,6 +49,7 @@
 		5329870531B3CC6679333B6C /* Pods-SwiftMediaContentHandlerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandlerTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandlerTests/Pods-SwiftMediaContentHandlerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6ED0E75D5BC4EB2A09F8763C /* Pods-SwiftMediaContentHandler.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandler.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandler/Pods-SwiftMediaContentHandler.debug.xcconfig"; sourceTree = "<group>"; };
 		78DCB540D0DE5B1E84340921 /* Pods-SwiftMediaContentHandlerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandlerTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandlerTests/Pods-SwiftMediaContentHandlerTests.release.xcconfig"; sourceTree = "<group>"; };
+		D30D54511EA060BD00DD29D6 /* MediaError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaError.swift; path = util/MediaError.swift; sourceTree = "<group>"; };
 		D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftMediaContentHandler.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D31285EB1E9F356C00F2AB64 /* SwiftMediaContentHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftMediaContentHandler.h; sourceTree = "<group>"; };
 		D31285EC1E9F356C00F2AB64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -60,6 +64,7 @@
 		D31286121E9F366C00F2AB64 /* MediaHandlerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHandlerTest.swift; sourceTree = "<group>"; };
 		D31286131E9F366C00F2AB64 /* TestMediaHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestMediaHandler.swift; sourceTree = "<group>"; };
 		D31286161E9F36A800F2AB64 /* SwiftUtilitiesTests.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUtilitiesTests.framework; path = "Pods/../build/Debug-iphoneos/SwiftUtilitiesTests/SwiftUtilitiesTests.framework"; sourceTree = "<group>"; };
+		D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestLocalMedia.swift; path = model/TestLocalMedia.swift; sourceTree = "<group>"; };
 		D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaRequest.swift; sourceTree = "<group>"; };
 		D3C87B991E9FDC3B000BAB62 /* MediaType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaType.swift; sourceTree = "<group>"; };
 		F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftMediaContentHandlerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +113,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D30D54501EA060AA00DD29D6 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				D30D54511EA060BD00DD29D6 /* MediaError.swift */,
+			);
+			name = util;
+			sourceTree = "<group>";
+		};
 		D31285DE1E9F356C00F2AB64 = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +144,7 @@
 		D31285EA1E9F356C00F2AB64 /* SwiftMediaContentHandler */ = {
 			isa = PBXGroup;
 			children = (
+				D30D54501EA060AA00DD29D6 /* util */,
 				D31286021E9F366200F2AB64 /* database */,
 				D31286051E9F366200F2AB64 /* model */,
 				D31286091E9F366200F2AB64 /* protocol */,
@@ -143,6 +157,7 @@
 		D31285F51E9F356D00F2AB64 /* SwiftMediaContentHandlerTests */ = {
 			isa = PBXGroup;
 			children = (
+				D313E5CD1EA0C8AB0063F91F /* model */,
 				D31286111E9F366C00F2AB64 /* database */,
 				D31285F81E9F356D00F2AB64 /* Info.plist */,
 			);
@@ -185,6 +200,14 @@
 				D31286131E9F366C00F2AB64 /* TestMediaHandler.swift */,
 			);
 			path = database;
+			sourceTree = "<group>";
+		};
+		D313E5CD1EA0C8AB0063F91F /* model */ = {
+			isa = PBXGroup;
+			children = (
+				D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */,
+			);
+			name = model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,6 +411,7 @@
 				D312860C1E9F366200F2AB64 /* MediaDatabase.swift in Sources */,
 				D3C87B9A1E9FDC3B000BAB62 /* MediaType.swift in Sources */,
 				D312860D1E9F366200F2AB64 /* Album.swift in Sources */,
+				D30D54521EA060BD00DD29D6 /* MediaError.swift in Sources */,
 				D312860F1E9F366200F2AB64 /* LocalMedia.swift in Sources */,
 				D3C87B8A1E9F9AF0000BAB62 /* MediaRequest.swift in Sources */,
 			);
@@ -397,6 +421,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D313E5CA1EA0B64F0063F91F /* MediaError.swift in Sources */,
 				D3C87B9E1EA00282000BAB62 /* MediaType.swift in Sources */,
 				D3C87B931E9FB82A000BAB62 /* MediaRequest.swift in Sources */,
 				D31286191E9F380E00F2AB64 /* MediaHandler.swift in Sources */,
@@ -406,6 +431,7 @@
 				D312861D1E9F380E00F2AB64 /* LocalMedia.swift in Sources */,
 				D312861E1E9F380E00F2AB64 /* ImageViewProtocol.swift in Sources */,
 				D31286151E9F366C00F2AB64 /* TestMediaHandler.swift in Sources */,
+				D313E5CC1EA0C8A80063F91F /* TestLocalMedia.swift in Sources */,
 				D31286141E9F366C00F2AB64 /* MediaHandlerTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -466,7 +492,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "-D DEBUG";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";

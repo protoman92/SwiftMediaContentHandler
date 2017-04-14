@@ -6,55 +6,47 @@
 //  Copyright © 2017 Swiften. All rights reserved.
 //
 
+import Photos
 import RxSwift
 import SwiftUtilities
 import SwiftUtilitiesTests
 
 class TestMediaHandler: MediaHandler {
-    let request_withBaseRequest: FakeDetails
-    let request_withWebRequest: FakeDetails
     let request_withWebImageRequest: FakeDetails
-    let request_withLocalRequest: FakeDetails
     let request_withLocaImageRequest: FakeDetails
-    let rxRequest_withBaseRequest: FakeDetails
     
     var fetchActualData: Bool
+    var isPhotoAccessAuthorized: Bool
     
     override init() {
-        request_withBaseRequest = FakeDetails.builder().build()
-        request_withWebRequest = FakeDetails.builder().build()
         request_withWebImageRequest = FakeDetails.builder().build()
-        request_withLocalRequest = FakeDetails.builder().build()
         request_withLocaImageRequest = FakeDetails.builder().build()
-        rxRequest_withBaseRequest = FakeDetails.builder().build()
         fetchActualData = true
+        isPhotoAccessAuthorized = true
         super.init()
     }
     
-    override func requestMedia(with request: MediaRequest,
-                               andThen complete: @escaping MediaCallback) {
-        request_withBaseRequest.onMethodCalled(withParameters: request)
-        super.requestMedia(with: request, andThen: complete)
-    }
-    
-    override func requestWebMedia(with request: WebRequest,
-                                  andThen complete: @escaping MediaCallback) {
-        request_withWebRequest.onMethodCalled(withParameters: request)
-        super.requestWebMedia(with: request, andThen: complete)
-    }
-    
-    override func requestLocalMedia(with request: LocalRequest,
-                                    andThen complete: @escaping MediaCallback) {
-        request_withLocalRequest.onMethodCalled(withParameters: request)
-        super.requestLocalMedia(with: request, andThen: complete)
+    /// To simulate authorization status, we can change isPhotoAccessAuthorized
+    /// flag.
+    ///
+    /// - Returns: An Observable instance.
+    override func rxIsAuthorized() -> Observable<Bool> {
+        if isPhotoAccessAuthorized {
+            return Observable.just(true)
+        } else {
+            return Observable.just(false)
+        }
     }
     
     override func requestLocalImage(with request: LocalImageRequest,
+                                    using manager: PHImageManager,
                                     andThen complete: @escaping MediaCallback) {
         request_withLocaImageRequest.onMethodCalled(withParameters: request)
         
         if fetchActualData {
-            super.requestLocalImage(with: request, andThen: complete)
+            super.requestLocalImage(with: request, using: manager, andThen: complete)
+        } else {
+            complete(nil, nil)
         }
     }
     
@@ -64,24 +56,17 @@ class TestMediaHandler: MediaHandler {
         
         if fetchActualData {
             super.requestWebImage(with: request, andThen: complete)
+        } else {
+            complete(nil, nil)
         }
-    }
-    
-    override func rxRequest(with request: MediaRequest) -> Observable<Any> {
-        rxRequest_withBaseRequest.onMethodCalled(withParameters: request)
-        return super.rxRequest(with: request)
     }
 }
 
 extension TestMediaHandler: FakeProtocol {
     func reset() {
         [
-            request_withBaseRequest,
-            request_withLocalRequest,
             request_withLocaImageRequest,
-            request_withWebRequest,
-            request_withWebImageRequest,
-            rxRequest_withBaseRequest
+            request_withWebImageRequest
         ].forEach({$0.reset()})
     }
 }

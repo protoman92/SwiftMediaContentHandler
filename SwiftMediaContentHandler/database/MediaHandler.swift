@@ -20,14 +20,6 @@ public protocol MediaHandlerProtocol {
     /// - Parameter request: An MediaRequest instance.
     /// - Returns: An Observable instance.
     func rxRequest(with request: MediaRequest) -> Observable<Any>
-    
-    /// Check permission to access Medias SDK.
-    ///
-    /// - Parameters:
-    ///   - status: The current authorization status.
-    ///   - completion: Completion closure.
-    func checkAuthorization(status: PHAuthorizationStatus,
-                            completion: ((Bool) -> Void)?)
 }
 
 public class MediaHandler: NSObject {
@@ -65,40 +57,38 @@ public class MediaHandler: NSObject {
     /// - Parameter request: A Request instance.
     /// - Returns: An Observable instance.
     public func rxRequest(with request: MediaRequest) -> Observable<Any> {
-        return Observable
-            .create({(observer) in
-                self.requestMedia(with: request) {
-                    if let media = $0.0 {
-                        observer.onNext(media)
-                        observer.onCompleted()
-                    } else if let error = $0.1 {
-                        observer.onError(error)
-                    } else {
-                        observer.onCompleted()
-                    }
-                }
-                
-                return Disposables.create()
-            })
-            .applyCommonSchedulers()
-    }
-    
-    /// Request media, either remotely or locally.
-    ///
-    /// - Parameter request: A Request instance.
-    public func requestMedia(with request: MediaRequest,
-                             andThen complete: @escaping MediaCallback) {
+        let source: Observable<Any>
+        
         switch request {
         case let request as WebRequest:
-            requestWebMedia(with: request, andThen: complete)
+            source = rxRequestWebMedia(with: request)
             
         case let request as LocalRequest:
-            requestLocalMedia(with: request, andThen: complete)
+            source = rxRequestLocalMedia(with: request)
             
         default:
-            debugException()
-            break
+            source = Observable.error(MediaError.mediaHandlerUnknownRequest)
         }
+        
+        return source.applyCommonSchedulers()
+    }
+    
+    /// Request media remotely with rx.
+    ///
+    /// - Parameter request: A WebRequest instance.
+    /// - Returns: An Observable instance.
+    public func rxRequestWebMedia(with request: WebRequest) -> Observable<Any> {
+        return Observable.create({observer in
+            self.requestWebMedia(with: request) {
+                if let result = $0.0 {
+                    observer.onNext(result)
+                } else if let error = $0.1 {
+                    observer.onError(error)
+                }
+            }
+            
+            return Disposables.create()
+        })
     }
     
     /// Request media remotely. This method delegates the work to other
@@ -127,8 +117,8 @@ public class MediaHandler: NSObject {
     public func requestWebImage(with request: WebImageRequest,
                                 andThen complete: @escaping MediaCallback) {
         guard let url = request.url else {
-            debugException()
-            complete(nil, nil)
+            let error = Exception(MediaError.mediaUnavailable)
+            mainThread {complete(nil, error)}
             return
         }
         
@@ -143,17 +133,104 @@ public class MediaHandler: NSObject {
         }
     }
     
+    /// Check if access to PHPhotoLibrary is authorized.
+    ///
+    /// - Returns: An Observable instance.
+    public func rxIsAuthorized() -> Observable<Bool> {
+        let status = PHPhotoLibrary.authorizationStatus()
+        return Observable.just(status).map({$0 == .authorized})
+    }
+    
+    /// Check authorization status from PHMediaLibrary. If media access is
+    /// granted, we can initialze the PHImageManager instances - this is done
+    /// so as to avoid crashes that may occur upon PHImageManager
+    /// initialization if permission is not granted.
+    ///
+    /// If authorization is granted, initiaze the phManager if it has yet to
+    /// be created.
+    ///
+    /// - Returns: An Observable instance.
+    public func rxGetPHImageManager() -> Observable<PHImageManager> {
+        
+        /// If phManager has already been set, emit it immediately.
+        if let phManager = self.phManager {
+            return Observable.just(phManager)
+        }
+        
+        return rxIsAuthorized()
+            .flatMap(rxGetPHImageManager)
+            .doOnNext(setPHImageManager)
+    }
+    
+    /// When permission is granted, we initialize phManager or throw an Error
+    /// otherwise.
+    ///
+    /// - Parameter granted: A Bool value.
+    ///
+    /// - Returns: An Observable instance.
+    fileprivate func rxGetPHImageManager(permissionGranted granted: Bool)
+        -> Observable<PHImageManager>
+    {
+        guard granted else {
+            return Observable.error(MediaError.permissionNotGranted)
+        }
+        
+        let phManager = PHImageManager()
+        return Observable.just(phManager)
+    }
+    
+    /// Set the PHImageManager instance.
+    ///
+    /// - Parameter manager: A PHImageManager instance.
+    fileprivate func setPHImageManager(_ manager: PHImageManager) {
+        if self.phManager == nil {
+            self.phManager = manager
+        }
+    }
+    
+    /// Request media locally with rx.
+    ///
+    /// - Parameter request: A LocalRequest instance.
+    /// - Returns: An Observable instance.
+    public func rxRequestLocalMedia(with request: LocalRequest)
+        -> Observable<Any>
+    {
+        return rxGetPHImageManager()
+            .flatMap({manager in
+                Observable<Any>.create({observer in
+                    self.requestLocalMedia(with: request, using: manager) {
+                        if let result = $0.0 {
+                            observer.onNext(result)
+                        } else if let error = $0.1 {
+                            observer.onError(error)
+                        } else {
+                            // This error should not be expected. This means
+                            // all handlers failed to return any response.
+                            let error = Exception(MediaError.mediaUnavailable)
+                            observer.onError(error)
+                        }
+                        
+                        observer.onCompleted()
+                    }
+                    
+                    return Disposables.create()
+                })
+            })
+    }
+    
     /// Request media locally. This method delegates the work to other
     /// appropriate methods, depending on the request type.
     ///
     /// - Parameters:
     ///   - request: A LocalRequest instance.
+    ///   - manager: A PHImageManager instance.
     ///   - complete: Completion closure.
     public func requestLocalMedia(with request: LocalRequest,
+                                  using manager: PHImageManager,
                                   andThen complete: @escaping MediaCallback) {
         switch request {
         case let request as LocalImageRequest:
-            requestLocalImage(with: request, andThen: complete)
+            requestLocalImage(with: request, using: manager, andThen: complete)
             
         default:
             debugException()
@@ -165,21 +242,20 @@ public class MediaHandler: NSObject {
     ///
     /// - Parameters:
     ///   - request: A LocalImageRequest instance.
+    ///   - manager: A PHImageManager instance.
     ///   - complete: Completion closure.
     public func requestLocalImage(with request: LocalImageRequest,
+                                  using manager: PHImageManager,
                                   andThen complete: @escaping MediaCallback) {
-        guard
-            let phManager = self.phManager,
-            let asset = request.mediaAsset?.asset
-        else {
-            debugException()
-            mainThread {complete(nil, nil)}
+        guard let asset = request.mediaAsset?.asset else {
+            let error = Exception(MediaError.mediaUnavailable)
+            mainThread {complete(nil, error)}
             return
         }
         
         /// If a size is specified, resize the image.
         if let size = request.imageSize {
-            phManager.requestImage(
+            manager.requestImage(
                 for: asset,
                 targetSize: size,
                 contentMode: .aspectFill,
@@ -191,10 +267,7 @@ public class MediaHandler: NSObject {
         } else {
             // We are requesting raw data from the local database, and then
             // converting it to an UIImage.
-            phManager.requestImageData(
-                for: asset,
-                options: nil
-            ) {
+            manager.requestImageData(for: asset, options: nil) {
                 guard let data = $0.0, let image = UIImage(data: data) else {
                     mainThread {complete(nil, nil)}
                     return
@@ -231,61 +304,4 @@ public extension MediaHandler {
     public static func builder() -> Builder {
         return Builder()
     }
-}
-
-public extension MediaHandler {
-    
-    /// Check authorization status from PHMediaLibrary.
-    ///
-    /// - Parameter completion: Completion closure.
-    public func checkAuthorization(completion: ((Bool) -> Void)?) {
-        checkAuthorization(status: PHPhotoLibrary.authorizationStatus(),
-                           completion: completion)
-    }
-    
-    /// Check authorization status from PHMediaLibrary. If media access is
-    /// granted, we can initialze the PHImageManager instances - this is done
-    /// so as to avoid crashes that may occur upon PHImageManager 
-    /// initialization if permission is not granted.
-    ///
-    /// This method should be called when the app is first started.
-    ///
-    /// - Parameters:
-    ///   - status: The authorization status being checked.
-    ///
-    /// - Returns: An Observable instance.
-    public func rxCheckAuthorization(status: PHAuthorizationStatus)
-        -> Observable<Bool>
-    {
-        return Observable
-            .create({
-                switch status {
-                case .authorized:
-                    $0.onNext(true)
-                    
-                default:
-                    $0.onNext(false)
-                }
-                
-                $0.onCompleted()
-                return Disposables.create()
-            })
-            .doOnNext(onPermissionChecked)
-    }
-    
-    fileprivate func onPermissionChecked(_ granted: Bool) {
-        if granted && phManager == nil {
-            phManager = PHImageManager()
-        }
-    }
-}
-
-extension MediaHandler: MediaHandlerProtocol {
-    /// Check permission to access Medias SDK.
-    ///
-    /// - Parameters:
-    ///   - status: The current authorization status.
-    ///   - completion: Completion closure.
-    public func checkAuthorization(status: PHAuthorizationStatus,
-                                   completion: ((Bool) -> Void)?) {}
 }

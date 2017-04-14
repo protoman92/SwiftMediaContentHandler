@@ -6,6 +6,7 @@
 //  Copyright © 2017 Swiften. All rights reserved.
 //
 
+import Photos
 import RxSwift
 import RxTest
 import RxBlocking
@@ -14,6 +15,7 @@ import XCTest
 class ImageHandlerTest: XCTestCase {
     fileprivate var mediaHandler: TestMediaHandler!
     fileprivate var remoteUrl: String!
+    fileprivate let expectationTimeout: TimeInterval = 5
     
     override func setUp() {
         super.setUp()
@@ -32,70 +34,50 @@ class ImageHandlerTest: XCTestCase {
         mediaHandler.reset()
     }
     
-    func test_mock_loadWebImage_shouldCallCorrectMethods() {
-        // Setup
-        let request = WebImageRequest.builder().with(url: remoteUrl).build()
-        
-        // When
-        mediaHandler.requestMedia(with: request, andThen: {_,_ in})
-        
-        // Then
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebImageRequest.methodCount, 1)
-        XCTAssertTrue(mediaHandler.request_withLocalRequest.methodNotCalled)
-        XCTAssertTrue(mediaHandler.request_withLocaImageRequest.methodNotCalled)
-    }
-    
-    func test_mock_loadLocalImage_shouldCallCorrectMethods() {
-        // Setup
-        let request = LocalImageRequest.builder().with(media: LocalMedia.blank).build()
-        
-        // When
-        mediaHandler.requestMedia(with: request, andThen: {_,_ in})
-        
-        // Then
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
-        XCTAssertTrue(mediaHandler.request_withWebRequest.methodNotCalled)
-        XCTAssertTrue(mediaHandler.request_withWebImageRequest.methodNotCalled)
-    }
-    
     func test_mock_rxLoadWebImage_shouldCallCorrectMethods() {
         // Setup
         let request = WebImageRequest.builder().with(url: remoteUrl).build()
         let scheduler = TestScheduler(initialClock: 0)
         let observer = scheduler.createObserver(Any.self)
+        let expect = expectation(description: "Should have worked")
         
         // When
-        _ = mediaHandler.rxRequest(with: request).subscribe(observer)
+        _ = mediaHandler
+            .rxRequest(with: request)
+            .doOnCompleted({
+                print("WTF")
+            })
+            .doOnCompleted(expect.fulfill)
+            .subscribe(observer)
+        
         scheduler.start()
         
         // Then
-        XCTAssertEqual(mediaHandler.rxRequest_withBaseRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withBaseRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withWebRequest.methodCount, 1)
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
         XCTAssertEqual(mediaHandler.request_withWebImageRequest.methodCount, 1)
-        XCTAssertTrue(mediaHandler.request_withLocalRequest.methodNotCalled)
         XCTAssertTrue(mediaHandler.request_withLocaImageRequest.methodNotCalled)
     }
     
     func test_mock_rxLoadLocalImage_shouldCallCorrectMethods() {
         // Setup
-        let request = LocalImageRequest.builder().with(media: LocalMedia.blank).build()
+        let request = LocalImageRequest.builder()
+            .with(media: LocalMedia.fake)
+            .build()
+        
         let scheduler = TestScheduler(initialClock: 0)
         let observer = scheduler.createObserver(Any.self)
+        let expect = expectation(description: "Should have worked")
         
         // When
-        _ = mediaHandler.rxRequest(with: request).subscribe(observer)
+        _ = mediaHandler.rxRequest(with: request)
+            .doOnCompleted(expect.fulfill)
+            .subscribe(observer)
+        
         scheduler.start()
         
         // Then
-        XCTAssertEqual(mediaHandler.rxRequest_withBaseRequest.methodCount, 1)
-        XCTAssertEqual(mediaHandler.request_withLocalRequest.methodCount, 1)
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
         XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
-        XCTAssertTrue(mediaHandler.request_withWebRequest.methodNotCalled)
         XCTAssertTrue(mediaHandler.request_withWebImageRequest.methodNotCalled)
     }
 }
