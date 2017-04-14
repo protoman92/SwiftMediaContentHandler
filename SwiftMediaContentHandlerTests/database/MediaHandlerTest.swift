@@ -44,9 +44,6 @@ class ImageHandlerTest: XCTestCase {
         // When
         _ = mediaHandler
             .rxRequest(with: request)
-            .doOnCompleted({
-                print("WTF")
-            })
             .doOnCompleted(expect.fulfill)
             .subscribe(observer)
         

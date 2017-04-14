@@ -17,12 +17,14 @@ class TestMediaHandler: MediaHandler {
     
     var fetchActualData: Bool
     var isPhotoAccessAuthorized: Bool
+    var returnValidMedia: Bool
     
     override init() {
         request_withWebImageRequest = FakeDetails.builder().build()
         request_withLocaImageRequest = FakeDetails.builder().build()
         fetchActualData = true
         isPhotoAccessAuthorized = true
+        returnValidMedia = true
         super.init()
     }
     
@@ -44,9 +46,15 @@ class TestMediaHandler: MediaHandler {
         request_withLocaImageRequest.onMethodCalled(withParameters: request)
         
         if fetchActualData {
-            super.requestLocalImage(with: request, using: manager, andThen: complete)
+            super.requestLocalImage(with: request,
+                                    using: manager,
+                                    andThen: complete)
         } else {
-            complete(nil, nil)
+            if returnValidMedia {
+                complete(UIImage(), nil)
+            } else {
+                complete(nil, Exception(MediaError.mediaUnavailable))
+            }
         }
     }
     
@@ -57,7 +65,11 @@ class TestMediaHandler: MediaHandler {
         if fetchActualData {
             super.requestWebImage(with: request, andThen: complete)
         } else {
-            complete(nil, nil)
+            if returnValidMedia {
+                complete(UIImage(), nil)
+            } else {
+                complete(nil, Exception(MediaError.mediaUnavailable))
+            }
         }
     }
 }

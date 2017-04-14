@@ -82,7 +82,11 @@ public class MediaHandler: NSObject {
             self.requestWebMedia(with: request) {
                 if let result = $0.0 {
                     observer.onNext(result)
+                    observer.onCompleted()
                 } else if let error = $0.1 {
+                    observer.onError(error)
+                } else {
+                    let error = Exception(MediaError.mediaUnavailable)
                     observer.onError(error)
                 }
             }
@@ -201,6 +205,7 @@ public class MediaHandler: NSObject {
                     self.requestLocalMedia(with: request, using: manager) {
                         if let result = $0.0 {
                             observer.onNext(result)
+                            observer.onCompleted()
                         } else if let error = $0.1 {
                             observer.onError(error)
                         } else {
@@ -209,8 +214,6 @@ public class MediaHandler: NSObject {
                             let error = Exception(MediaError.mediaUnavailable)
                             observer.onError(error)
                         }
-                        
-                        observer.onCompleted()
                     }
                     
                     return Disposables.create()

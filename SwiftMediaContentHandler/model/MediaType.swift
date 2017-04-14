@@ -25,22 +25,3 @@ extension MediaType: CustomComparisonProtocol {
         return self == object
     }
 }
-
-public protocol MediaTypeProtocol {
-    var assetType: PHAssetMediaType { get }
-}
-
-extension MediaType: MediaTypeProtocol {}
-
-public extension Array where Element: MediaTypeProtocol {
-    
-    /// Get all asset types, from each element in the Array.
-    public var assetTypes: [PHAssetMediaType] {
-        return map({$0.assetType})
-    }
-    
-    /// Get all asset type raw values.
-    public var assetTypeRawValues: [Int] {
-        return assetTypes.map({$0.rawValue})
-    }
-}
