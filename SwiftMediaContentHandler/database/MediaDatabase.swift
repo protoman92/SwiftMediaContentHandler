@@ -265,7 +265,6 @@ public extension MediaDatabase {
         return Observable
             .from(fetchOptions)
             .flatMap({self.rxLoadAlbums(collection: collection, options: $0)})
-            .logNext()
     }
     
     /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.

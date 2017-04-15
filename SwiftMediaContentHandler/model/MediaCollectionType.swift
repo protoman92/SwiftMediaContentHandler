@@ -10,10 +10,18 @@ import Photos
 import SwiftUtilities
 
 public enum MediaCollectionType {
+    case album
+    case moment
     case smartAlbum
     
     public var collectionType: PHAssetCollectionType {
         switch self {
+        case .album:
+            return .album
+            
+        case .moment:
+            return .moment
+            
         case .smartAlbum:
             return .smartAlbum
         }
