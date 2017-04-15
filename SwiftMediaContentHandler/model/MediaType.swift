@@ -9,6 +9,7 @@
 import Photos
 import SwiftUtilities
 
+/// This enum encapsulates PHAssetMediaType.
 public enum MediaType {
     case image
     case video

@@ -9,7 +9,7 @@
 import UIKit
 
 /// Views that can display images should implement this protocol for use with
-/// ImageHandler (e.g. UIImageView).
+/// MediaHandler (e.g. UIImageView).
 public protocol ImageViewProtocol {
     
     /// Return the UIImage that is currently displayed.

@@ -8,6 +8,7 @@
 
 import UIKit
 
+/// Default image sizes to be used when getting local media.
 public struct ImageSize {
     
     /// Medium-sized images

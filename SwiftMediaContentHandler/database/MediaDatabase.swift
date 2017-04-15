@@ -11,6 +11,8 @@ import Photos
 import RxSwift
 import SwiftUtilities
 
+/// This class can be used to get PHAsset of different types from 
+/// PHPhotoLibrary.
 public class MediaDatabase: NSObject {
     /// We can use this mediaHandler instance to cache and load media.
     fileprivate var handler: MediaHandlerProtocol?
@@ -35,10 +37,12 @@ public class MediaDatabase: NSObject {
     /// from the final result.
     fileprivate var filterEmptyAlbums: Bool
     
+    /// Return handler.
     public var mediaHandler: MediaHandlerProtocol? {
         return handler
     }
     
+    /// Return photoLibraryObservable
     public var mediaObservable: Observable<Album>? {
         return photoLibraryObservable
     }

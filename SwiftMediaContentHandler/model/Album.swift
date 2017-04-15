@@ -9,6 +9,8 @@
 import Photos
 import SwiftUtilities
 
+/// This class represents a collection of LocalMedia, and each instance has
+/// a name that can be used to identify itself.
 public class Album: Collection {
     public var startIndex: Int {
         return medias.startIndex

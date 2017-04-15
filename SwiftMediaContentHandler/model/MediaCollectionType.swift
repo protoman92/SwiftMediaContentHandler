@@ -9,6 +9,7 @@
 import Photos
 import SwiftUtilities
 
+/// This enum encapsulates PHAssetCollectionType.
 public enum MediaCollectionType {
     case album
     case moment

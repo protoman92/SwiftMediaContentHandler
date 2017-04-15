@@ -15,12 +15,17 @@ import XCTest
 class ImageHandlerTest: XCTestCase {
     fileprivate var mediaHandler: TestMediaHandler!
     fileprivate var remoteUrl: String!
+    fileprivate var observer: TestableObserver<Any>!
+    fileprivate var scheduler: TestScheduler!
     fileprivate let expectationTimeout: TimeInterval = 5
     
     override func setUp() {
         super.setUp()
         mediaHandler = TestMediaHandler()
         mediaHandler.fetchActualData = false
+        
+        scheduler = TestScheduler(initialClock: 0)
+        observer = scheduler.createObserver(Any.self)
         
         remoteUrl =
             "http://" +
@@ -37,14 +42,12 @@ class ImageHandlerTest: XCTestCase {
     func test_mock_rxLoadWebImage_shouldCallCorrectMethods() {
         // Setup
         let request = WebImageRequest.builder().with(url: remoteUrl).build()
-        let scheduler = TestScheduler(initialClock: 0)
-        let observer = scheduler.createObserver(Any.self)
         let expect = expectation(description: "Should have worked")
         
         // When
         _ = mediaHandler
             .rxRequest(with: request)
-            .doOnCompleted(expect.fulfill)
+            .doOnDispose(expect.fulfill)
             .subscribe(observer)
         
         scheduler.start()
@@ -61,20 +64,89 @@ class ImageHandlerTest: XCTestCase {
             .with(media: LocalMedia.fake)
             .build()
         
-        let scheduler = TestScheduler(initialClock: 0)
-        let observer = scheduler.createObserver(Any.self)
         let expect = expectation(description: "Should have worked")
         
         // When
         _ = mediaHandler.rxRequest(with: request)
-            .doOnCompleted(expect.fulfill)
+            .doOnDispose(expect.fulfill)
             .subscribe(observer)
-        
+
         scheduler.start()
         
         // Then
         waitForExpectations(timeout: expectationTimeout, handler: nil)
         XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
         XCTAssertTrue(mediaHandler.request_withWebImageRequest.methodNotCalled)
+    }
+    
+    func test_mock_notAuthorizedLocally_shouldThrow() {
+        // Setup
+        mediaHandler.isPhotoAccessAuthorized = false
+        let request = LocalRequest.localBuilder().build()
+        let expect = expectation(description: "Should have failed")
+        
+        // When
+        _ = mediaHandler
+            .rxRequest(with: request)
+            .doOnDispose(expect.fulfill)
+            .subscribe(observer)
+        
+        scheduler.start()
+        
+        // Then
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
+        XCTAssertTrue(mediaHandler.request_withLocaImageRequest.methodNotCalled)
+        
+        let events = observer.events
+        let error = events.first!.value.error
+        XCTAssertNotNil(error)
+        
+        XCTAssertEqual(error!.localizedDescription,
+                       MediaError.permissionNotGranted)
+    }
+    
+    func test_mock_unknownRequestType_shouldThrow() {
+        // Setup
+        let request = MediaRequest.baseBuilder().build()
+        let expect = expectation(description: "Should have failed")
+        
+        // When
+        _ = mediaHandler
+            .rxRequest(with: request)
+            .doOnDispose(expect.fulfill)
+            .subscribe(observer)
+        
+        scheduler.start()
+        
+        // Then
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
+        let events = observer.events
+        let error = events.first!.value.error
+        XCTAssertNotNil(error)
+        
+        XCTAssertEqual(error!.localizedDescription,
+                       MediaError.mediaHandlerUnknownRequest)
+    }
+    
+    func test_mock_mediaUnavailable_shouldThrow() {
+        // Setup
+        mediaHandler.returnValidMedia = false
+        let request = LocalImageRequest.builder().build()
+        let expect = expectation(description: "Should have failed")
+        
+        // When
+        _ = mediaHandler
+            .rxRequest(with: request)
+            .doOnDispose(expect.fulfill)
+            .subscribe(observer)
+        
+        scheduler.start()
+        
+        // Then
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
+        let events = observer.events
+        let error = events.first!.value.error
+        XCTAssertNotNil(error)
+        XCTAssertEqual(error!.localizedDescription, MediaError.mediaUnavailable)
     }
 }

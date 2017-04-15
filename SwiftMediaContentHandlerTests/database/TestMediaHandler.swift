@@ -80,5 +80,9 @@ extension TestMediaHandler: FakeProtocol {
             request_withLocaImageRequest,
             request_withWebImageRequest
         ].forEach({$0.reset()})
+        
+        fetchActualData = true
+        isPhotoAccessAuthorized = true
+        returnValidMedia = true
     }
 }

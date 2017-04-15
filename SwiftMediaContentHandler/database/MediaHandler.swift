@@ -12,8 +12,11 @@ import RxSwift
 import SwiftUtilities
 import UIKit
 
+/// Catch-all completion closure for media loading.
 public typealias MediaCallback = (Any?, Error?) -> Void
 
+/// Classes that implement this protocol must be able to handle different
+/// types of MediaRequest.
 public protocol MediaHandlerProtocol {
     /// Load media reactively using a MediaRequest.
     ///
@@ -28,10 +31,14 @@ public protocol MediaHandlerProtocol {
     func rxRequestImage(with request: MediaRequest) -> Observable<UIImage>
 }
 
+/// Use this class to load various types of media from different sources.
+/// The request will be forwarded to the correct methods, depending on the
+/// type of MediaRequest used.
 public class MediaHandler: NSObject {
     fileprivate var phManager: PHImageManager?
     fileprivate let manager: SDWebImageManager
     
+    /// The cache to be used for web images.
     fileprivate var capacity: UInt64? {
         get {
             guard let capacity = manager.imageCache?.config.maxCacheSize else {
@@ -128,8 +135,9 @@ public class MediaHandler: NSObject {
             requestWebImage(with: request, andThen: complete)
             
         default:
-            debugException()
-            break
+            let message = MediaError.mediaHandlerUnknownRequest
+            let error = Exception(message)
+            mainThread {complete(nil, error)}
         }
     }
     
@@ -256,8 +264,9 @@ public class MediaHandler: NSObject {
             requestLocalImage(with: request, using: manager, andThen: complete)
             
         default:
-            debugException()
-            break
+            let message = MediaError.mediaHandlerUnknownRequest
+            let error = Exception(message)
+            mainThread {complete(nil, error)}
         }
     }
     

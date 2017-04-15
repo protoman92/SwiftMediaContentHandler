@@ -15,7 +15,7 @@ public class MediaRequest: NSObject {
     public class BaseBuilder {
         fileprivate let request: MediaRequest
         
-        fileprivate init(request: MediaRequest) {
+        init(request: MediaRequest) {
             self.request = request
         }
         
@@ -58,7 +58,7 @@ public class WebRequest: MediaRequest {
 /// Download image from the web.
 public final class WebImageRequest: WebRequest {
     public final class Builder: WebBuilder {
-        fileprivate init() {
+        init() {
             super.init(request: WebImageRequest())
         }
     }
@@ -73,21 +73,21 @@ public class LocalRequest: MediaRequest {
     var mediaAsset: LocalMedia? {
         return media
     }
-}
-
-public class LocalBuilder: MediaRequest.BaseBuilder {
-    fileprivate var localRequest: LocalRequest? {
-        return request as? LocalRequest
-    }
     
-    /// Set the media variable for request.
-    ///
-    /// - Parameter photo: A Media instance.
-    /// - Returns: The current Builder instance.
-    @discardableResult
-    public func with(media: LocalMedia) -> LocalBuilder {
-        localRequest?.media = media
-        return self
+    public class LocalBuilder: MediaRequest.BaseBuilder {
+        fileprivate var localRequest: LocalRequest? {
+            return request as? LocalRequest
+        }
+        
+        /// Set the media variable for request.
+        ///
+        /// - Parameter photo: A Media instance.
+        /// - Returns: The current Builder instance.
+        @discardableResult
+        public func with(media: LocalMedia) -> LocalBuilder {
+            localRequest?.media = media
+            return self
+        }
     }
 }
 
@@ -106,7 +106,7 @@ public final class LocalImageRequest: LocalRequest {
             return super.localRequest as? LocalImageRequest
         }
         
-        fileprivate init() {
+        init() {
             super.init(request: LocalImageRequest())
         }
         
