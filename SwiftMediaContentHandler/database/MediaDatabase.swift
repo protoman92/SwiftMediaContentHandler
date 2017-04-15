@@ -12,15 +12,19 @@ import RxSwift
 import SwiftUtilities
 
 public class MediaDatabase: NSObject {
-    /// Return all Album instances fetched from PHPhotoLibrary.
-    public var allAlbums: [Album] {
-        return albums
-    }
+//    /// Return all Album instances fetched from PHPhotoLibrary.
+//    public var allAlbums: [Album] {
+//        return albums
+//    }
     
-    /// Return all Photo instances fetched from PHPhotoLibrary.
-    public var allPhotos: [LocalMedia] {
-        return allPhotos(from: albums)
-    }
+//    /// Return all Photo instances fetched from PHPhotoLibrary.
+//    public var allPhotos: [LocalMedia] {
+//        return allPhotos(from: albums)
+//    }
+    
+//    /// This Album array contains PHAsset instances that can be queried later
+//    /// using MediaHandler.
+//    fileprivate var albums = [Album]()
     
     /// We can use this mediaHandler instance to cache and load media.
     public var mediaHandler: MediaHandlerProtocol?
@@ -40,9 +44,9 @@ public class MediaDatabase: NSObject {
     /// When a Photo library change is detected, call onNext.
     fileprivate let photoLibraryListener: PublishSubject<PHAssetCollection>
     
-    /// This Album array contains PHAsset instances that can be queried later
-    /// using MediaHandler.
-    fileprivate var albums = [Album]()
+    /// When this Observable is subscribed to, it will emit data that it
+    /// fetches from PHPhotoLibrary.
+    fileprivate var photoLibraryObservable: Observable<Album>?
     
     fileprivate override init() {
         photoLibraryListener = PublishSubject<PHAssetCollection>()
@@ -51,7 +55,6 @@ public class MediaDatabase: NSObject {
         assetCollectionFetch = []
         fetchOptions = PHFetchOptions()
         super.init()
-        PHPhotoLibrary.shared().register(self)
     }
     
     deinit {
@@ -75,15 +78,18 @@ public class MediaDatabase: NSObject {
         fetchOptions.sortDescriptors = [
             NSSortDescriptor(key: "creationDate", ascending: false)
         ]
+        
+        // Initialize the PHPhotoLibrary Observable.
+        photoLibraryObservable = rxLoadAlbums()
     }
     
-    /// Get all Photo instances from an albums Array.
-    ///
-    /// - Parameter albums: An Array of Album instances.
-    /// - Returns: An Array of Photo instances.
-    fileprivate func allPhotos(from albums: [Album]) -> [LocalMedia] {
-        return albums.map({$0.medias}).reduce([LocalMedia](), +)
-    }
+//    /// Get all Photo instances from an albums Array.
+//    ///
+//    /// - Parameter albums: An Array of Album instances.
+//    /// - Returns: An Array of Photo instances.
+//    fileprivate func allPhotos(from albums: [Album]) -> [LocalMedia] {
+//        return albums.map({$0.medias}).reduce([LocalMedia](), +)
+//    }
     
     public class Builder {
         fileprivate let database: MediaDatabase
@@ -111,8 +117,8 @@ public class MediaDatabase: NSObject {
             return self
         }
         
-        /// Add a new MediaCollectionType to the set of acceptable collection types.
-        /// If this type already exists, do nothing.
+        /// Add a new MediaCollectionType to the set of acceptable collection 
+        /// types. If this type already exists, do nothing.
         ///
         /// - Parameter type: A MediaCollectionType instance.
         /// - Returns: The current Builder instance.
@@ -198,6 +204,7 @@ public extension MediaDatabase {
                     self.rxLoadAlbums(collection: collection)
                 })
             })
+            .applyCommonSchedulers()
     }
     
     /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.

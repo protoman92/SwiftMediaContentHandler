@@ -22,4 +22,8 @@ public class MediaError {
     public static var mediaUnavailable: String {
         return "media.error.unavailable".localized
     }
+    
+    public static var notAnImage: String {
+        return "media.error.notAnImage".localized
+    }
 }

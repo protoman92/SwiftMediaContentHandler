@@ -54,7 +54,7 @@ public class MediaHandler: NSObject {
     
     /// Reactively request media. Emit an Error if necessary.
     ///
-    /// - Parameter request: A Request instance.
+    /// - Parameter request: A MediaRequest instance.
     /// - Returns: An Observable instance.
     public func rxRequest(with request: MediaRequest) -> Observable<Any> {
         let source: Observable<Any>
@@ -71,6 +71,20 @@ public class MediaHandler: NSObject {
         }
         
         return source.applyCommonSchedulers()
+    }
+    
+    /// Request a UIImage. Should be the same as the above method, but casts
+    /// the result to UIImage at the end.
+    ///
+    /// - Parameter request: A MediaRequest instance.
+    /// - Returns: An Observable instance.
+    public func rxRequestImage(with request: MediaRequest)
+        -> Observable<UIImage>
+    {
+        return rxRequest(with: request)
+            .filter({$0 is UIImage})
+            .throwIfEmpty(MediaError.notAnImage)
+            .map({$0 as! UIImage})
     }
     
     /// Request media remotely with rx.
