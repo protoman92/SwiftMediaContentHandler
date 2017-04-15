@@ -17,9 +17,15 @@ public typealias MediaCallback = (Any?, Error?) -> Void
 public protocol MediaHandlerProtocol {
     /// Load media reactively using a MediaRequest.
     ///
-    /// - Parameter request: An MediaRequest instance.
+    /// - Parameter request: A MediaRequest instance.
     /// - Returns: An Observable instance.
     func rxRequest(with request: MediaRequest) -> Observable<Any>
+    
+    /// Load image reactively using a MediaRequest.
+    ///
+    /// - Parameter request: A MediaRequest instance.
+    /// - Returns: An Observable instance.
+    func rxRequestImage(with request: MediaRequest) -> Observable<UIImage>
 }
 
 public class MediaHandler: NSObject {
@@ -322,3 +328,5 @@ public extension MediaHandler {
         return Builder()
     }
 }
+
+extension MediaHandler: MediaHandlerProtocol {}

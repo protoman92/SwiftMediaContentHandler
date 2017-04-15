@@ -11,11 +11,19 @@ import SwiftUtilities
 
 public enum MediaType {
     case image
+    case video
+    case audio
     
     public var assetType: PHAssetMediaType {
         switch self {
         case .image:
             return .image
+            
+        case .video:
+            return .video
+            
+        case .audio:
+            return .audio
         }
     }
 }

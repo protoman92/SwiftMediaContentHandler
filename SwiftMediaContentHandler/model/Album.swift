@@ -82,6 +82,12 @@ public extension Album {
     }
 }
 
+extension Album: CustomStringConvertible {
+    public var description: String {
+        return "Album: \(name), item count: \(medias.count)"
+    }
+}
+
 public protocol AlbumProtocol: class {
     var name: String { get set }
     
