@@ -31,6 +31,7 @@
 		D313E5CA1EA0B64F0063F91F /* MediaError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30D54511EA060BD00DD29D6 /* MediaError.swift */; };
 		D313E5CC1EA0C8A80063F91F /* TestLocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */; };
 		D374AE001EA2A0FD004542E9 /* TestMediaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D374ADFF1EA2A0FD004542E9 /* TestMediaRequest.swift */; };
+		D38316981EA3EED8009706FF /* SwiftMediaContentHandler.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */; };
 		D3BFD2071EA30FB300582031 /* TestMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */; };
 		D3BFD20A1EA3199400582031 /* MediaDatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BFD2091EA3199400582031 /* MediaDatabaseTest.swift */; };
 		D3C87B8A1E9F9AF0000BAB62 /* MediaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */; };
@@ -74,6 +75,7 @@
 		D31286161E9F36A800F2AB64 /* SwiftUtilitiesTests.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUtilitiesTests.framework; path = "Pods/../build/Debug-iphoneos/SwiftUtilitiesTests/SwiftUtilitiesTests.framework"; sourceTree = "<group>"; };
 		D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestLocalMedia.swift; path = model/TestLocalMedia.swift; sourceTree = "<group>"; };
 		D374ADFF1EA2A0FD004542E9 /* TestMediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestMediaRequest.swift; path = model/TestMediaRequest.swift; sourceTree = "<group>"; };
+		D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwiftMediaContentHandler.podspec; sourceTree = "<group>"; };
 		D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestMediaDatabase.swift; sourceTree = "<group>"; };
 		D3BFD2091EA3199400582031 /* MediaDatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseTest.swift; sourceTree = "<group>"; };
 		D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaRequest.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 		D31285DE1E9F356C00F2AB64 = {
 			isa = PBXGroup;
 			children = (
+				D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */,
 				D31285EA1E9F356C00F2AB64 /* SwiftMediaContentHandler */,
 				D31285F51E9F356D00F2AB64 /* SwiftMediaContentHandlerTests */,
 				D31285E91E9F356C00F2AB64 /* Products */,
@@ -329,6 +332,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D38316981EA3EED8009706FF /* SwiftMediaContentHandler.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
