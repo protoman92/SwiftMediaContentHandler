@@ -129,10 +129,10 @@ public class MediaHandler: NSObject {
     ///   - request: A WebRequest instance.
     ///   - complete: Completion closure.
     public func requestWebMedia(with request: WebRequest,
-                                andThen complete: @escaping MediaCallback) {
+                                then complete: @escaping MediaCallback) {
         switch request {
         case let request as WebImageRequest:
-            requestWebImage(with: request, andThen: complete)
+            requestWebImage(with: request, then: complete)
             
         default:
             let message = MediaError.mediaHandlerUnknownRequest
@@ -147,7 +147,7 @@ public class MediaHandler: NSObject {
     ///   - request: A WebImageRequest instance.
     ///   - complete: Completion closure.
     public func requestWebImage(with request: WebImageRequest,
-                                andThen complete: @escaping MediaCallback) {
+                                then complete: @escaping MediaCallback) {
         guard let url = request.url else {
             let error = Exception(MediaError.mediaUnavailable)
             mainThread {complete(nil, error)}
@@ -258,10 +258,10 @@ public class MediaHandler: NSObject {
     ///   - complete: Completion closure.
     public func requestLocalMedia(with request: LocalRequest,
                                   using manager: PHImageManager,
-                                  andThen complete: @escaping MediaCallback) {
+                                  then complete: @escaping MediaCallback) {
         switch request {
         case let request as LocalImageRequest:
-            requestLocalImage(with: request, using: manager, andThen: complete)
+            requestLocalImage(with: request, using: manager, then: complete)
             
         default:
             let message = MediaError.mediaHandlerUnknownRequest
@@ -278,7 +278,7 @@ public class MediaHandler: NSObject {
     ///   - complete: Completion closure.
     public func requestLocalImage(with request: LocalImageRequest,
                                   using manager: PHImageManager,
-                                  andThen complete: @escaping MediaCallback) {
+                                  then complete: @escaping MediaCallback) {
         guard let asset = request.mediaAsset?.asset else {
             let error = Exception(MediaError.mediaUnavailable)
             mainThread {complete(nil, error)}
@@ -301,7 +301,8 @@ public class MediaHandler: NSObject {
             // converting it to an UIImage.
             manager.requestImageData(for: asset, options: nil) {
                 guard let data = $0.0, let image = UIImage(data: data) else {
-                    mainThread {complete(nil, nil)}
+                    let error = Exception(MediaError.mediaUnavailable)
+                    mainThread {complete(nil, error)}
                     return
                 }
                 

@@ -28,12 +28,50 @@ public class Album: Collection {
         return medias[index]
     }
     
-    public var name: String
-    public var medias: [LocalMedia]
+    /// The Album's name as found by PHPhotoLibrary.
+    fileprivate var name: String
+    
+    
+    /// The Album's PHAsset instances, wrapped in LocalMedia.
+    fileprivate var medias: [LocalMedia]
+    
+    /// This is used for MediaDatabase's filterAlbumWithNoName.
+    public var hasName: Bool {
+        return name.isNotEmpty
+    }
+    
+    /// This getter is used to hide the Album's name field, so that it cannot
+    /// be changed dynamically.
+    public var albumName: String {
+        return name
+    }
+    
+    /// This getter is used to hide the Album's medias field, so that it
+    /// cannot be changed dynamically.
+    public var albumMedia: [LocalMedia] {
+        return medias
+    }
     
     fileprivate init() {
         name = ""
         medias = []
+    }
+    
+    /// Check if two Albums have the same name.
+    ///
+    /// - Parameter album: An Album instance.
+    /// - Returns: A Bool value.
+    public func hasSameName<A: AlbumProtocol>(as album: A) -> Bool {
+        return albumName == album.albumName
+    }
+    
+    /// Append another Album's media instances.
+    ///
+    /// - Parameter album: An Album instance.
+    /// - Returns: An Int value representing number of unique LocalMedie added.
+    @discardableResult
+    public func appendMedia<A: AlbumProtocol>(from album: A) -> Int {
+        return medias.appendOrReplace(uniqueContentsOf: album.albumMedia)
     }
     
     public class Builder {
@@ -90,10 +128,17 @@ extension Album: CustomStringConvertible {
     }
 }
 
+/// Classes that implement this protocol must be able to hold local media
+/// information.
 public protocol AlbumProtocol: class {
-    var name: String { get set }
+    var albumName: String { get }
     
-    var medias: [LocalMedia] { get set }
+    var albumMedia: [LocalMedia] { get }
+    
+    func hasSameName<A: AlbumProtocol>(as album: A) -> Bool
+    
+    @discardableResult
+    func appendMedia<A: AlbumProtocol>(from album: A) -> Int
 }
 
 extension Album: AlbumProtocol {}
@@ -105,10 +150,10 @@ public extension Array where Element: AlbumProtocol {
     /// - Parameter album: The Album to get Photo instances from.
     public mutating func append(uniqueAssetsFrom album: Element) {
         if
-            let index = index(where: {$0.name == album.name}),
+            let index = index(where: {$0.hasSameName(as: album)}),
             let existing = element(at: index)
         {
-            existing.medias.appendOrReplace(uniqueContentsOf: album.medias)
+            existing.appendMedia(from: album)
         } else {
             self.append(album)
         }

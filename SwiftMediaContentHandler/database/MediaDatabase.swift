@@ -14,8 +14,6 @@ import SwiftUtilities
 /// This class can be used to get PHAsset of different types from 
 /// PHPhotoLibrary.
 public class MediaDatabase: NSObject {
-    /// We can use this mediaHandler instance to cache and load media.
-    fileprivate var handler: MediaHandlerProtocol?
     
     /// We can add collection types to fetch with PHFetchRequest.
     fileprivate var collectionTypes: [MediaCollectionType]
@@ -31,33 +29,157 @@ public class MediaDatabase: NSObject {
     
     /// When this Observable is subscribed to, it will emit data that it
     /// fetches from PHPhotoLibrary.
-    fileprivate var photoLibraryObservable: Observable<Album>?
+    fileprivate var photoLibraryObservable: Observable<Album>
     
     /// If this is set to true, empty Album instances will be filtered out
     /// from the final result.
     fileprivate var filterEmptyAlbums: Bool
     
-    /// Return handler.
-    public var mediaHandler: MediaHandlerProtocol? {
-        return handler
+    /// If this is set to true, Albums with no names will be filtered out.
+    fileprivate var filterAlbumWithNoName: Bool
+    
+    /// Return mediaTypes, a MediaType Array.
+    public var registeredMediaTypes: [MediaType] {
+        return mediaTypes
     }
     
-    /// Return photoLibraryObservable
-    public var mediaObservable: Observable<Album>? {
+    /// Return collectionTypes, a MediaCollectionType Array.
+    public var registeredCollectionTypes: [MediaCollectionType] {
+        return collectionTypes
+    }
+    
+    /// Return photoLibraryListener
+    var mediaListener: PublishSubject<PHAssetCollection> {
+        return photoLibraryListener
+    }
+    
+    /// Return photoLibraryObservable.
+    public var mediaObservable: Observable<Album> {
         return photoLibraryObservable
     }
     
-    fileprivate override init() {
+    /// Return filterEmptyAlbums.
+    public var shouldFilterEmptyAlbums: Bool {
+        return filterEmptyAlbums
+    }
+    
+    /// Return filterAlbumWithNoName.
+    public var shouldFilterAlbumsWithoutName: Bool {
+        return filterAlbumWithNoName
+    }
+    
+    override init() {
         assetCollectionFetch = []
         collectionTypes = []
+        filterAlbumWithNoName = true
         filterEmptyAlbums = true
         mediaTypes = []
         photoLibraryListener = PublishSubject<PHAssetCollection>()
+        
+        // Placebo value - we will immediately update it after self has been
+        // initialized successfully.
+        photoLibraryObservable = Observable.empty()
         super.init()
+        photoLibraryObservable = rxLoadAlbums()
     }
     
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+    }
+    
+    /// Check for PHPhotoLibrary permission, and then load albums reactively
+    /// if authorized.
+    ///
+    /// - Returns: An Observable instance.
+    public func rxLoadAlbums() -> Observable<Album> {
+        return mediaListener
+            .doOnNext({_ in print("ASSET COLLECTION")})
+            .flatMap({(collection) -> Observable<Album> in
+                if self.isAuthorized() {
+                    return self.rxLoadAlbums(collection: collection)
+                } else {
+                    let error = MediaError.permissionNotGranted
+                    return Observable.error(error)
+                }
+            })
+            // If filterEmptyAlbums is true, filter out empty Albums.
+            .filter({!self.shouldFilterEmptyAlbums || $0.isNotEmpty})
+            // If filterAlbumWithNoName is true, filter out Albums with no name.
+            .filter({!self.shouldFilterAlbumsWithoutName || $0.hasName})
+            .applyCommonSchedulers()
+    }
+    
+    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
+    ///
+    /// - Parameters:
+    ///   - collection: The PHAssetCollection to get PHAsset instances.
+    ///   - options: The PHFetchOptions to use for the fetching.
+    /// - Returns: An Observable instance.
+    func rxLoadAlbums(collection: PHAssetCollection) -> Observable<Album> {
+        let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
+        
+        // For each registered MediaType, we provide a separate PHFetchOptions.
+        return Observable
+            .from(fetchOptions)
+            .flatMap({self.rxLoadAlbums(collection: collection, options: $0)})
+    }
+    
+    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
+    ///
+    /// - Parameters:
+    ///   - collection: The PHAssetCollection to get PHAsset instances.
+    ///   - options: The PHFetchOptions to use for the fetching.
+    /// - Returns: An Observable instance.
+    func rxLoadAlbums(collection: PHAssetCollection, options: PHFetchOptions)
+        -> Observable<Album>
+    {
+        let result = PHAsset.fetchAssets(in: collection, options: options)
+        
+        return Observable<PHAsset>
+            .create({observer in
+                self.observeFetchResult(result, with: observer)
+                return Disposables.create()
+            })
+            .toArray()
+            .map({self.createAlbum(with: collection, with: $0)})
+    }
+    
+    /// Observe PHAsset from a PHFetchResult, using an Observer. This method
+    /// is used in rxLoadAlbums(collection:, options:), so that we can
+    /// override it during testing to return test Album instances.
+    ///
+    /// - Parameters:
+    ///   - result: A PHFetchResult instance.
+    ///   - observer: An AnyObserver instance.
+    func observeFetchResult(_ result: PHFetchResult<PHAsset>,
+                            with observer: AnyObserver<PHAsset>) {
+        if result.count > 0 {
+            result.enumerateObjects({
+                observer.onNext($0.0)
+                
+                if $0.1 == result.count - 1 {
+                    observer.onCompleted()
+                }
+            })
+        } else {
+            observer.onCompleted()
+        }
+    }
+    
+    /// Create an Album instance.
+    ///
+    /// - Parameters:
+    ///   - collection: The PHAssetCollection to which the Album belongs.
+    ///   - assets: An Array of PHAsset instances.
+    /// - Returns: An Album instance.
+    func createAlbum(with collection: PHAssetCollection,
+                     with assets: [PHAsset]) -> Album {
+        return Album.builder()
+            /// If the album does not have a title, leave empty and
+            /// delegate to caller.
+            .with(name: collection.localizedTitle ?? "")
+            .add(assets: assets)
+            .build()
     }
     
     public class Builder {
@@ -65,16 +187,6 @@ public class MediaDatabase: NSObject {
         
         fileprivate init() {
             database = MediaDatabase()
-        }
-        
-        /// Set the database's mediaHandler instance.
-        ///
-        /// - Parameter mediaHandler: An mediaHandler instance.
-        /// - Returns: The current Builder instance.
-        @discardableResult
-        public func with(mediaHandler: MediaHandlerProtocol) -> Builder {
-            database.handler = mediaHandler
-            return self
         }
         
         /// Add a new MediaType to the set of acceptable media types. If this
@@ -98,7 +210,7 @@ public class MediaDatabase: NSObject {
             return self
         }
         
-        /// Add a new MediaCollectionType to the set of acceptable collection 
+        /// Add a new MediaCollectionType to the set of acceptable collection
         /// types. If this type already exists, do nothing.
         ///
         /// - Parameter type: A MediaCollectionType instance.
@@ -132,7 +244,6 @@ public class MediaDatabase: NSObject {
         }
         
         public func build() -> MediaDatabase {
-            database.onInstanceBuilt()
             return database
         }
     }
@@ -145,21 +256,37 @@ public extension MediaDatabase {
 }
 
 public extension MediaDatabase {
-    /// Call this method when Builder.build() is called.
-    fileprivate func onInstanceBuilt() {
-        // Initialize the PHPhotoLibrary Observable.
-        photoLibraryObservable = rxLoadAlbums()
+    
+    /// Get the current authorization status for PHPhotoLibrary.
+    public var currentAuthorizationStatus: PHAuthorizationStatus {
+        return PHPhotoLibrary.authorizationStatus()
     }
-}
-
-public extension MediaDatabase {
     
     /// Check if the user has granted Photos permission. This method can be
     /// used in conjunction with Observable.filter.
     ///
     /// - Returns: A Bool value.
     public func isAuthorized() -> Bool {
-        return PHPhotoLibrary.authorizationStatus() == .authorized
+        return currentAuthorizationStatus == .authorized
+    }
+}
+
+public extension MediaDatabase {
+    /// Create a PHFetchOptions based on a MediaType instance.
+    ///
+    /// - Parameter type: A MediaType instance.
+    /// - Returns: A PHFetchOptions instance.
+    fileprivate func fetchOptions(for type: MediaType) -> PHFetchOptions {
+        let fetchOptions = PHFetchOptions()
+        let typeValue = type.assetType.rawValue
+        let predicate = NSPredicate(format: "mediaType = %i", typeValue)
+        fetchOptions.predicate = predicate
+        
+        fetchOptions.sortDescriptors = [
+            NSSortDescriptor(key: "creationDate", ascending: false)
+        ]
+        
+        return fetchOptions
     }
 }
 
@@ -178,8 +305,7 @@ public extension MediaDatabase {
     ///
     /// We first need to check for PHPhotoLibrary authorization.
     public func loadInitialAlbums() {
-        let status = PHPhotoLibrary.authorizationStatus()
-        loadInitialAlbums(status: status)
+        loadInitialAlbums(status: currentAuthorizationStatus)
     }
     
     /// Reload albums after checking authorization status.
@@ -190,13 +316,13 @@ public extension MediaDatabase {
         case .authorized:
             registerChangeObserver()
             
-            let photoLibraryListener = self.photoLibraryListener
+            let mediaListener = self.mediaListener
             
             // Initialize the PHFetchResult Array here, instead of when the
             // instance is first built. This is because doing this will
             // explicitly request permission - we only want to ask for
             // permission when the app first starts loading Albums.
-            assetCollectionFetch = collectionTypes.map({
+            assetCollectionFetch = registeredCollectionTypes.map({
                 PHAssetCollection.fetchAssetCollections(
                     with: $0.collectionType,
                     subtype: .any,
@@ -204,9 +330,7 @@ public extension MediaDatabase {
             })
             
             assetCollectionFetch.forEach({
-                $0.enumerateObjects({
-                    photoLibraryListener.onNext($0.0)
-                })
+                $0.enumerateObjects({mediaListener.onNext($0.0)})
             })
             
         case .notDetermined:
@@ -218,119 +342,18 @@ public extension MediaDatabase {
     }
 }
 
-public extension MediaDatabase {
-    
-    /// Create a PHFetchOptions based on a MediaType instance.
-    ///
-    /// - Parameter type: A MediaType instance.
-    /// - Returns: A PHFetchOptions instance.
-    fileprivate func fetchOptions(for type: MediaType) -> PHFetchOptions {
-        let fetchOptions = PHFetchOptions()
-        let typeValue = type.assetType.rawValue
-        let predicate = NSPredicate(format: "mediaType = %i", typeValue)
-        fetchOptions.predicate = predicate
-        
-        fetchOptions.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: false)
-        ]
-        
-        return fetchOptions
-    }
-
-    /// Check for PHPhotoLibrary permission, and then load albums reactively
-    /// if authorized.
-    ///
-    /// - Returns: An Observable instance.
-    public func rxLoadAlbums() -> Observable<Album> {
-        return photoLibraryListener
-            .flatMap({(collection) -> Observable<Album> in
-                if self.isAuthorized() {
-                    return self.rxLoadAlbums(collection: collection)
-                } else {
-                    let error = MediaError.permissionNotGranted
-                    return Observable<Album>.error(error)
-                }
-            })
-            .applyCommonSchedulers()
-    }
-    
-    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
-    ///
-    /// - Parameters:
-    ///   - collection: The PHAssetCollection to get PHAsset instances.
-    ///   - options: The PHFetchOptions to use for the fetching.
-    /// - Returns: An Observable instance.
-    fileprivate func rxLoadAlbums(collection: PHAssetCollection)
-        -> Observable<Album>
-    {
-        let fetchOptions = mediaTypes.map(self.fetchOptions)
-        
-        // For each registered MediaType, we provide a separate PHFetchOptions.
-        return Observable
-            .from(fetchOptions)
-            .flatMap({self.rxLoadAlbums(collection: collection, options: $0)})
-    }
-    
-    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
-    ///
-    /// - Parameters:
-    ///   - collection: The PHAssetCollection to get PHAsset instances.
-    ///   - options: The PHFetchOptions to use for the fetching.
-    /// - Returns: An Observable instance.
-    fileprivate func rxLoadAlbums(collection: PHAssetCollection,
-                                  options: PHFetchOptions)
-        -> Observable<Album>
-    {
-        let result = PHAsset.fetchAssets(in: collection, options: options)
-            
-        return Observable<PHAsset>
-            .create({observer in
-                result.enumerateObjects({
-                    observer.onNext($0.0)
-                    
-                    if $0.1 == result.count - 1 {
-                        observer.onCompleted()
-                    }
-                })
-                
-                return Disposables.create()
-            })
-            .toArray()
-            .map({self.createAlbum(with: collection, with: $0)})
-            
-            // If filterEmptyAlbums is true, filter out empty Album.
-            .filter({!self.filterEmptyAlbums || $0.isNotEmpty})
-    }
-    
-    /// Create an Album instance.
-    ///
-    /// - Parameters:
-    ///   - collection: The PHAssetCollection to which the Album belongs.
-    ///   - assets: An Array of PHAsset instances.
-    /// - Returns: An Album instance.
-    fileprivate func createAlbum(with collection: PHAssetCollection,
-                                 with assets: [PHAsset]) -> Album {
-        return Album.builder()
-            /// If the album does not have a title, leave empty and
-            /// delegate to caller.
-            .with(name: collection.localizedTitle ?? "")
-            .add(assets: assets)
-            .build()
-    }
-}
-
 extension MediaDatabase: PHPhotoLibraryChangeObserver {
     
     /// When media content is added or deleted, call this method.
     ///
     /// - Parameter changeInstance: A PHChange instance.
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        let photoLibraryListener = self.photoLibraryListener
+        let mediaListener = self.mediaListener
         
         assetCollectionFetch
             .flatMap(changeInstance.changeDetails)
             .map({$0.changedObjects})
             .reduce([], +)
-            .forEach(photoLibraryListener.onNext)
+            .forEach(mediaListener.onNext)
     }
 }

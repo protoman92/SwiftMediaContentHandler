@@ -42,13 +42,13 @@ class TestMediaHandler: MediaHandler {
     
     override func requestLocalImage(with request: LocalImageRequest,
                                     using manager: PHImageManager,
-                                    andThen complete: @escaping MediaCallback) {
+                                    then complete: @escaping MediaCallback) {
         request_withLocaImageRequest.onMethodCalled(withParameters: request)
         
         if fetchActualData {
             super.requestLocalImage(with: request,
                                     using: manager,
-                                    andThen: complete)
+                                    then: complete)
         } else {
             if returnValidMedia {
                 complete(UIImage(), nil)
@@ -59,11 +59,11 @@ class TestMediaHandler: MediaHandler {
     }
     
     override func requestWebImage(with request: WebImageRequest,
-                                  andThen complete: @escaping MediaCallback) {
+                                  then complete: @escaping MediaCallback) {
         request_withWebImageRequest.onMethodCalled(withParameters: request)
         
         if fetchActualData {
-            super.requestWebImage(with: request, andThen: complete)
+            super.requestWebImage(with: request, then: complete)
         } else {
             if returnValidMedia {
                 complete(UIImage(), nil)

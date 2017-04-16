@@ -12,9 +12,9 @@ import RxTest
 import RxBlocking
 import XCTest
 
-class ImageHandlerTest: XCTestCase {
+class MediaHandlerTest: XCTestCase {
     fileprivate var mediaHandler: TestMediaHandler!
-    fileprivate var remoteUrl: String!
+    fileprivate var remoteImageUrl: String!
     fileprivate var observer: TestableObserver<Any>!
     fileprivate var scheduler: TestScheduler!
     fileprivate let expectationTimeout: TimeInterval = 5
@@ -27,7 +27,7 @@ class ImageHandlerTest: XCTestCase {
         scheduler = TestScheduler(initialClock: 0)
         observer = scheduler.createObserver(Any.self)
         
-        remoteUrl =
+        remoteImageUrl =
             "http://" +
             "vignette2.wikia.nocookie.net" +
             "/fallout/images/6/69/RadChildFNV.png/" +
@@ -41,7 +41,7 @@ class ImageHandlerTest: XCTestCase {
     
     func test_mock_rxLoadWebImage_shouldCallCorrectMethods() {
         // Setup
-        let request = WebImageRequest.builder().with(url: remoteUrl).build()
+        let request = WebImageRequest.builder().with(url: remoteImageUrl).build()
         let expect = expectation(description: "Should have worked")
         
         // When
@@ -77,6 +77,34 @@ class ImageHandlerTest: XCTestCase {
         waitForExpectations(timeout: expectationTimeout, handler: nil)
         XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
         XCTAssertTrue(mediaHandler.request_withWebImageRequest.methodNotCalled)
+    }
+    
+    func test_rxLoadLocalImageWithNoMedia_shouldThrow() {
+        // Setup
+        mediaHandler.fetchActualData = true
+        
+        let request = LocalImageRequest.builder()
+            .with(media: LocalMedia.noMedia)
+            .build()
+        
+        let expect = expectation(description: "Should have failed")
+        
+        // When
+        _ = mediaHandler.rxRequest(with: request)
+            .doOnDispose(expect.fulfill)
+            .subscribe(observer)
+        
+        scheduler.start()
+        
+        // Then
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
+        XCTAssertEqual(mediaHandler.request_withLocaImageRequest.methodCount, 1)
+        
+        let events = observer.events
+        print(events)
+        let error = events.first!.value.error
+        XCTAssertNotNil(error)
+        XCTAssertEqual(error!.localizedDescription, MediaError.mediaUnavailable)
     }
     
     func test_mock_notAuthorizedLocally_shouldThrow() {

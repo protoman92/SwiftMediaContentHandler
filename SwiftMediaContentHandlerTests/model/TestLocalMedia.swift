@@ -13,4 +13,6 @@ extension LocalMedia {
         .builder()
         .with(asset: PHAsset())
         .build()
+    
+    public static var noMedia = LocalMedia.builder().build()
 }
