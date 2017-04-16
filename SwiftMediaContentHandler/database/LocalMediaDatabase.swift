@@ -84,7 +84,6 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     public func rxLoadAlbums() -> Observable<Album> {
         return mediaListener
-            .doOnNext({_ in print("ASSET COLLECTION")})
             .flatMap({(collection) -> Observable<Album> in
                 if self.isAuthorized() {
                     return self.rxLoadAlbums(collection: collection)
@@ -142,11 +141,13 @@ public class LocalMediaDatabase: NSObject {
     ///   - observer: An AnyObserver instance.
     func observeFetchResult(_ result: PHFetchResult<PHAsset>,
                             with observer: AnyObserver<PHAsset>) {
-        if result.count > 0 {
+        let count = result.count
+        
+        if count > 0 {
             result.enumerateObjects({
                 observer.onNext($0.0)
                 
-                if $0.1 == result.count - 1 {
+                if $0.1 == count - 1 {
                     observer.onCompleted()
                 }
             })

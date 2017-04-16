@@ -7,8 +7,24 @@
 //
 
 /// Cache for PHAsset fetched by LocalMediaDatabase.
-public final class LocalMediaCache {
+public final class LocalMediaCache: Collection {
     fileprivate var albums: [Album]
+    
+    public var startIndex: Int {
+        return albums.startIndex
+    }
+    
+    public var endIndex: Int {
+        return albums.endIndex
+    }
+    
+    public func index(after i: Int) -> Int {
+        return Swift.min(i + 1, endIndex)
+    }
+    
+    public subscript(index: Int) -> Album {
+        return albums[index]
+    }
     
     /// Return an Array of cached Album instances.
     public var cachedAlbums: [Album] {

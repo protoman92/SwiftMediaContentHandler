@@ -119,6 +119,15 @@ public final class LocalImageRequest: LocalRequest {
             localRequest?.size = size
             return self
         }
+        
+        /// Set the size variable for request.
+        ///
+        /// - Parameter imageSize: An ImageSizeProtocol instance.
+        /// - Returns: The current Builder instance.
+        @discardableResult
+        public func with(imageSize: ImageSizeProtocol) -> Builder {
+            return with(size: imageSize.squaredSize)
+        }
     }
 }
 

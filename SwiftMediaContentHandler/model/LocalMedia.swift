@@ -13,13 +13,37 @@ import SwiftUtilities
 public class LocalMedia {
     public static let blank = LocalMedia()
     
-    public var asset: PHAsset?
+    /// We can only set the album name after fetching PHAsset from 
+    /// PHPhotoLibrary.
+    fileprivate var albumName: String
+    
+    /// A PHAsset instance. This can used to fetch local media.
+    fileprivate var asset: PHAsset?
+    
+    /// Return albumName. Also provides a setter because the album's name
+    /// cannot be set at the Builder stage.
+    public var localAlbumName: String {
+        get {
+            return albumName
+        }
+        
+        set {
+            albumName = newValue
+        }
+    }
+    
+    /// Return asset.
+    public var localAsset: PHAsset? {
+        return asset
+    }
     
     public var id: String {
         return asset?.localIdentifier ?? ""
     }
     
-    fileprivate init() {}
+    fileprivate init() {
+        albumName = ""
+    }
     
     public func hasLocalAsset() -> Bool {
         return asset != nil
@@ -30,6 +54,15 @@ public class LocalMedia {
         
         fileprivate init() {
             media = LocalMedia()
+        }
+        
+        /// Set the LocalMedia's albumName.
+        ///
+        /// - Parameter name: A String value.
+        /// - Returns: The current Builder instance.
+        public func with(albumName name: String) -> Builder {
+            media.albumName = name
+            return self
         }
         
         /// Set the LocalMedia's asset instance.
@@ -60,7 +93,7 @@ extension LocalMedia: CustomStringConvertible {
 }
 
 public protocol LocalMediaProtocol {
-    var asset: PHAsset? { get }
+    var localAsset: PHAsset? { get }
 }
 
 extension LocalMedia: LocalMediaProtocol {}
@@ -85,6 +118,6 @@ public func ==(first: LocalMedia, second: LocalMedia) -> Bool {
 
 extension Array where Element: LocalMediaProtocol {
     public var assets: [PHAsset] {
-        return flatMap({$0.asset})
+        return flatMap({$0.localAsset})
     }
 }

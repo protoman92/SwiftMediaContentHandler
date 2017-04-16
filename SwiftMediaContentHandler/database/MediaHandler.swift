@@ -279,7 +279,7 @@ public class MediaHandler: NSObject {
     public func requestLocalImage(with request: LocalImageRequest,
                                   using manager: PHImageManager,
                                   then complete: @escaping MediaCallback) {
-        guard let asset = request.mediaAsset?.asset else {
+        guard let asset = request.mediaAsset?.localAsset else {
             let error = Exception(MediaError.mediaUnavailable)
             mainThread {complete(nil, error)}
             return

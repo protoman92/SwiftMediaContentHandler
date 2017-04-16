@@ -74,6 +74,14 @@ public class Album: Collection {
         return medias.appendOrReplace(uniqueContentsOf: album.albumMedia)
     }
     
+    /// We need to set the albumName for each LocalMedia instance. This method
+    /// is called during Builder.build() to ensure that the albumName as
+    /// well as the LocalMedia Array have been initialized.
+    fileprivate func onInstanceBuilt() {
+        let albumName = self.albumName
+        forEach({$0.localAlbumName = albumName})
+    }
+    
     public class Builder {
         fileprivate let album: Album
         
@@ -111,6 +119,7 @@ public class Album: Collection {
         }
         
         public func build() -> Album {
+            album.onInstanceBuilt()
             return album
         }
     }
