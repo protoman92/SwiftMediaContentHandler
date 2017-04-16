@@ -13,7 +13,7 @@ import SwiftUtilities
 
 /// This class can be used to get PHAsset of different types from 
 /// PHPhotoLibrary.
-public class MediaDatabase: NSObject {
+public class LocalMediaDatabase: NSObject {
     
     /// We can add collection types to fetch with PHFetchRequest.
     fileprivate var collectionTypes: [MediaCollectionType]
@@ -34,9 +34,6 @@ public class MediaDatabase: NSObject {
     /// If this is set to true, empty Album instances will be filtered out
     /// from the final result.
     fileprivate var filterEmptyAlbums: Bool
-    
-    /// If this is set to true, Albums with no names will be filtered out.
-    fileprivate var filterAlbumWithNoName: Bool
     
     /// Return mediaTypes, a MediaType Array.
     public var registeredMediaTypes: [MediaType] {
@@ -63,15 +60,9 @@ public class MediaDatabase: NSObject {
         return filterEmptyAlbums
     }
     
-    /// Return filterAlbumWithNoName.
-    public var shouldFilterAlbumsWithoutName: Bool {
-        return filterAlbumWithNoName
-    }
-    
     override init() {
         assetCollectionFetch = []
         collectionTypes = []
-        filterAlbumWithNoName = true
         filterEmptyAlbums = true
         mediaTypes = []
         photoLibraryListener = PublishSubject<PHAssetCollection>()
@@ -104,8 +95,6 @@ public class MediaDatabase: NSObject {
             })
             // If filterEmptyAlbums is true, filter out empty Albums.
             .filter({!self.shouldFilterEmptyAlbums || $0.isNotEmpty})
-            // If filterAlbumWithNoName is true, filter out Albums with no name.
-            .filter({!self.shouldFilterAlbumsWithoutName || $0.hasName})
             .applyCommonSchedulers()
     }
     
@@ -177,16 +166,24 @@ public class MediaDatabase: NSObject {
         return Album.builder()
             /// If the album does not have a title, leave empty and
             /// delegate to caller.
-            .with(name: collection.localizedTitle ?? "")
+            .with(name: collection.localizedTitle ?? defaultAlbumName())
             .add(assets: assets)
             .build()
     }
     
+    /// Get the default Album name that will be used when a PHAssetCollection
+    /// has no title.
+    ///
+    /// - Returns: A String value.
+    func defaultAlbumName() -> String {
+        return "media.title.untitled".localized
+    }
+    
     public class Builder {
-        fileprivate let database: MediaDatabase
+        fileprivate let database: LocalMediaDatabase
         
         fileprivate init() {
-            database = MediaDatabase()
+            database = LocalMediaDatabase()
         }
         
         /// Add a new MediaType to the set of acceptable media types. If this
@@ -243,19 +240,19 @@ public class MediaDatabase: NSObject {
             return self
         }
         
-        public func build() -> MediaDatabase {
+        public func build() -> LocalMediaDatabase {
             return database
         }
     }
 }
 
-public extension MediaDatabase {
+public extension LocalMediaDatabase {
     public static func builder() -> Builder {
         return Builder()
     }
 }
 
-public extension MediaDatabase {
+public extension LocalMediaDatabase {
     
     /// Get the current authorization status for PHPhotoLibrary.
     public var currentAuthorizationStatus: PHAuthorizationStatus {
@@ -271,7 +268,7 @@ public extension MediaDatabase {
     }
 }
 
-public extension MediaDatabase {
+public extension LocalMediaDatabase {
     /// Create a PHFetchOptions based on a MediaType instance.
     ///
     /// - Parameter type: A MediaType instance.
@@ -290,7 +287,7 @@ public extension MediaDatabase {
     }
 }
 
-public extension MediaDatabase {
+public extension LocalMediaDatabase {
     
     /// Register PHPhotoLibraryChangeObserver.
     fileprivate func registerChangeObserver() {
@@ -342,7 +339,7 @@ public extension MediaDatabase {
     }
 }
 
-extension MediaDatabase: PHPhotoLibraryChangeObserver {
+extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
     
     /// When media content is added or deleted, call this method.
     ///

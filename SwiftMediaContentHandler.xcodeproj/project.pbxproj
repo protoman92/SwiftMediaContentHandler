@@ -15,7 +15,7 @@
 		D31285F21E9F356D00F2AB64 /* SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */; };
 		D31285F91E9F356D00F2AB64 /* SwiftMediaContentHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = D31285EB1E9F356C00F2AB64 /* SwiftMediaContentHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D312860B1E9F366200F2AB64 /* MediaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286031E9F366200F2AB64 /* MediaHandler.swift */; };
-		D312860C1E9F366200F2AB64 /* MediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* MediaDatabase.swift */; };
+		D312860C1E9F366200F2AB64 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* LocalMediaDatabase.swift */; };
 		D312860D1E9F366200F2AB64 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286061E9F366200F2AB64 /* Album.swift */; };
 		D312860E1E9F366200F2AB64 /* ImageSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286071E9F366200F2AB64 /* ImageSize.swift */; };
 		D312860F1E9F366200F2AB64 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* LocalMedia.swift */; };
@@ -23,7 +23,7 @@
 		D31286141E9F366C00F2AB64 /* MediaHandlerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286121E9F366C00F2AB64 /* MediaHandlerTest.swift */; };
 		D31286151E9F366C00F2AB64 /* TestMediaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286131E9F366C00F2AB64 /* TestMediaHandler.swift */; };
 		D31286191E9F380E00F2AB64 /* MediaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286031E9F366200F2AB64 /* MediaHandler.swift */; };
-		D312861A1E9F380E00F2AB64 /* MediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* MediaDatabase.swift */; };
+		D312861A1E9F380E00F2AB64 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286041E9F366200F2AB64 /* LocalMediaDatabase.swift */; };
 		D312861B1E9F380E00F2AB64 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286061E9F366200F2AB64 /* Album.swift */; };
 		D312861C1E9F380E00F2AB64 /* ImageSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286071E9F366200F2AB64 /* ImageSize.swift */; };
 		D312861D1E9F380E00F2AB64 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31286081E9F366200F2AB64 /* LocalMedia.swift */; };
@@ -38,6 +38,7 @@
 		D3C87B9A1E9FDC3B000BAB62 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B991E9FDC3B000BAB62 /* MediaType.swift */; };
 		D3C87B9E1EA00282000BAB62 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3C87B991E9FDC3B000BAB62 /* MediaType.swift */; };
 		D3FE35EB1EA33BDF00C44052 /* TestAlbum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FE35EA1EA33BDF00C44052 /* TestAlbum.swift */; };
+		D3FE35F01EA3540D00C44052 /* LocalMediaCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FE35EF1EA3540D00C44052 /* LocalMediaCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,7 +64,7 @@
 		D31285F11E9F356D00F2AB64 /* SwiftMediaContentHandlerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftMediaContentHandlerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D31285F81E9F356D00F2AB64 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D31286031E9F366200F2AB64 /* MediaHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaHandler.swift; sourceTree = "<group>"; };
-		D31286041E9F366200F2AB64 /* MediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabase.swift; sourceTree = "<group>"; };
+		D31286041E9F366200F2AB64 /* LocalMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMediaDatabase.swift; sourceTree = "<group>"; };
 		D31286061E9F366200F2AB64 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		D31286071E9F366200F2AB64 /* ImageSize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSize.swift; sourceTree = "<group>"; };
 		D31286081E9F366200F2AB64 /* LocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMedia.swift; sourceTree = "<group>"; };
@@ -75,9 +76,10 @@
 		D374ADFF1EA2A0FD004542E9 /* TestMediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestMediaRequest.swift; path = model/TestMediaRequest.swift; sourceTree = "<group>"; };
 		D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestMediaDatabase.swift; sourceTree = "<group>"; };
 		D3BFD2091EA3199400582031 /* MediaDatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseTest.swift; sourceTree = "<group>"; };
-		D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaRequest.swift; path = ../database/MediaRequest.swift; sourceTree = "<group>"; };
+		D3C87B891E9F9AF0000BAB62 /* MediaRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaRequest.swift; sourceTree = "<group>"; };
 		D3C87B991E9FDC3B000BAB62 /* MediaType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaType.swift; sourceTree = "<group>"; };
 		D3FE35EA1EA33BDF00C44052 /* TestAlbum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestAlbum.swift; path = model/TestAlbum.swift; sourceTree = "<group>"; };
+		D3FE35EF1EA3540D00C44052 /* LocalMediaCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMediaCache.swift; sourceTree = "<group>"; };
 		F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftMediaContentHandlerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F57CDB865D90241C9000FB50 /* Pods-SwiftMediaContentHandler.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandler.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandler/Pods-SwiftMediaContentHandler.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,7 +181,8 @@
 			isa = PBXGroup;
 			children = (
 				D31286031E9F366200F2AB64 /* MediaHandler.swift */,
-				D31286041E9F366200F2AB64 /* MediaDatabase.swift */,
+				D31286041E9F366200F2AB64 /* LocalMediaDatabase.swift */,
+				D3FE35EF1EA3540D00C44052 /* LocalMediaCache.swift */,
 			);
 			path = database;
 			sourceTree = "<group>";
@@ -423,8 +426,9 @@
 			files = (
 				D31286101E9F366200F2AB64 /* ImageViewProtocol.swift in Sources */,
 				D312860E1E9F366200F2AB64 /* ImageSize.swift in Sources */,
+				D3FE35F01EA3540D00C44052 /* LocalMediaCache.swift in Sources */,
 				D312860B1E9F366200F2AB64 /* MediaHandler.swift in Sources */,
-				D312860C1E9F366200F2AB64 /* MediaDatabase.swift in Sources */,
+				D312860C1E9F366200F2AB64 /* LocalMediaDatabase.swift in Sources */,
 				D3C87B9A1E9FDC3B000BAB62 /* MediaType.swift in Sources */,
 				D30FA5221EA13C2200D440EA /* MediaCollectionType.swift in Sources */,
 				D312860D1E9F366200F2AB64 /* Album.swift in Sources */,
@@ -445,7 +449,7 @@
 				D3C87B931E9FB82A000BAB62 /* MediaRequest.swift in Sources */,
 				D3FE35EB1EA33BDF00C44052 /* TestAlbum.swift in Sources */,
 				D31286191E9F380E00F2AB64 /* MediaHandler.swift in Sources */,
-				D312861A1E9F380E00F2AB64 /* MediaDatabase.swift in Sources */,
+				D312861A1E9F380E00F2AB64 /* LocalMediaDatabase.swift in Sources */,
 				D3BFD20A1EA3199400582031 /* MediaDatabaseTest.swift in Sources */,
 				D312861B1E9F380E00F2AB64 /* Album.swift in Sources */,
 				D312861C1E9F380E00F2AB64 /* ImageSize.swift in Sources */,

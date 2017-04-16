@@ -10,7 +10,7 @@ import Photos
 import RxSwift
 import SwiftUtilitiesTests
 
-class TestMediaDatabase: MediaDatabase {
+class TestMediaDatabase: LocalMediaDatabase {
     override var currentAuthorizationStatus: PHAuthorizationStatus {
         return authorizationStatus
     }
@@ -27,17 +27,12 @@ class TestMediaDatabase: MediaDatabase {
         return filterEmptyAlbums
     }
     
-    override var shouldFilterAlbumsWithoutName: Bool {
-        return filterAlbumWithNoName
-    }
-    
     let loadAlbum_withCollectionAndOptions: FakeDetails
     
     var authorizationStatus: PHAuthorizationStatus
     var collectionTypes: [MediaCollectionType]
     var fetchActualData: Bool
     var filterEmptyAlbums: Bool
-    var filterAlbumWithNoName: Bool
     var mediaTypes: [MediaType]
     var returnValidMedia: Bool
     
@@ -46,7 +41,6 @@ class TestMediaDatabase: MediaDatabase {
         authorizationStatus = .authorized
         fetchActualData = true
         filterEmptyAlbums = true
-        filterAlbumWithNoName = true
         returnValidMedia = true
         collectionTypes = [.album, .moment, .smartAlbum]
         mediaTypes = [.audio, .image, .video]
