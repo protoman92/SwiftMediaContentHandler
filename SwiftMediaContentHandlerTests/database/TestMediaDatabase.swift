@@ -33,6 +33,8 @@ class TestMediaDatabase: LocalMediaDatabase {
     var collectionTypes: [MediaCollectionType]
     var fetchActualData: Bool
     var filterEmptyAlbums: Bool
+    var includeEmptyAlbums: Bool
+    var itemsPerAlbum: Int
     var mediaTypes: [MediaType]
     var returnValidMedia: Bool
     
@@ -41,6 +43,8 @@ class TestMediaDatabase: LocalMediaDatabase {
         authorizationStatus = .authorized
         fetchActualData = true
         filterEmptyAlbums = true
+        includeEmptyAlbums = true
+        itemsPerAlbum = 10
         returnValidMedia = true
         collectionTypes = [.album, .moment, .smartAlbum]
         mediaTypes = [.audio, .image, .video]
@@ -58,10 +62,21 @@ class TestMediaDatabase: LocalMediaDatabase {
     override func observeFetchResult(_ result: PHFetchResult<PHAsset>,
                                      with observer: AnyObserver<PHAsset>) {
         if returnValidMedia {
-            observer.onNext(PHAsset())
+            for _ in 0..<itemsPerAlbum {
+                observer.onNext(PHAsset())
+            }
         }
         
         observer.onCompleted()
+    }
+    
+    override func createAlbum(with collection: PHAssetCollection,
+                              with assets: [PHAsset]) -> Album {
+        if includeEmptyAlbums && arc4random_uniform(2) == 0 {
+            return Album.empty
+        } else {
+            return super.createAlbum(with: collection, with: assets)
+        }
     }
 }
 
@@ -70,7 +85,7 @@ extension TestMediaDatabase: FakeProtocol {
         authorizationStatus = .authorized
         fetchActualData = true
         filterEmptyAlbums = true
-        filterAlbumWithNoName = true
+        includeEmptyAlbums = true
         returnValidMedia = true
     }
 }

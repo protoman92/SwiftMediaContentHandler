@@ -84,15 +84,8 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     public func rxLoadAlbums() -> Observable<Album> {
         return mediaListener
-            .flatMap({(collection) -> Observable<Album> in
-                if self.isAuthorized() {
-                    return self.rxLoadAlbums(collection: collection)
-                } else {
-                    let error = MediaError.permissionNotGranted
-                    return Observable.error(error)
-                }
-            })
-            // If filterEmptyAlbums is true, filter out empty Albums.
+            .logNext()
+            .flatMap(self.rxLoadAlbums)
             .filter({!self.shouldFilterEmptyAlbums || $0.isNotEmpty})
             .applyCommonSchedulers()
     }
@@ -104,6 +97,11 @@ public class LocalMediaDatabase: NSObject {
     ///   - options: The PHFetchOptions to use for the fetching.
     /// - Returns: An Observable instance.
     func rxLoadAlbums(collection: PHAssetCollection) -> Observable<Album> {
+        if !isAuthorized() {
+            let error = MediaError.permissionNotGranted
+            return Observable.error(error)
+        }
+        
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
         
         // For each registered MediaType, we provide a separate PHFetchOptions.

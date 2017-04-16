@@ -16,6 +16,10 @@ extension Album {
             .build()
     }
     
+    static var empty: Album {
+        return Album.builder().build()
+    }
+    
     static var noName: Album {
         return Album.builder()
             .with(name: "")

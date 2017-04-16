@@ -94,10 +94,7 @@ public class MediaHandler: NSObject {
     public func rxRequestImage(with request: MediaRequest)
         -> Observable<UIImage>
     {
-        return rxRequest(with: request)
-            .filter({$0 is UIImage})
-            .throwIfEmpty(MediaError.notAnImage)
-            .map({$0 as! UIImage})
+        return rxRequest(with: request).cast(to: UIImage.self)
     }
     
     /// Request media remotely with rx.

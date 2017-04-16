@@ -82,6 +82,7 @@ public class Album: Collection {
         forEach({$0.localAlbumName = albumName})
     }
     
+    /// Builder for Album.
     public class Builder {
         fileprivate let album: Album
         
