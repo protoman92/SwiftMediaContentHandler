@@ -8,6 +8,7 @@
 
 import Photos
 import RxSwift
+import SwiftUtilities
 import SwiftUtilitiesTests
 
 class TestMediaDatabase: LocalMediaDatabase {
@@ -36,6 +37,7 @@ class TestMediaDatabase: LocalMediaDatabase {
     var includeEmptyAlbums: Bool
     var itemsPerAlbum: Int
     var mediaTypes: [MediaType]
+    var throwRandomError: Bool
     var returnValidMedia: Bool
     
     override init() {
@@ -48,6 +50,7 @@ class TestMediaDatabase: LocalMediaDatabase {
         returnValidMedia = true
         collectionTypes = [.album, .moment, .smartAlbum]
         mediaTypes = [.audio, .image, .video]
+        throwRandomError = true
         super.init()
     }
     
@@ -61,7 +64,9 @@ class TestMediaDatabase: LocalMediaDatabase {
     
     override func observeFetchResult(_ result: PHFetchResult<PHAsset>,
                                      with observer: AnyObserver<PHAsset>) {
-        if returnValidMedia {
+        if throwRandomError && arc4random_uniform(2) == 0 {
+            observer.onError(Exception("Failed to fetch Album"))
+        } else if returnValidMedia {
             for _ in 0..<itemsPerAlbum {
                 observer.onNext(PHAsset())
             }
@@ -87,5 +92,6 @@ extension TestMediaDatabase: FakeProtocol {
         filterEmptyAlbums = true
         includeEmptyAlbums = true
         returnValidMedia = true
+        throwRandomError = true
     }
 }

@@ -10,6 +10,7 @@
 		59CAC75C7F574DD8369A6A69 /* Pods_SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EC7FDA16E624E604E71DEFF /* Pods_SwiftMediaContentHandler.framework */; };
 		85B923ED0AE7A8EB847C3317 /* Pods_SwiftMediaContentHandlerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */; };
 		D30D54521EA060BD00DD29D6 /* MediaError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30D54511EA060BD00DD29D6 /* MediaError.swift */; };
+		D30F47C71EA45CD1004C4CD6 /* pod-publish.txt in Resources */ = {isa = PBXBuildFile; fileRef = D30F47C61EA45CD1004C4CD6 /* pod-publish.txt */; };
 		D30FA5221EA13C2200D440EA /* MediaCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30FA5211EA13C2200D440EA /* MediaCollectionType.swift */; };
 		D30FA5231EA1471E00D440EA /* MediaCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30FA5211EA13C2200D440EA /* MediaCollectionType.swift */; };
 		D31285F21E9F356D00F2AB64 /* SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */; };
@@ -58,6 +59,7 @@
 		6ED0E75D5BC4EB2A09F8763C /* Pods-SwiftMediaContentHandler.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandler.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandler/Pods-SwiftMediaContentHandler.debug.xcconfig"; sourceTree = "<group>"; };
 		78DCB540D0DE5B1E84340921 /* Pods-SwiftMediaContentHandlerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandlerTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandlerTests/Pods-SwiftMediaContentHandlerTests.release.xcconfig"; sourceTree = "<group>"; };
 		D30D54511EA060BD00DD29D6 /* MediaError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaError.swift; path = util/MediaError.swift; sourceTree = "<group>"; };
+		D30F47C61EA45CD1004C4CD6 /* pod-publish.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pod-publish.txt"; sourceTree = "<group>"; };
 		D30FA5211EA13C2200D440EA /* MediaCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaCollectionType.swift; sourceTree = "<group>"; };
 		D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftMediaContentHandler.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D31285EB1E9F356C00F2AB64 /* SwiftMediaContentHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftMediaContentHandler.h; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 		D31285DE1E9F356C00F2AB64 = {
 			isa = PBXGroup;
 			children = (
+				D30F47C61EA45CD1004C4CD6 /* pod-publish.txt */,
 				D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */,
 				D31285EA1E9F356C00F2AB64 /* SwiftMediaContentHandler */,
 				D31285F51E9F356D00F2AB64 /* SwiftMediaContentHandlerTests */,
@@ -332,6 +335,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D30F47C71EA45CD1004C4CD6 /* pod-publish.txt in Resources */,
 				D38316981EA3EED8009706FF /* SwiftMediaContentHandler.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -518,7 +522,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -565,7 +569,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -589,6 +593,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = SwiftMediaContentHandler/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.swiften.SwiftMediaContentHandler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -610,6 +615,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = SwiftMediaContentHandler/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.swiften.SwiftMediaContentHandler;
 				PRODUCT_NAME = "$(TARGET_NAME)";

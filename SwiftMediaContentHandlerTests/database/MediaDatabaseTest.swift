@@ -23,6 +23,7 @@ class MediaDatabaseTest: XCTestCase {
         scheduler = TestScheduler(initialClock: 0)
         observer = scheduler.createObserver(Album.self)
         mediaDatabase.includeEmptyAlbums = false
+        mediaDatabase.throwRandomError = false
     }
     
     override func tearDown() {
@@ -116,5 +117,37 @@ class MediaDatabaseTest: XCTestCase {
         let count = events.count
         let nextValues = events[0..<count - 1].flatMap({$0.value.element})
         XCTAssertLessThanOrEqual(nextValues.count, totalTry)
+    }
+    
+    public func test_mock_randomErrorThrown_shouldStillSucceed() {
+        // Setup
+        mediaDatabase.throwRandomError = true
+        let tries = 10
+        let typeCount = mediaDatabase.mediaTypes.count
+        let totalTry = tries * typeCount
+        let expect = expectation(description: "Should have succeeded")
+        
+        // When
+        /// We need to use a range due to includeEmptyAlbums using a random
+        /// Bool value.
+        _ = Observable.range(start: 1, count: tries)
+            .flatMap({_ in self.mediaDatabase
+                .rxLoadAlbums(collection: PHAssetCollection())})
+            .filter({$0.isNotEmpty})
+            .doOnDispose(expect.fulfill)
+            .subscribe(observer)
+        
+        scheduler.start()
+        
+        // Then
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
+        
+        XCTAssertEqual(
+            mediaDatabase.loadAlbum_withCollectionAndOptions.methodCount,
+            totalTry
+        )
+        
+        let events = observer.events
+        print(events)
     }
 }

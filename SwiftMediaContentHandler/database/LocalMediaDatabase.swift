@@ -97,6 +97,9 @@ public class LocalMediaDatabase: NSObject {
     ///   - options: The PHFetchOptions to use for the fetching.
     /// - Returns: An Observable instance.
     func rxLoadAlbums(collection: PHAssetCollection) -> Observable<Album> {
+        
+        // Authorization error should be a terminal event and terminate all
+        // currently executing streams.
         if !isAuthorized() {
             let error = MediaError.permissionNotGranted
             return Observable.error(error)
@@ -128,6 +131,10 @@ public class LocalMediaDatabase: NSObject {
             })
             .toArray()
             .map({self.createAlbum(with: collection, with: $0)})
+            
+            // If an error is encountered, we need to switch to another
+            // Observable, or else the entire stream will be terminated.
+            .catchSwitchToEmpty()
     }
     
     /// Observe PHAsset from a PHFetchResult, using an Observer. This method
