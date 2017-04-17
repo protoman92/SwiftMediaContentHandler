@@ -31,3 +31,7 @@ Finally, load initial albums and set up the Change Observer:
 > mediaDatabase.loadInitialAlbums()
 
 If permission is denied at this stage, an Error will be thrown.
+
+# Demonstration
+
+Please visit **TestApplication-iOS** [https://github.com/protoman92/TestApplication-iOS.git] for a quick demonstration (esp. **GalleryController**).
