@@ -32,6 +32,14 @@ Finally, load initial albums and set up the Change Observer:
 
 If permission is denied at this stage, an Error will be thrown.
 
+# Installation
+
+This library requires CocoaPods. Please use:
+
+> pod 'SwiftMediaContentHandler'
+
+for the appropriate build targets.
+
 # Demonstration
 
 Please visit **TestApplication-iOS** [https://github.com/protoman92/TestApplication-iOS.git] for a quick demonstration (esp. **GalleryController**).
