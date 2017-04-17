@@ -3,7 +3,7 @@
 //  SwiftMediaContentHandler
 //
 //  Created by Hai Pham on 7/31/16.
-//  Copyright © 2016 Anh Vu Mai. All rights reserved.
+//  Copyright © 2016 Swiften. All rights reserved.
 //
 
 import Photos
