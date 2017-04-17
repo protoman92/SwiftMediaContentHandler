@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
     s.name = "SwiftMediaContentHandler"
     s.summary = "Media content handler that abstracts away PHPhotoLibrary using RxSwift."
     s.requires_arc = true
-    s.version = "1.0.0"
+    s.version = "1.0.1"
     s.license = { :type => "Apache-2.0", :file => "LICENSE" }
     s.author = { "Hai Pham" => "swiften.svc@gmail.com" }
     s.homepage = "https://github.com/protoman92/SwiftMediaContentHandler.git"

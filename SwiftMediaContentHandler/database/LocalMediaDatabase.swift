@@ -84,10 +84,17 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     public func rxLoadAlbums() -> Observable<Album> {
         return mediaListener
-            .logNext()
-            .flatMap(self.rxLoadAlbums)
-            .filter({!self.shouldFilterEmptyAlbums || $0.isNotEmpty})
-            .applyCommonSchedulers()
+            // The flatMap here should switch to an entirely different
+            // Observable, or else an Error will terminate the whole stream
+            // and invalidate the mediaListener.
+            .flatMap({self.rxLoadAlbums(collection: $0)
+                .filter({!self.shouldFilterEmptyAlbums || $0.isNotEmpty})
+                
+                // If an error is encountered, we should switch to another
+                // Observable, or else the PublishSubject will not emit
+                // anything else in the future.
+                .catchSwitchToEmpty()
+                .applyCommonSchedulers()})
     }
     
     /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
@@ -97,9 +104,6 @@ public class LocalMediaDatabase: NSObject {
     ///   - options: The PHFetchOptions to use for the fetching.
     /// - Returns: An Observable instance.
     func rxLoadAlbums(collection: PHAssetCollection) -> Observable<Album> {
-        
-        // Authorization error should be a terminal event and terminate all
-        // currently executing streams.
         if !isAuthorized() {
             let error = MediaError.permissionNotGranted
             return Observable.error(error)

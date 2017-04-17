@@ -6,6 +6,7 @@
 //  Copyright © 2017 Swiften. All rights reserved.
 //
 
+/// Common error messages.
 public class MediaError {
     public static var permissionNotGranted: String {
         return "media.error.permissionNotGranted".localized
