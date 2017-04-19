@@ -34,10 +34,10 @@ PODS:
   - SDWebImage/WebP (4.0.0):
     - libwebp
     - SDWebImage/Core
-  - SwiftUtilities/Main (1.1.9):
+  - SwiftUtilities/Main (1.2.2):
     - RxCocoa (~> 3.0)
     - RxSwift (~> 3.0)
-  - SwiftUtilitiesTests/Main (1.1.9):
+  - SwiftUtilitiesTests/Main (1.2.2):
     - RxBlocking (~> 3.0)
     - RxCocoa (~> 3.0)
     - RxSwift (~> 3.0)
@@ -55,8 +55,8 @@ SPEC CHECKSUMS:
   RxSwift: 3789a1af753002a14edecdb698a2424624296a9c
   RxTest: beb6beb882cf1dcac5fc9fdbd4760a5254e7f3a6
   SDWebImage: 76a6348bdc74eb5a55dd08a091ef298e56b55e41
-  SwiftUtilities: a2eafa20bbe7e3972d91df908087e3d528fee077
-  SwiftUtilitiesTests: 16f0be53fd589aab74bda6a4c1744960ef8ee3bd
+  SwiftUtilities: 6edf0e3c35199bc30abd31f60ccfb83690968a8c
+  SwiftUtilitiesTests: 1030cc9b04d94e278f4cd068efd86bcef1fa014f
 
 PODFILE CHECKSUM: 8fc304f3980f4e59cf8fc27d16796a6d3140bc9c
 

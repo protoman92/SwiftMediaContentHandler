@@ -262,6 +262,32 @@ public extension LocalMediaDatabase {
     }
 }
 
+fileprivate extension LocalMediaDatabase {
+    
+    /// Convenient method to start fetch for a new PHAssetCollection.
+    ///
+    /// - Parameters:
+    ///   - collection: A PHAssetCollection instance.
+    ///   - observer: An Observer instance.
+    fileprivate func startFetch<O: ObserverType>(
+        for collection: PHAssetCollection,
+        with observer: O) where O.E == PHAssetCollection
+    {
+        observer.onNext(collection)
+    }
+    
+    /// Convenient to start fetch with a lock.
+    ///
+    /// - Parameter collection: A PHAssetCollection instance.
+    fileprivate func startFetch(for collection: PHAssetCollection) {
+        let mediaListener = self.mediaListener
+        
+        synchronized(mediaListener, then: {
+            startFetch(for: collection, with: mediaListener)
+        })
+    }
+}
+
 public extension LocalMediaDatabase {
     
     /// Get the current authorization status for PHPhotoLibrary.
@@ -278,7 +304,7 @@ public extension LocalMediaDatabase {
     }
 }
 
-public extension LocalMediaDatabase {
+fileprivate extension LocalMediaDatabase {
     /// Create a PHFetchOptions based on a MediaType instance.
     ///
     /// - Parameter type: A MediaType instance.
@@ -323,8 +349,6 @@ public extension LocalMediaDatabase {
         case .authorized:
             registerChangeObserver()
             
-            let mediaListener = self.mediaListener
-            
             // Initialize the PHFetchResult Array here, instead of when the
             // instance is first built. This is because doing this will
             // explicitly request permission - we only want to ask for
@@ -337,7 +361,7 @@ public extension LocalMediaDatabase {
             })
             
             assetCollectionFetch.forEach({
-                $0.enumerateObjects({mediaListener.onNext($0.0)})
+                $0.enumerateObjects({self.startFetch(for: $0.0)})
             })
             
         case .notDetermined:
@@ -355,12 +379,10 @@ extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
     ///
     /// - Parameter changeInstance: A PHChange instance.
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        let mediaListener = self.mediaListener
-        
         assetCollectionFetch
             .flatMap(changeInstance.changeDetails)
             .map({$0.changedObjects})
             .reduce([], +)
-            .forEach(mediaListener.onNext)
+            .forEach(startFetch)
     }
 }
