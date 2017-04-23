@@ -29,7 +29,7 @@ public enum MediaCollectionType {
     }
 }
 
-extension MediaCollectionType: CustomComparisonProtocol {
+extension MediaCollectionType: CustomComparisonType {
     public func equals(object: MediaCollectionType?) -> Bool {
         return self == object
     }

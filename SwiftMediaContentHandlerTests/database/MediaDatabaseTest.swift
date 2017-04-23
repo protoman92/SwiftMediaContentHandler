@@ -28,7 +28,6 @@ class MediaDatabaseTest: XCTestCase {
     
     override func tearDown() {
         super.tearDown()
-        mediaDatabase.reset()
     }
     
     public func test_mock_permissionNotGranted_shouldThrow() {

@@ -98,13 +98,13 @@ public protocol LocalMediaProtocol {
 
 extension LocalMedia: LocalMediaProtocol {}
 
-extension LocalMedia: CustomComparisonProtocol {
+extension LocalMedia: CustomComparisonType {
     public func equals(object: LocalMedia?) -> Bool {
         return object?.id == id
     }
 }
 
-extension PHAsset: CustomComparisonProtocol {
+extension PHAsset: CustomComparisonType {
     public func equals(object: PHAsset?) -> Bool {
         return object == self
     }
