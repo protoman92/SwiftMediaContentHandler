@@ -11,7 +11,7 @@ import Photos
 import RxSwift
 import SwiftUtilities
 
-/// This class can be used to get PHAsset of different types from 
+/// This class can be used to get PHAsset of different types from
 /// PHPhotoLibrary.
 public class LocalMediaDatabase: NSObject {
     
@@ -87,14 +87,31 @@ public class LocalMediaDatabase: NSObject {
             // The flatMap here should switch to an entirely different
             // Observable, or else an Error will terminate the whole stream
             // and invalidate the mediaListener.
-            .flatMap({self.rxLoadAlbums(collection: $0)
-                .filter({!self.shouldFilterEmptyAlbums || $0.isNotEmpty})
-                
-                // If an error is encountered, we should switch to another
-                // Observable, or else the PublishSubject will not emit
-                // anything else in the future.
-                .catchSwitchToEmpty()
-                .applyCommonSchedulers()})
+            .flatMap({[weak self] (collection) -> Observable<Album> in
+                if let `self` = self {
+                    return `self`.rxLoadAlbums(using: collection, with: `self`)
+                } else {
+                    return Observable<Album>.empty()
+                }
+            })
+    }
+    
+    /// Bridge method to avoid self being captured in closure.
+    ///
+    /// - Parameters:
+    ///   - collection: A PHAssetCollection instance.
+    ///   - current: The current LocalMediaDatabase instance.
+    /// - Returns: An Observable instance.
+    func rxLoadAlbums(using collection: PHAssetCollection,
+                      with current: LocalMediaDatabase) -> Observable<Album> {
+        return current.rxLoadAlbums(collection: collection)
+            .filter({!current.shouldFilterEmptyAlbums || $0.isNotEmpty})
+            
+            // If an error is encountered, we should switch to another
+            // Observable, or else the PublishSubject will not emit
+            // anything else in the future.
+            .catchSwitchToEmpty()
+            .applyCommonSchedulers()
     }
     
     /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
