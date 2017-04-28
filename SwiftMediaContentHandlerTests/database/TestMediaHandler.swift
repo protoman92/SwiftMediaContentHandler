@@ -53,7 +53,7 @@ class TestMediaHandler: MediaHandler {
             if returnValidMedia {
                 complete(UIImage(), nil)
             } else {
-                complete(nil, Exception(MediaError.mediaUnavailable))
+                complete(nil, Exception(mediaUnavailable))
             }
         }
     }
@@ -68,7 +68,7 @@ class TestMediaHandler: MediaHandler {
             if returnValidMedia {
                 complete(UIImage(), nil)
             } else {
-                complete(nil, Exception(MediaError.mediaUnavailable))
+                complete(nil, Exception(mediaUnavailable))
             }
         }
     }

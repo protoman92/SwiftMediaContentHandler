@@ -7,24 +7,26 @@
 //
 
 /// Common error messages.
-public class MediaError {
-    public static var permissionNotGranted: String {
+public protocol MediaErrorType {}
+
+public extension MediaErrorType {
+    public var permissionNotGranted: String {
         return "media.error.permissionNotGranted".localized
     }
     
-    public static var mediaHandlerUnavailable: String {
+    public var mediaHandlerUnavailable: String {
         return "media.error.handlerUnavailable".localized
     }
     
-    public static var mediaHandlerUnknownRequest: String {
+    public var mediaHandlerUnknownRequest: String {
         return "media.error.unknownRequestType".localized
     }
     
-    public static var mediaUnavailable: String {
+    public var mediaUnavailable: String {
         return "media.error.unavailable".localized
     }
     
-    public static var notAnImage: String {
+    public var notAnImage: String {
         return "media.error.notAnImage".localized
     }
 }

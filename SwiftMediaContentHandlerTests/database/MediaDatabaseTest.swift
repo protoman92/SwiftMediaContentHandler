@@ -55,7 +55,7 @@ class MediaDatabaseTest: XCTestCase {
         XCTAssertNotNil(error)
         
         XCTAssertEqual(error!.localizedDescription,
-                       MediaError.permissionNotGranted)
+                       permissionNotGranted)
     }
     
     public func test_mock_fetchWithPermission_shouldSucceed() {
@@ -150,3 +150,5 @@ class MediaDatabaseTest: XCTestCase {
         print(events)
     }
 }
+
+extension MediaDatabaseTest: MediaErrorType {}

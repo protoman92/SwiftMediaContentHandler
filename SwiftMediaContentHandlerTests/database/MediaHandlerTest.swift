@@ -104,7 +104,7 @@ class MediaHandlerTest: XCTestCase {
         print(events)
         let error = events.first!.value.error
         XCTAssertNotNil(error)
-        XCTAssertEqual(error!.localizedDescription, MediaError.mediaUnavailable)
+        XCTAssertEqual(error!.localizedDescription, mediaUnavailable)
     }
     
     func test_mock_notAuthorizedLocally_shouldThrow() {
@@ -130,7 +130,7 @@ class MediaHandlerTest: XCTestCase {
         XCTAssertNotNil(error)
         
         XCTAssertEqual(error!.localizedDescription,
-                       MediaError.permissionNotGranted)
+                       permissionNotGranted)
     }
     
     func test_mock_unknownRequestType_shouldThrow() {
@@ -153,7 +153,7 @@ class MediaHandlerTest: XCTestCase {
         XCTAssertNotNil(error)
         
         XCTAssertEqual(error!.localizedDescription,
-                       MediaError.mediaHandlerUnknownRequest)
+                       mediaHandlerUnknownRequest)
     }
     
     func test_mock_mediaUnavailable_shouldThrow() {
@@ -175,6 +175,8 @@ class MediaHandlerTest: XCTestCase {
         let events = observer.events
         let error = events.first!.value.error
         XCTAssertNotNil(error)
-        XCTAssertEqual(error!.localizedDescription, MediaError.mediaUnavailable)
+        XCTAssertEqual(error!.localizedDescription, mediaUnavailable)
     }
 }
+
+extension MediaHandlerTest: MediaErrorType {}

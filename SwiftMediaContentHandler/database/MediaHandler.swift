@@ -17,7 +17,7 @@ public typealias MediaCallback = (Any?, Error?) -> Void
 
 /// Classes that implement this protocol must be able to handle different
 /// types of MediaRequest.
-public protocol MediaHandlerProtocol {
+public protocol MediaHandlerType {
     /// Load media reactively using a MediaRequest.
     ///
     /// - Parameter request: A MediaRequest instance.
@@ -80,7 +80,7 @@ public class MediaHandler: NSObject {
             source = rxRequestLocalMedia(with: request)
             
         default:
-            source = Observable.error(MediaError.mediaHandlerUnknownRequest)
+            source = Observable.error(mediaHandlerUnknownRequest)
         }
         
         return source.applyCommonSchedulers()
@@ -110,8 +110,7 @@ public class MediaHandler: NSObject {
                 } else if let error = $0.1 {
                     observer.onError(error)
                 } else {
-                    let error = Exception(MediaError.mediaUnavailable)
-                    observer.onError(error)
+                    observer.onError(Exception(self.mediaUnavailable))
                 }
             }
             
@@ -132,7 +131,7 @@ public class MediaHandler: NSObject {
             requestWebImage(with: request, then: complete)
             
         default:
-            let message = MediaError.mediaHandlerUnknownRequest
+            let message = mediaHandlerUnknownRequest
             let error = Exception(message)
             mainThread {complete(nil, error)}
         }
@@ -146,7 +145,7 @@ public class MediaHandler: NSObject {
     public func requestWebImage(with request: WebImageRequest,
                                 then complete: @escaping MediaCallback) {
         guard let url = request.url else {
-            let error = Exception(MediaError.mediaUnavailable)
+            let error = Exception(mediaUnavailable)
             mainThread {complete(nil, error)}
             return
         }
@@ -201,7 +200,7 @@ public class MediaHandler: NSObject {
         -> Observable<PHImageManager>
     {
         guard granted else {
-            return Observable.error(MediaError.permissionNotGranted)
+            return Observable.error(permissionNotGranted)
         }
         
         let phManager = PHImageManager()
@@ -236,8 +235,7 @@ public class MediaHandler: NSObject {
                         } else {
                             // This error should not be expected. This means
                             // all handlers failed to return any response.
-                            let error = Exception(MediaError.mediaUnavailable)
-                            observer.onError(error)
+                            observer.onError(Exception(self.mediaUnavailable))
                         }
                     }
                     
@@ -261,7 +259,7 @@ public class MediaHandler: NSObject {
             requestLocalImage(with: request, using: manager, then: complete)
             
         default:
-            let message = MediaError.mediaHandlerUnknownRequest
+            let message = mediaHandlerUnknownRequest
             let error = Exception(message)
             mainThread {complete(nil, error)}
         }
@@ -277,7 +275,7 @@ public class MediaHandler: NSObject {
                                   using manager: PHImageManager,
                                   then complete: @escaping MediaCallback) {
         guard let asset = request.mediaAsset?.localAsset else {
-            let error = Exception(MediaError.mediaUnavailable)
+            let error = Exception(mediaUnavailable)
             mainThread {complete(nil, error)}
             return
         }
@@ -298,8 +296,7 @@ public class MediaHandler: NSObject {
             // converting it to an UIImage.
             manager.requestImageData(for: asset, options: nil) {
                 guard let data = $0.0, let image = UIImage(data: data) else {
-                    let error = Exception(MediaError.mediaUnavailable)
-                    mainThread {complete(nil, error)}
+                    mainThread {complete(nil, Exception(self.mediaUnavailable))}
                     return
                 }
                 
@@ -336,4 +333,5 @@ public extension MediaHandler {
     }
 }
 
-extension MediaHandler: MediaHandlerProtocol {}
+extension MediaHandler: MediaHandlerType {}
+extension MediaHandler: MediaErrorType {}

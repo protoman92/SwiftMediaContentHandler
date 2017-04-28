@@ -122,8 +122,7 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     func rxLoadAlbums(collection: PHAssetCollection) -> Observable<Album> {
         if !isAuthorized() {
-            let error = MediaError.permissionNotGranted
-            return Observable.error(error)
+            return Observable.error(permissionNotGranted)
         }
         
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
@@ -403,3 +402,5 @@ extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
             .forEach(startFetch)
     }
 }
+
+extension LocalMediaDatabase: MediaErrorType {}
