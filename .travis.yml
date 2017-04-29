@@ -8,4 +8,3 @@ before_install:
 
 script:
     - set -o pipefail && xcodebuild test -sdk iphonesimulator -workspace SwiftMediaContentHandler.xcworkspace  -scheme SwiftMediaContentHandler  CODE_SIGNING_REQUIRED=NO -destination 'platform=iOS Simulator,name=iPhone 7 Plus,OS=10.2'
-	- pod lib lint
