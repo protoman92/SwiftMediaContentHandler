@@ -1,6 +1,8 @@
 # SwiftMediaContentHandler
 Media Content Handler for **PHPhotoLibrary**. Based on RxSwift.
 
+![](https://travis-ci.org/protoman92/SwiftMediaContentHandler.svg?branch=master)
+
 This library provides two main convenient classes that abstract most of the work needed to handle media fetching in iOS development:
 
 ## MediaHandler: 
