@@ -33,7 +33,7 @@ public class LocalMediaDatabase: NSObject {
     
     /// When this Observable is subscribed to, it will emit data that it
     /// fetches from PHPhotoLibrary.
-    fileprivate var photoLibraryObservable: Observable<LocalMedia>
+    fileprivate var photoLibraryObservable: Observable<LocalMediaType>
     
     /// Return mediaTypes, a MediaType Array.
     public var registeredMediaTypes: [MediaType] {
@@ -51,7 +51,7 @@ public class LocalMediaDatabase: NSObject {
     }
     
     /// Return photoLibraryObservable.
-    public var mediaObservable: Observable<LocalMedia> {
+    public var mediaObservable: Observable<LocalMediaType> {
         return photoLibraryObservable
     }
     
@@ -76,13 +76,13 @@ public class LocalMediaDatabase: NSObject {
     /// if authorized.
     ///
     /// - Returns: An Observable instance.
-    public func rxa_loadMedia() -> Observable<LocalMedia> {
+    public func rxa_loadMedia() -> Observable<LocalMediaType> {
         return mediaListener
-            .flatMap({[weak self] (collection) -> Observable<LocalMedia> in
+            .flatMap({[weak self] (collection) -> Observable<LocalMediaType> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection)
                 } else {
-                    return Observable<LocalMedia>.empty()
+                    return Observable.empty()
                 }
             })
             .observeOn(MainScheduler.instance)
@@ -92,7 +92,9 @@ public class LocalMediaDatabase: NSObject {
     ///
     /// - Parameter collection: The PHAssetCollection to get PHAsset instances.
     /// - Returns: An Observable instance.
-    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<LocalMedia> {
+    func rxa_loadMedia(from collection: PHAssetCollection)
+        -> Observable<LocalMediaType>
+    {
         if !isAuthorized() {
             return Observable.error(permissionNotGranted)
         }
@@ -101,11 +103,11 @@ public class LocalMediaDatabase: NSObject {
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
         return Observable.from(fetchOptions)
-            .flatMap({[weak self] (ops) -> Observable<LocalMedia> in
+            .flatMap({[weak self] (ops) -> Observable<LocalMediaType> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection, with: ops)
                 } else {
-                    return Observable<LocalMedia>.empty()
+                    return Observable.empty()
                 }
             })
     }
@@ -118,7 +120,7 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     func rxa_loadMedia(from collection: PHAssetCollection,
                        with options: PHFetchOptions)
-        -> Observable<LocalMedia>
+        -> Observable<LocalMediaType>
     {
         let result = PHAsset.fetchAssets(in: collection, options: options)
         let title = collection.localizedTitle ?? defaultAlbumName()
@@ -128,9 +130,14 @@ public class LocalMediaDatabase: NSObject {
                 self?.observeFetchResult(result, with: observer)
                 return Disposables.create()
             })
-            .map({LocalMedia.builder().with(asset: $0)})
-            .map({$0.with(albumName: title)})
-            .map({$0.build()})
+            .map({[weak self] in
+                if let `self` = self {
+                    return `self`.createLocalMedia(with: $0, with: title)
+                } else {
+                    return LocalMedia.blank()
+                }
+            })
+            .filter({$0.hasLocalAsset()})
             .subscribeOn(qos: .background)
     }
     
@@ -153,6 +160,21 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: A String value.
     func defaultAlbumName() -> String {
         return "media.title.untitled".localized
+    }
+    
+    /// Create a LocalMedia instance with PHAsset and album name.
+    ///
+    /// - Parameters:
+    ///   - asset: A PHAsset instance.
+    ///   - title: A String value.
+    /// - Returns: A LocalMedia instance.
+    func createLocalMedia(with asset: PHAsset, with title: String)
+        -> LocalMediaType
+    {
+        return LocalMedia.builder()
+            .with(asset: asset)
+            .with(albumName: title)
+            .build()
     }
     
     /// Builder class for LocalMediaDatabase.
@@ -352,3 +374,25 @@ extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
 }
 
 extension LocalMediaDatabase: MediaDatabaseErrorType {}
+
+public extension ObservableType where E == LocalMediaType {
+    
+    /// Convert LocalMedia emission into Album instance.
+    ///
+    /// - Returns: An Observable instance.
+    public func toAlbum() -> Observable<AlbumType> {
+        return groupBy(keySelector: {$0.localAlbumName})
+            .flatMap({(gObs) -> Observable<AlbumType> in
+                let albumName = gObs.key
+                
+                return gObs.asObservable().toArray()
+                    .map({Album.builder()
+                        .add(medias: $0)
+                        .with(name: albumName)
+                        .build()
+                    })
+                    .subscribeOn(qos: .background)
+            })
+            .observeOn(MainScheduler.instance)
+    }
+}

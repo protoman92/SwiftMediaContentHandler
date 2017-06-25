@@ -11,7 +11,7 @@ import RxSwift
 import SwiftUtilities
 import SwiftUtilitiesTests
 
-class TestMediaDatabase: LocalMediaDatabase {
+final class TestMediaDatabase: LocalMediaDatabase {
     override var currentAuthorizationStatus: PHAuthorizationStatus {
         return authorizationStatus
     }
@@ -24,28 +24,20 @@ class TestMediaDatabase: LocalMediaDatabase {
         return collectionTypes
     }
     
-    override var shouldFilterEmptyAlbums: Bool {
-        return filterEmptyAlbums
-    }
-    
-    let loadAlbum_withCollectionAndOptions: FakeDetails
+    let loadwithCollectionAndOptions: FakeDetails
     
     var authorizationStatus: PHAuthorizationStatus
     var collectionTypes: [MediaCollectionType]
     var fetchActualData: Bool
-    var filterEmptyAlbums: Bool
-    var includeEmptyAlbums: Bool
     var itemsPerAlbum: Int
     var mediaTypes: [MediaType]
     var throwRandomError: Bool
     var returnValidMedia: Bool
     
     override init() {
-        loadAlbum_withCollectionAndOptions = FakeDetails.builder().build()
+        loadwithCollectionAndOptions = FakeDetails.builder().build()
         authorizationStatus = .authorized
         fetchActualData = true
-        filterEmptyAlbums = true
-        includeEmptyAlbums = true
         itemsPerAlbum = 10
         returnValidMedia = true
         collectionTypes = [.album, .moment, .smartAlbum]
@@ -54,12 +46,12 @@ class TestMediaDatabase: LocalMediaDatabase {
         super.init()
     }
     
-    override func rxLoadAlbums(collection: PHAssetCollection,
-                               options: PHFetchOptions) -> Observable<Album> {
-        loadAlbum_withCollectionAndOptions
-            .onMethodCalled(withParameters: (collection, options))
-        
-        return super.rxLoadAlbums(collection: collection, options: options)
+    override func rxa_loadMedia(from collection: PHAssetCollection,
+                                with options: PHFetchOptions)
+        -> Observable<LocalMediaType>
+    {
+        loadwithCollectionAndOptions.onMethodCalled(withParameters: (collection, options))
+        return super.rxa_loadMedia(from: collection, with: options)
     }
     
     override func observeFetchResult(_ result: PHFetchResult<PHAsset>,
@@ -75,13 +67,10 @@ class TestMediaDatabase: LocalMediaDatabase {
         observer.onCompleted()
     }
     
-    override func createAlbum(with collection: PHAssetCollection,
-                              with assets: [PHAsset]) -> Album {
-        if includeEmptyAlbums && arc4random_uniform(2) == 0 {
-            return Album.empty
-        } else {
-            return super.createAlbum(with: collection, with: assets)
-        }
+    override func createLocalMedia(with asset: PHAsset, with title: String)
+        -> LocalMediaType
+    {
+        return LocalMedia.fake()
     }
 }
 
@@ -89,8 +78,6 @@ extension TestMediaDatabase: FakeProtocol {
     func reset() {
         authorizationStatus = .authorized
         fetchActualData = true
-        filterEmptyAlbums = true
-        includeEmptyAlbums = true
         returnValidMedia = true
         throwRandomError = true
     }

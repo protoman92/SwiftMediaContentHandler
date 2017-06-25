@@ -14,14 +14,19 @@
 		D313E5CC1EA0C8A80063F91F /* TestLocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */; };
 		D38316981EA3EED8009706FF /* SwiftMediaContentHandler.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */; };
 		D3BFD2071EA30FB300582031 /* TestMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */; };
-		D3BFD20A1EA3199400582031 /* MediaDatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BFD2091EA3199400582031 /* MediaDatabaseTest.swift */; };
 		D3D3CF7D1F00233C009ABC03 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF761F00233C009ABC03 /* LocalMediaDatabase.swift */; };
 		D3D3CF7E1F00233C009ABC03 /* MediaDatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF771F00233C009ABC03 /* MediaDatabaseError.swift */; };
 		D3D3CF7F1F00233C009ABC03 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF791F00233C009ABC03 /* Album.swift */; };
 		D3D3CF801F00233C009ABC03 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF7A1F00233C009ABC03 /* LocalMedia.swift */; };
 		D3D3CF811F00233C009ABC03 /* MediaCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF7B1F00233C009ABC03 /* MediaCollectionType.swift */; };
 		D3D3CF821F00233C009ABC03 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF7C1F00233C009ABC03 /* MediaType.swift */; };
-		D3FE35EB1EA33BDF00C44052 /* TestAlbum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FE35EA1EA33BDF00C44052 /* TestAlbum.swift */; };
+		D3D3CF831F002DA4009ABC03 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF761F00233C009ABC03 /* LocalMediaDatabase.swift */; };
+		D3D3CF841F002DA4009ABC03 /* MediaDatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF771F00233C009ABC03 /* MediaDatabaseError.swift */; };
+		D3D3CF851F002DA4009ABC03 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF791F00233C009ABC03 /* Album.swift */; };
+		D3D3CF861F002DA4009ABC03 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF7A1F00233C009ABC03 /* LocalMedia.swift */; };
+		D3D3CF871F002DA4009ABC03 /* MediaCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF7B1F00233C009ABC03 /* MediaCollectionType.swift */; };
+		D3D3CF881F002DA4009ABC03 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF7C1F00233C009ABC03 /* MediaType.swift */; };
+		D3D3CF8C1F003029009ABC03 /* MediaDatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF8A1F002EBD009ABC03 /* MediaDatabaseTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,14 +53,13 @@
 		D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestLocalMedia.swift; path = model/TestLocalMedia.swift; sourceTree = "<group>"; };
 		D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwiftMediaContentHandler.podspec; sourceTree = "<group>"; };
 		D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestMediaDatabase.swift; sourceTree = "<group>"; };
-		D3BFD2091EA3199400582031 /* MediaDatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseTest.swift; sourceTree = "<group>"; };
 		D3D3CF761F00233C009ABC03 /* LocalMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMediaDatabase.swift; sourceTree = "<group>"; };
 		D3D3CF771F00233C009ABC03 /* MediaDatabaseError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseError.swift; sourceTree = "<group>"; };
 		D3D3CF791F00233C009ABC03 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		D3D3CF7A1F00233C009ABC03 /* LocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMedia.swift; sourceTree = "<group>"; };
 		D3D3CF7B1F00233C009ABC03 /* MediaCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaCollectionType.swift; sourceTree = "<group>"; };
 		D3D3CF7C1F00233C009ABC03 /* MediaType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaType.swift; sourceTree = "<group>"; };
-		D3FE35EA1EA33BDF00C44052 /* TestAlbum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestAlbum.swift; path = model/TestAlbum.swift; sourceTree = "<group>"; };
+		D3D3CF8A1F002EBD009ABC03 /* MediaDatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseTest.swift; sourceTree = "<group>"; };
 		F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftMediaContentHandlerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F57CDB865D90241C9000FB50 /* Pods-SwiftMediaContentHandler.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandler.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandler/Pods-SwiftMediaContentHandler.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -137,6 +141,7 @@
 		D31285F51E9F356D00F2AB64 /* SwiftMediaContentHandlerTests */ = {
 			isa = PBXGroup;
 			children = (
+				D3D3CF891F002EBD009ABC03 /* test */,
 				D313E5CD1EA0C8AB0063F91F /* model */,
 				D31286111E9F366C00F2AB64 /* database */,
 				D31285F81E9F356D00F2AB64 /* Info.plist */,
@@ -147,7 +152,6 @@
 		D31286111E9F366C00F2AB64 /* database */ = {
 			isa = PBXGroup;
 			children = (
-				D3BFD2091EA3199400582031 /* MediaDatabaseTest.swift */,
 				D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */,
 			);
 			path = database;
@@ -157,7 +161,6 @@
 			isa = PBXGroup;
 			children = (
 				D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */,
-				D3FE35EA1EA33BDF00C44052 /* TestAlbum.swift */,
 			);
 			name = model;
 			sourceTree = "<group>";
@@ -180,6 +183,14 @@
 				D3D3CF7C1F00233C009ABC03 /* MediaType.swift */,
 			);
 			path = model;
+			sourceTree = "<group>";
+		};
+		D3D3CF891F002EBD009ABC03 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				D3D3CF8A1F002EBD009ABC03 /* MediaDatabaseTest.swift */,
+			);
+			path = test;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -392,8 +403,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3FE35EB1EA33BDF00C44052 /* TestAlbum.swift in Sources */,
-				D3BFD20A1EA3199400582031 /* MediaDatabaseTest.swift in Sources */,
+				D3D3CF8C1F003029009ABC03 /* MediaDatabaseTest.swift in Sources */,
+				D3D3CF831F002DA4009ABC03 /* LocalMediaDatabase.swift in Sources */,
+				D3D3CF841F002DA4009ABC03 /* MediaDatabaseError.swift in Sources */,
+				D3D3CF851F002DA4009ABC03 /* Album.swift in Sources */,
+				D3D3CF861F002DA4009ABC03 /* LocalMedia.swift in Sources */,
+				D3D3CF871F002DA4009ABC03 /* MediaCollectionType.swift in Sources */,
+				D3D3CF881F002DA4009ABC03 /* MediaType.swift in Sources */,
 				D313E5CC1EA0C8A80063F91F /* TestLocalMedia.swift in Sources */,
 				D3BFD2071EA30FB300582031 /* TestMediaDatabase.swift in Sources */,
 			);

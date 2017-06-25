@@ -7,12 +7,17 @@
 //
 
 import Photos
+import SwiftUtilitiesTests
 
 extension LocalMedia {
-    public static var fake = LocalMedia
-        .builder()
-        .with(asset: PHAsset())
-        .build()
     
-    public static var noMedia = LocalMedia.builder().build()
+    /// Get a fake LocalMedia instance.
+    ///
+    /// - Returns: A LocalMedia instance.
+    public static func fake() -> LocalMedia {
+        return LocalMedia.builder()
+            .with(asset: PHAsset())
+            .with(albumName: String.random(withLength: 10))
+            .build()
+    }
 }

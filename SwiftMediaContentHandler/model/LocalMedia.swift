@@ -9,46 +9,62 @@
 import Photos
 import SwiftUtilities
 
+/// Implement this protocol to provide local media information.
+public protocol LocalMediaType {
+    
+    /// Get the associated album name.
+    var localAlbumName: String { get }
+    
+    /// Get the associated PHAsset instance.
+    var localAsset: PHAsset? { get }
+}
+
+public extension LocalMediaType {
+    
+    /// Get the PHAsset id, if available.
+    public var id: String {
+        return localAsset?.localIdentifier ?? ""
+    }
+    
+    /// Check whether the PHAsset instance is available.
+    ///
+    /// - Returns: A Bool value.
+    public func hasLocalAsset() -> Bool {
+        return localAsset != nil
+    }
+}
+
 /// This class hides PHAsset implementation.
 public class LocalMedia {
-    public static let blank = LocalMedia()
     
-    /// We can only set the album name after fetching PHAsset from 
-    /// PHPhotoLibrary.
+    /// Get a blank LocalMedia instance.
+    ///
+    /// - Returns: A LocalMedia instance.
+    public static func blank() -> LocalMedia {
+        return LocalMedia()
+    }
+    
+    /// The album name.
     fileprivate var albumName: String
     
     /// A PHAsset instance. This can used to fetch local media.
     fileprivate var asset: PHAsset?
     
-    /// Return albumName. Also provides a setter because the album's name
-    /// cannot be set at the Builder stage.
+    /// Get albumName.
     public var localAlbumName: String {
-        get {
-            return albumName
-        }
-        
-        set {
-            albumName = newValue
-        }
+        return albumName
     }
     
-    /// Return asset.
+    /// Get asset.
     public var localAsset: PHAsset? {
         return asset
-    }
-    
-    public var id: String {
-        return asset?.localIdentifier ?? ""
     }
     
     fileprivate init() {
         albumName = ""
     }
     
-    public func hasLocalAsset() -> Bool {
-        return asset != nil
-    }
-    
+    /// Builder class for LocalMedia.
     public class Builder {
         fileprivate let media: LocalMedia
         
@@ -74,6 +90,9 @@ public class LocalMedia {
             return self
         }
         
+        /// Get media instance.
+        ///
+        /// - Returns: A LocalMedia instance.
         public func build() -> LocalMedia {
             return media
         }
@@ -92,11 +111,7 @@ extension LocalMedia: CustomStringConvertible {
     }
 }
 
-public protocol LocalMediaProtocol {
-    var localAsset: PHAsset? { get }
-}
-
-extension LocalMedia: LocalMediaProtocol {}
+extension LocalMedia: LocalMediaType {}
 
 extension LocalMedia: CustomComparisonType {
     public func equals(object: LocalMedia?) -> Bool {
@@ -114,10 +129,4 @@ extension LocalMedia: Equatable {}
 
 public func ==(first: LocalMedia, second: LocalMedia) -> Bool {
     return first.id == second.id
-}
-
-extension Array where Element: LocalMediaProtocol {
-    public var assets: [PHAsset] {
-        return flatMap({$0.localAsset})
-    }
 }

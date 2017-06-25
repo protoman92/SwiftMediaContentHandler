@@ -7,12 +7,12 @@ target 'SwiftMediaContentHandler' do
 
   # Pods for SwiftMediaContentHandler
   pod 'SDWebImage/WebP'
-  pod 'SwiftUtilities/Main'
+  pod 'SwiftUtilities/Main', :git => 'https://github.com/protoman92/SwiftUtilities.git'
 
   target 'SwiftMediaContentHandlerTests' do
     inherit! :search_paths
     # Pods for testing
-    pod 'SwiftUtilitiesTests/Main'
+    pod 'SwiftUtilitiesTests/Main', :git => 'https://github.com/protoman92/SwiftUtilities.git'
   end
 
 end

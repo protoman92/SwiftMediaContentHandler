@@ -9,6 +9,22 @@
 import Photos
 import SwiftUtilities
 
+/// Classes that implement this protocol must be able to hold local media
+/// information.
+public protocol AlbumType: class {
+    
+    /// Get the album name.
+    var albumName: String { get }
+    
+    /// Get the album's media instances.
+    var albumMedia: [LocalMediaType] { get }
+    
+    /// Get the number of LocalMediaType instances.
+    var count: Int { get }
+    
+    func hasSameName<A: AlbumType>(as album: A) -> Bool
+}
+
 /// This class represents a collection of LocalMedia, and each instance has
 /// a name that can be used to identify itself.
 public class Album: Collection {
@@ -24,7 +40,7 @@ public class Album: Collection {
         return Swift.min(i + 1, endIndex)
     }
     
-    public subscript(index: Int) -> LocalMedia {
+    public subscript(index: Int) -> LocalMediaType {
         return medias[index]
     }
     
@@ -33,7 +49,7 @@ public class Album: Collection {
     
     
     /// The Album's PHAsset instances, wrapped in LocalMedia.
-    fileprivate var medias: [LocalMedia]
+    fileprivate var medias: [LocalMediaType]
     
     /// This is used for MediaDatabase's filterAlbumWithNoName.
     public var hasName: Bool {
@@ -48,7 +64,7 @@ public class Album: Collection {
     
     /// This getter is used to hide the Album's medias field, so that it
     /// cannot be changed dynamically.
-    public var albumMedia: [LocalMedia] {
+    public var albumMedia: [LocalMediaType] {
         return medias
     }
     
@@ -61,29 +77,12 @@ public class Album: Collection {
     ///
     /// - Parameter album: An Album instance.
     /// - Returns: A Bool value.
-    public func hasSameName<A: AlbumProtocol>(as album: A) -> Bool {
+    public func hasSameName<A: AlbumType>(as album: A) -> Bool {
         return albumName == album.albumName
     }
     
-    /// Append another Album's media instances.
-    ///
-    /// - Parameter album: An Album instance.
-    /// - Returns: An Int value representing number of unique LocalMedie added.
-    @discardableResult
-    public func appendMedia<A: AlbumProtocol>(from album: A) -> Int {
-        return medias.appendOrReplace(uniqueContentsOf: album.albumMedia)
-    }
-    
-    /// We need to set the albumName for each LocalMedia instance. This method
-    /// is called during Builder.build() to ensure that the albumName as
-    /// well as the LocalMedia Array have been initialized.
-    fileprivate func onInstanceBuilt() {
-        let albumName = self.albumName
-        forEach({$0.localAlbumName = albumName})
-    }
-    
     /// Builder for Album.
-    public class Builder {
+    public final class Builder {
         fileprivate let album: Album
         
         fileprivate init() {
@@ -103,8 +102,8 @@ public class Album: Collection {
         ///
         /// - Parameter photos: An Array of Photo instances.
         /// - Returns: The current Builder instance.
-        public func add(medias: [LocalMedia]) -> Builder {
-            album.medias.append(uniqueContentsOf: medias)
+        public func add(medias: [LocalMediaType]) -> Builder {
+            album.medias.append(contentsOf: medias)
             return self
         }
         
@@ -119,14 +118,20 @@ public class Album: Collection {
             }))
         }
         
+        /// Get album.
+        ///
+        /// - Returns: An Album instance.
         public func build() -> Album {
-            album.onInstanceBuilt()
             return album
         }
     }
 }
 
 public extension Album {
+    
+    /// Get a Builder instance.
+    ///
+    /// - Returns: A Builder instance.
     public static func builder() -> Builder {
         return Builder()
     }
@@ -138,43 +143,4 @@ extension Album: CustomStringConvertible {
     }
 }
 
-/// Classes that implement this protocol must be able to hold local media
-/// information.
-public protocol AlbumProtocol: class {
-    var albumName: String { get }
-    
-    var albumMedia: [LocalMedia] { get }
-    
-    func hasSameName<A: AlbumProtocol>(as album: A) -> Bool
-    
-    @discardableResult
-    func appendMedia<A: AlbumProtocol>(from album: A) -> Int
-}
-
-extension Album: AlbumProtocol {}
-
-public extension Array where Element: AlbumProtocol {
-    
-    /// Append unique Photo instances from another Album.
-    ///
-    /// - Parameter album: The Album to get Photo instances from.
-    public mutating func append(uniqueAssetsFrom album: Element) {
-        if
-            let index = index(where: {$0.hasSameName(as: album)}),
-            let existing = element(at: index)
-        {
-            existing.appendMedia(from: album)
-        } else {
-            self.append(album)
-        }
-    }
-    
-    /// Append unique Photo instances from an Array of Album.
-    ///
-    /// - Parameter albums: An Array of Album instances to get Photo from.
-    public mutating func append(uniqueAlbumContentsOf albums: [Element]) {
-        for album in albums {
-            append(uniqueAssetsFrom: album)
-        }
-    }
-}
+extension Album: AlbumType {}
