@@ -11,8 +11,12 @@ import Photos
 import RxSwift
 import SwiftUtilities
 
-/// This class can be used to get PHAsset of different types from
-/// PHPhotoLibrary.
+/// This class can be used to get PHAsset of different types from PHPhotoLibrary.
+/// To use it, we first need to register observers for mediaListener, after
+/// which new media content will be delivered once available. Afterwards, we
+/// must call loadInitialMedia() once to ask for user permission and set up
+/// the internals. Once the user has granted permission, this class can do its
+/// work - otherwise, its mediaListener will emit errors.
 public class LocalMediaDatabase: NSObject {
     
     /// We can add collection types to fetch with PHFetchRequest.
@@ -29,11 +33,7 @@ public class LocalMediaDatabase: NSObject {
     
     /// When this Observable is subscribed to, it will emit data that it
     /// fetches from PHPhotoLibrary.
-    fileprivate var photoLibraryObservable: Observable<Album>
-    
-    /// If this is set to true, empty Album instances will be filtered out
-    /// from the final result.
-    fileprivate var filterEmptyAlbums: Bool
+    fileprivate var photoLibraryObservable: Observable<LocalMedia>
     
     /// Return mediaTypes, a MediaType Array.
     public var registeredMediaTypes: [MediaType] {
@@ -51,19 +51,13 @@ public class LocalMediaDatabase: NSObject {
     }
     
     /// Return photoLibraryObservable.
-    public var mediaObservable: Observable<Album> {
+    public var mediaObservable: Observable<LocalMedia> {
         return photoLibraryObservable
-    }
-    
-    /// Return filterEmptyAlbums.
-    public var shouldFilterEmptyAlbums: Bool {
-        return filterEmptyAlbums
     }
     
     override init() {
         assetCollectionFetch = []
         collectionTypes = []
-        filterEmptyAlbums = true
         mediaTypes = []
         photoLibraryListener = PublishSubject<PHAssetCollection>()
         
@@ -71,56 +65,34 @@ public class LocalMediaDatabase: NSObject {
         // initialized successfully.
         photoLibraryObservable = Observable.empty()
         super.init()
-        photoLibraryObservable = rxLoadAlbums()
+        photoLibraryObservable = rxa_loadMedia()
     }
     
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
-    /// Check for PHPhotoLibrary permission, and then load albums reactively
+    /// Check for PHPhotoLibrary permission, and then load LocalMedia reactively
     /// if authorized.
     ///
     /// - Returns: An Observable instance.
-    public func rxLoadAlbums() -> Observable<Album> {
+    public func rxa_loadMedia() -> Observable<LocalMedia> {
         return mediaListener
-            // The flatMap here should switch to an entirely different
-            // Observable, or else an Error will terminate the whole stream
-            // and invalidate the mediaListener.
-            .flatMap({[weak self] (collection) -> Observable<Album> in
+            .flatMap({[weak self] (collection) -> Observable<LocalMedia> in
                 if let `self` = self {
-                    return `self`.rxLoadAlbums(using: collection, with: `self`)
+                    return `self`.rxa_loadMedia(from: collection)
                 } else {
-                    return Observable<Album>.empty()
+                    return Observable<LocalMedia>.empty()
                 }
             })
+            .observeOn(MainScheduler.instance)
     }
     
-    /// Bridge method to avoid self being captured in closure.
+    /// Load LocalMedia reactively, using a PHAssetCollection.
     ///
-    /// - Parameters:
-    ///   - collection: A PHAssetCollection instance.
-    ///   - current: The current LocalMediaDatabase instance.
+    /// - Parameter collection: The PHAssetCollection to get PHAsset instances.
     /// - Returns: An Observable instance.
-    func rxLoadAlbums(using collection: PHAssetCollection,
-                      with current: LocalMediaDatabase) -> Observable<Album> {
-        return current.rxLoadAlbums(collection: collection)
-            .filter({!current.shouldFilterEmptyAlbums || $0.isNotEmpty})
-            
-            // If an error is encountered, we should switch to another
-            // Observable, or else the PublishSubject will not emit
-            // anything else in the future.
-            .catchSwitchToEmpty()
-            .applyCommonSchedulers()
-    }
-    
-    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
-    ///
-    /// - Parameters:
-    ///   - collection: The PHAssetCollection to get PHAsset instances.
-    ///   - options: The PHFetchOptions to use for the fetching.
-    /// - Returns: An Observable instance.
-    func rxLoadAlbums(collection: PHAssetCollection) -> Observable<Album> {
+    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<LocalMedia> {
         if !isAuthorized() {
             return Observable.error(permissionNotGranted)
         }
@@ -128,73 +100,51 @@ public class LocalMediaDatabase: NSObject {
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
-        return Observable
-            .from(fetchOptions)
-            .flatMap({self.rxLoadAlbums(collection: collection, options: $0)})
+        return Observable.from(fetchOptions)
+            .flatMap({[weak self] (ops) -> Observable<LocalMedia> in
+                if let `self` = self {
+                    return `self`.rxa_loadMedia(from: collection, with: ops)
+                } else {
+                    return Observable<LocalMedia>.empty()
+                }
+            })
     }
     
-    /// Load Album reactively, using a PHAssetCollection and PHFetchOptions.
+    /// Load LocalMedia reactively, using a PHAssetCollection and PHFetchOptions.
     ///
     /// - Parameters:
     ///   - collection: The PHAssetCollection to get PHAsset instances.
     ///   - options: The PHFetchOptions to use for the fetching.
     /// - Returns: An Observable instance.
-    func rxLoadAlbums(collection: PHAssetCollection, options: PHFetchOptions)
-        -> Observable<Album>
+    func rxa_loadMedia(from collection: PHAssetCollection,
+                       with options: PHFetchOptions)
+        -> Observable<LocalMedia>
     {
         let result = PHAsset.fetchAssets(in: collection, options: options)
+        let title = collection.localizedTitle ?? defaultAlbumName()
         
         return Observable<PHAsset>
-            .create({observer in
-                self.observeFetchResult(result, with: observer)
+            .create({[weak self] observer in
+                self?.observeFetchResult(result, with: observer)
                 return Disposables.create()
             })
-            .toArray()
-            .map({self.createAlbum(with: collection, with: $0)})
-            
-            // If an error is encountered, we need to switch to another
-            // Observable, or else the entire stream will be terminated.
-            .catchSwitchToEmpty()
+            .map({LocalMedia.builder().with(asset: $0)})
+            .map({$0.with(albumName: title)})
+            .map({$0.build()})
+            .subscribeOn(qos: .background)
     }
     
     /// Observe PHAsset from a PHFetchResult, using an Observer. This method
-    /// is used in rxLoadAlbums(collection:, options:), so that we can
-    /// override it during testing to return test Album instances.
+    /// is used in rxa_loadMedia(collection:, options:), so that we can
+    /// override it during testing to return test LocalMedia instances.
     ///
     /// - Parameters:
     ///   - result: A PHFetchResult instance.
     ///   - observer: An AnyObserver instance.
     func observeFetchResult(_ result: PHFetchResult<PHAsset>,
                             with observer: AnyObserver<PHAsset>) {
-        let count = result.count
-        
-        if count > 0 {
-            result.enumerateObjects({
-                observer.onNext($0.0)
-                
-                if $0.1 == count - 1 {
-                    observer.onCompleted()
-                }
-            })
-        } else {
-            observer.onCompleted()
-        }
-    }
-    
-    /// Create an Album instance.
-    ///
-    /// - Parameters:
-    ///   - collection: The PHAssetCollection to which the Album belongs.
-    ///   - assets: An Array of PHAsset instances.
-    /// - Returns: An Album instance.
-    func createAlbum(with collection: PHAssetCollection,
-                     with assets: [PHAsset]) -> Album {
-        return Album.builder()
-            /// If the album does not have a title, leave empty and
-            /// delegate to caller.
-            .with(name: collection.localizedTitle ?? defaultAlbumName())
-            .add(assets: assets)
-            .build()
+        defer { observer.onCompleted() }
+        result.enumerateObjects({observer.onNext($0.0)})
     }
     
     /// Get the default Album name that will be used when a PHAssetCollection
@@ -205,8 +155,9 @@ public class LocalMediaDatabase: NSObject {
         return "media.title.untitled".localized
     }
     
-    public class Builder {
-        fileprivate let database: LocalMediaDatabase
+    /// Builder class for LocalMediaDatabase.
+    public final class Builder {
+        private let database: LocalMediaDatabase
         
         fileprivate init() {
             database = LocalMediaDatabase()
@@ -250,22 +201,14 @@ public class LocalMediaDatabase: NSObject {
         /// - Parameter types: A vararg MediaCollectionType Array.
         /// - Returns: The current Builder instance.
         @discardableResult
-        public func add(collectionTypes types: MediaCollectionType...)
-            -> Builder
-        {
+        public func add(collectionTypes types: MediaCollectionType...) -> Builder {
             types.forEach({self.add(collectionType: $0)})
             return self
         }
         
-        /// Set the database's filterEmptyAlbums value.
+        /// Get the LocalMediaDatabase instance.
         ///
-        /// - Parameter filter: A Bool value.
-        /// - Returns: The current Builder instance.
-        public func filterEmptyAlbums(_ filter: Bool) -> Builder {
-            database.filterEmptyAlbums = filter
-            return self
-        }
-        
+        /// - Returns: A LocalMediaDatabase instance.
         public func build() -> LocalMediaDatabase {
             return database
         }
@@ -273,6 +216,10 @@ public class LocalMediaDatabase: NSObject {
 }
 
 public extension LocalMediaDatabase {
+    
+    /// Get a Builder instance.
+    ///
+    /// - Returns: A Builder instance.
     public static func builder() -> Builder {
         return Builder()
     }
@@ -287,8 +234,8 @@ fileprivate extension LocalMediaDatabase {
     ///   - observer: An Observer instance.
     fileprivate func startFetch<O: ObserverType>(
         for collection: PHAssetCollection,
-        with observer: O) where O.E == PHAssetCollection
-    {
+        with observer: O
+    ) where O.E == PHAssetCollection {
         observer.onNext(collection)
     }
     
@@ -299,7 +246,7 @@ fileprivate extension LocalMediaDatabase {
         let mediaListener = self.mediaListener
         
         synchronized(mediaListener, then: {
-            startFetch(for: collection, with: mediaListener)
+            self.startFetch(for: collection, with: mediaListener)
         })
     }
 }
@@ -321,6 +268,7 @@ public extension LocalMediaDatabase {
 }
 
 fileprivate extension LocalMediaDatabase {
+    
     /// Create a PHFetchOptions based on a MediaType instance.
     ///
     /// - Parameter type: A MediaType instance.
@@ -346,21 +294,21 @@ public extension LocalMediaDatabase {
         PHPhotoLibrary.shared().register(self)
     }
     
-    /// Reload albums if the user has authorized access to PHPhotoLibrary.
+    /// Reload LocalMedia if the user has authorized access to PHPhotoLibrary.
     ///
-    /// This method should be called only once to load initial
-    /// media data. Subsequently, changes should be handled by PHPhotoLibrary's
-    /// listener method.
+    /// This method should be called only once to load initial media data. 
+    /// Subsequently, changes should be handled by PHPhotoLibrary's listener 
+    /// method.
     ///
     /// We first need to check for PHPhotoLibrary authorization.
-    public func loadInitialAlbums() {
-        loadInitialAlbums(status: currentAuthorizationStatus)
+    public func loadInitialMedia() {
+        loadInitialMedia(status: currentAuthorizationStatus)
     }
     
-    /// Reload albums after checking authorization status.
+    /// Reload LocalMedia after checking authorization status.
     ///
     /// - Parameter status: PHPhotoLibrary authorization status.
-    fileprivate func loadInitialAlbums(status: PHAuthorizationStatus) {
+    fileprivate func loadInitialMedia(status: PHAuthorizationStatus) {
         switch status {
         case .authorized:
             registerChangeObserver()
@@ -381,7 +329,7 @@ public extension LocalMediaDatabase {
             })
             
         case .notDetermined:
-            PHPhotoLibrary.requestAuthorization(loadInitialAlbums)
+            PHPhotoLibrary.requestAuthorization(loadInitialMedia)
             
         default:
             break
@@ -403,4 +351,4 @@ extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
     }
 }
 
-extension LocalMediaDatabase: MediaErrorType {}
+extension LocalMediaDatabase: MediaDatabaseErrorType {}
