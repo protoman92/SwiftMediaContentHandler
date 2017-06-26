@@ -33,23 +33,36 @@ final class MediaDatabaseTest: XCTestCase {
     
     public func test_permissionNotGranted_shouldThrow() {
         // Setup
-        mediaDatabase.authorizationStatus = .denied
-        let observer = scheduler.createObserver(Error.self)
-        let expect = expectation(description: "Should have emitted error")
+        let statuses: [PHAuthorizationStatus] = [.denied, .authorized]
+        let observer = scheduler.createObserver(Optional<Error>.self)
         
         // When
         mediaDatabase.databaseErrorObservable
-            .doOnNext({_ in expect.fulfill()})
             .subscribe(observer)
             .addDisposableTo(disposeBag)
         
-        mediaDatabase.loadInitialMedia()
-        waitForExpectations(timeout: expectationTimeout, handler: nil)
-        
-        // Then
-        let error = observer.nextElements().first!
-        XCTAssertTrue(mediaDatabase.loadwithCollectionAndOptions.methodNotCalled)
-        XCTAssertEqual(error.localizedDescription, errorProvider.permissionNotGranted)
+        for status in statuses {
+            mediaDatabase.authorizationStatus = status
+            mediaDatabase.loadInitialMedia()
+            
+            // Then
+            let nextElements = observer.nextElements()
+            let lastElement = nextElements.last!
+            
+            switch status {
+            case .denied:
+                let error = lastElement.unsafelyUnwrapped
+                XCTAssertEqual(error.localizedDescription, errorProvider.permissionNotGranted)
+                
+            case .authorized:
+                XCTAssertNil(lastElement)
+                
+            default:
+                break
+            }
+            
+            XCTAssertTrue(mediaDatabase.loadwithCollectionAndOptions.methodNotCalled)
+        }
     }
     
     public func test_fetchWithPermission_shouldSucceed() {

@@ -39,7 +39,8 @@ public class LocalMediaDatabase: NSObject {
     
     /// When there is a database-wide Error. i.e. errors that affect the entire
     /// fetch operation - such as permission error, call onNext.
-    fileprivate let databaseErrorListener: PublishSubject<Error>
+    /// When the error is resolved, pass in an empty Optional.
+    fileprivate let databaseErrorListener: PublishSubject<Optional<Error>>
     
     /// When this Observable is subscribed to, it will emit data that it
     /// fetches from PHPhotoLibrary.
@@ -61,7 +62,7 @@ public class LocalMediaDatabase: NSObject {
     }
     
     /// Return databaseErrorListener
-    public var databaseErrorObservable: Observable<Error> {
+    public var databaseErrorObservable: Observable<Optional<Error>> {
         return databaseErrorListener.asObservable()
     }
     
@@ -75,7 +76,7 @@ public class LocalMediaDatabase: NSObject {
         collectionTypes = []
         mediaTypes = []
         photoLibraryListener = PublishSubject<PHAssetCollection>()
-        databaseErrorListener = PublishSubject<Error>()
+        databaseErrorListener = PublishSubject<Optional<Error>>()
         sortDescriptor = .ascending(for: MediaSortMode.creationDate)
         errorProvider = DefaultMediaError()
         
@@ -373,6 +374,10 @@ public extension LocalMediaDatabase {
     fileprivate func loadInitialMedia(status: PHAuthorizationStatus) {
         switch status {
         case .authorized:
+            // Emit an empty Optional to indicate that the Error has been
+            // resolved.
+            databaseErrorListener.onNext(Optional.none)
+            
             registerChangeObserver()
             
             // Initialize the PHFetchResult Array here, instead of when the
