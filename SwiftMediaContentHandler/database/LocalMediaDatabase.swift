@@ -6,7 +6,6 @@
 //  Copyright © 2016 Swiften. All rights reserved.
 //
 
-import Either
 import Foundation
 import Photos
 import RxSwift
@@ -44,7 +43,7 @@ public class LocalMediaDatabase: NSObject {
     
     /// When this Observable is subscribed to, it will emit data that it
     /// fetches from PHPhotoLibrary.
-    fileprivate var photoLibraryObservable: Observable<LMTEither>
+    fileprivate var photoLibraryObservable: Observable<LMTResult>
     
     /// Return mediaTypes, a MediaType Array.
     public var registeredMediaTypes: [MediaType] {
@@ -67,7 +66,7 @@ public class LocalMediaDatabase: NSObject {
     }
     
     /// Return photoLibraryObservable.
-    public var mediaObservable: Observable<LMTEither> {
+    public var mediaObservable: Observable<LMTResult> {
         return photoLibraryObservable
     }
     
@@ -92,13 +91,13 @@ public class LocalMediaDatabase: NSObject {
         debugPrint("Deinitialized \(self)")
     }
     
-    /// Check for PHPhotoLibrary permission, and then load LMTEither reactively
+    /// Check for PHPhotoLibrary permission, and then load LMTResult reactively
     /// if authorized.
     ///
     /// - Returns: An Observable instance.
-    public func rxa_loadMedia() -> Observable<LMTEither> {
+    public func rxa_loadMedia() -> Observable<LMTResult> {
         return mediaListener
-            .concatMap({[weak self] (collection) -> Observable<LMTEither> in
+            .concatMap({[weak self] (collection) -> Observable<LMTResult> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection)
                 } else {
@@ -108,17 +107,17 @@ public class LocalMediaDatabase: NSObject {
             .observeOn(MainScheduler.instance)
     }
     
-    /// Load LMTEither reactively, using a PHAssetCollection.
+    /// Load LMTResult reactively, using a PHAssetCollection.
     ///
     /// - Parameter collection: The PHAssetCollection to get PHAsset instances.
     /// - Returns: An Observable instance.
-    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<LMTEither> {
+    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<LMTResult> {
         if !isAuthorized() { return Observable.empty() }
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
         return Observable.from(fetchOptions)
-            .concatMap({[weak self] (ops) -> Observable<LMTEither> in
+            .concatMap({[weak self] (ops) -> Observable<LMTResult> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection, with: ops)
                 } else {
@@ -127,7 +126,7 @@ public class LocalMediaDatabase: NSObject {
             })
     }
     
-    /// Load LMTEither reactively, using a PHAssetCollection and PHFetchOptions.
+    /// Load LMTResult reactively, using a PHAssetCollection and PHFetchOptions.
     ///
     /// - Parameters:
     ///   - collection: The PHAssetCollection to get PHAsset instances.
@@ -135,7 +134,7 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     func rxa_loadMedia(from collection: PHAssetCollection,
                        with options: PHFetchOptions)
-        -> Observable<LMTEither>
+        -> Observable<LMTResult>
     {
         let result = PHAsset.fetchAssets(in: collection, options: options)
         let title = collection.localizedTitle ?? defaultAlbumName()
@@ -153,8 +152,11 @@ public class LocalMediaDatabase: NSObject {
                 }
             })
             .filter({$0.hasLocalAsset()})
-            .map(LMTEither.right)
-            .catchErrorJustReturn(LMTEither.left)
+            .map(LMTResult.init)
+            .catchErrorJustReturn({
+                let message = $0.localizedDescription
+                return LMTResult(error: MediaError(message))
+            })
             .subscribeOn(qos: .background)
     }
     
@@ -354,7 +356,7 @@ public extension LocalMediaDatabase {
         PHPhotoLibrary.shared().register(self)
     }
     
-    /// Reload LMTEither if the user has authorized access to PHPhotoLibrary.
+    /// Reload LMTResult if the user has authorized access to PHPhotoLibrary.
     ///
     /// This method should be called only once to load initial media data. 
     /// Subsequently, changes should be handled by PHPhotoLibrary's listener 
@@ -365,7 +367,7 @@ public extension LocalMediaDatabase {
         loadInitialMedia(status: currentAuthorizationStatus)
     }
     
-    /// Reload LMTEither after checking authorization status.
+    /// Reload LMTResult after checking authorization status.
     ///
     /// - Parameter status: PHPhotoLibrary authorization status.
     fileprivate func loadInitialMedia(status: PHAuthorizationStatus) {
@@ -410,15 +412,15 @@ extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
     }
 }
 
-public extension ObservableType where E == LMTEither {
+public extension ObservableType where E == LMTResult {
     
-    /// Convert LMTEither emissions into Album instances. The resulting
+    /// Convert LMTResult emissions into Album instances. The resulting
     /// emissions are not sorted.
     ///
     /// - Returns: An Observable instance.
-    public func toUnsortedAlbums() -> Observable<AlbumEither> {
-        return groupBy(keySelector: {$0.map({$0.localAlbumName}).right ?? ""})
-            .flatMap({(gObs) -> Observable<AlbumEither> in
+    public func toUnsortedAlbums() -> Observable<AlbumResult> {
+        return groupBy(keySelector: {$0.map({$0.localAlbumName}).value ?? ""})
+            .flatMap({(gObs) -> Observable<AlbumResult> in
                 let albumName = gObs.key
                 
                 return gObs.toArray()
@@ -427,8 +429,7 @@ public extension ObservableType where E == LMTEither {
                         .with(name: albumName)
                         .build()
                     })
-                    .map(AlbumEither.right)
-                    .catchErrorJustReturn(AlbumEither.left)
+                    .map(AlbumResult.init)
             })
     }
 }

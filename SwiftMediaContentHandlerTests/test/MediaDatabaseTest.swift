@@ -61,7 +61,7 @@ final class MediaDatabaseTest: XCTestCase {
         // When
         mediaDatabase
             .rxa_loadMedia(from: PHAssetCollection())
-            .map({$0.right})
+            .map({$0.value})
             .map({$0?.localAsset})
             .cast(to: TestPHAsset.self)
             .doOnDispose(expect.fulfill)
@@ -98,7 +98,7 @@ final class MediaDatabaseTest: XCTestCase {
             .flatMap({_ in self.mediaDatabase.rxa_loadMedia(from: PHAssetCollection())})
             .toUnsortedAlbums()
             .toArray()
-            .map({$0.flatMap({$0.right})})
+            .map({$0.flatMap({$0.value})})
             .map({$0.sorted(by: {$0.0.albumName > $0.1.albumName})})
             .concatMap({Observable.from($0)})
             .doOnDispose(expect.fulfill)
@@ -118,7 +118,7 @@ final class MediaDatabaseTest: XCTestCase {
         mediaDatabase.throwRandomError = true
         let typeCount = mediaDatabase.mediaTypes.count
         let totalTry = tries * typeCount
-        let observer = scheduler.createObserver(LMTEither.self)
+        let observer = scheduler.createObserver(LMTResult.self)
         let expect = expectation(description: "Should have succeeded")
         
         // When

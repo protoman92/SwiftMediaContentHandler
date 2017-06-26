@@ -17,7 +17,7 @@ public protocol AlbumType {
     var albumName: String { get }
     
     /// Get the album's media instances.
-    var albumMedia: [LMTEither] { get }
+    var albumMedia: [LMTResult] { get }
     
     /// Get the number of LocalMediaType instances.
     var count: Int { get }
@@ -40,7 +40,7 @@ public struct Album: Collection {
         return Swift.min(i + 1, endIndex)
     }
     
-    public subscript(index: Int) -> LMTEither {
+    public subscript(index: Int) -> LMTResult {
         return medias[index]
     }
     
@@ -49,7 +49,7 @@ public struct Album: Collection {
     
     
     /// The Album's PHAsset instances, wrapped in LocalMedia.
-    fileprivate var medias: [LMTEither]
+    fileprivate var medias: [LMTResult]
     
     /// This is used for MediaDatabase's filterAlbumWithNoName.
     public var hasName: Bool {
@@ -64,7 +64,7 @@ public struct Album: Collection {
     
     /// This getter is used to hide the Album's medias field, so that it
     /// cannot be changed dynamically.
-    public var albumMedia: [LMTEither] {
+    public var albumMedia: [LMTResult] {
         return medias
     }
     
@@ -102,7 +102,7 @@ public struct Album: Collection {
         ///
         /// - Parameter photos: An Array of Photo instances.
         /// - Returns: The current Builder instance.
-        public func add(medias: [LMTEither]) -> Builder {
+        public func add(medias: [LMTResult]) -> Builder {
             album.medias.append(contentsOf: medias)
             return self
         }
@@ -115,7 +115,7 @@ public struct Album: Collection {
         public func add(assets: [PHAsset]) -> Builder {
             return add(medias: assets
                 .map({LocalMedia.builder().with(asset: $0).build()})
-                .map(LMTEither.right))
+                .map(LMTResult.init))
         }
         
         /// Get album.

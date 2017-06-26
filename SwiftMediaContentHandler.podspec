@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
     s.framework = "Photos"
     s.framework = "UIKit"
     s.dependency 'SwiftUtilities/Main'
+    s.dependency 'Result', '~> 3.0.0'
 
     s.subspec 'Main' do |main|
         main.source_files = "SwiftMediaContentHandler/**/*.{swift}"
