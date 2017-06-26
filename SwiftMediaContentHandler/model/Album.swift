@@ -21,56 +21,13 @@ public protocol AlbumType {
     
     /// Get the number of LocalMediaType instances.
     var count: Int { get }
-    
-    func hasSameName<A: AlbumType>(as album: A) -> Bool
 }
 
-/// This class represents a collection of LocalMedia, and each instance has
-/// a name that can be used to identify itself.
-public struct Album: Collection {
-    public var startIndex: Int {
-        return medias.startIndex
-    }
-    
-    public var endIndex: Int {
-        return medias.endIndex
-    }
-    
-    public func index(after i: Int) -> Int {
-        return Swift.min(i + 1, endIndex)
-    }
-    
-    public subscript(index: Int) -> LMTResult {
-        return medias[index]
-    }
-    
-    /// The Album's name as found by PHPhotoLibrary.
-    fileprivate var name: String
-    
-    
-    /// The Album's PHAsset instances, wrapped in LocalMedia.
-    fileprivate var medias: [LMTResult]
+public extension AlbumType {
     
     /// This is used for MediaDatabase's filterAlbumWithNoName.
     public var hasName: Bool {
-        return name.isNotEmpty
-    }
-    
-    /// This getter is used to hide the Album's name field, so that it cannot
-    /// be changed dynamically.
-    public var albumName: String {
-        return name
-    }
-    
-    /// This getter is used to hide the Album's medias field, so that it
-    /// cannot be changed dynamically.
-    public var albumMedia: [LMTResult] {
-        return medias
-    }
-    
-    fileprivate init() {
-        name = ""
-        medias = []
+        return albumName.isNotEmpty
     }
     
     /// Check if two Albums have the same name.
@@ -79,6 +36,23 @@ public struct Album: Collection {
     /// - Returns: A Bool value.
     public func hasSameName<A: AlbumType>(as album: A) -> Bool {
         return albumName == album.albumName
+    }
+}
+
+/// This class represents a collection of LocalMedia, and each instance has
+/// a name that can be used to identify itself.
+public struct Album {
+
+    /// The Album's name as found by PHPhotoLibrary.
+    fileprivate var name: String
+    
+    
+    /// The Album's PHAsset instances, wrapped in LocalMedia.
+    fileprivate var medias: [LMTResult]
+    
+    fileprivate init() {
+        name = ""
+        medias = []
     }
     
     /// Builder for Album.
@@ -139,8 +113,41 @@ public extension Album {
     /// Get an empty Album.
     ///
     /// - Returns: An AlbumType instance.
-    public static func empty() -> AlbumType {
+    public static func empty() -> Album {
         return builder().build()
+    }
+}
+
+extension Album: Collection {
+    public var startIndex: Int {
+        return medias.startIndex
+    }
+    
+    public var endIndex: Int {
+        return medias.endIndex
+    }
+    
+    public func index(after i: Int) -> Int {
+        return Swift.min(i + 1, endIndex)
+    }
+    
+    public subscript(index: Int) -> LMTResult {
+        return medias[index]
+    }
+}
+
+extension Album: AlbumType {
+    
+    /// This getter is used to hide the Album's name field, so that it cannot
+    /// be changed dynamically.
+    public var albumName: String {
+        return name
+    }
+    
+    /// This getter is used to hide the Album's medias field, so that it
+    /// cannot be changed dynamically.
+    public var albumMedia: [LMTResult] {
+        return medias
     }
 }
 
@@ -149,5 +156,3 @@ extension Album: CustomStringConvertible {
         return "Album: \(name), item count: \(medias.count)"
     }
 }
-
-extension Album: AlbumType {}
