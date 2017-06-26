@@ -12,7 +12,6 @@ Pod::Spec.new do |s|
     s.source = { :git => "https://github.com/protoman92/SwiftMediaContentHandler.git", :tag => "#{s.version}"}
     s.framework = "Photos"
     s.framework = "UIKit"
-    s.dependency 'SDWebImage/WebP'
     s.dependency 'SwiftUtilities/Main'
 
     s.subspec 'Main' do |main|

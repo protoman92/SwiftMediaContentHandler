@@ -6,7 +6,6 @@ target 'SwiftMediaContentHandler' do
   use_frameworks!
 
   # Pods for SwiftMediaContentHandler
-  pod 'SDWebImage/WebP'
   pod 'SwiftUtilities/Main', :git => 'https://github.com/protoman92/SwiftUtilities.git'
 
   target 'SwiftMediaContentHandlerTests' do
