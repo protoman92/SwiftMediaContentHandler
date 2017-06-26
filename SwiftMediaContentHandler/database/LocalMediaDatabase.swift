@@ -23,7 +23,7 @@ public class LocalMediaDatabase: NSObject {
     fileprivate var collectionTypes: [MediaCollectionType]
     
     /// This is responsible for providing error messages.
-    fileprivate var errorProvider: MediaDatabaseErrorType
+    fileprivate var messageProvider: MediaDatabaseMessageType
     
     /// We can add media types to fetch with PHFetchRequest.
     fileprivate var mediaTypes: [MediaType]
@@ -78,7 +78,7 @@ public class LocalMediaDatabase: NSObject {
         photoLibraryListener = PublishSubject<PHAssetCollection>()
         databaseErrorListener = PublishSubject<Optional<Error>>()
         sortDescriptor = .ascending(for: MediaSortMode.creationDate)
-        errorProvider = DefaultMediaError()
+        messageProvider = DefaultMediaMessage()
         
         // Placebo value - we will immediately update it after self has been
         // initialized successfully.
@@ -115,16 +115,26 @@ public class LocalMediaDatabase: NSObject {
     func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<AlbumResult> {
         if !isAuthorized() { return Observable.empty() }
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
+        let defTitle = messageProvider.defaultAlbumName
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
         return Observable.from(fetchOptions)
             .concatMap({[weak self] (ops) -> Observable<AlbumResult> in
-                if let `self` = self {
-                    return `self`.rxa_loadMedia(from: collection, with: ops)
-                } else {
-                    return Observable.empty()
-                }
+                self?.rxa_loadMedia(from: collection, with: ops) ?? .empty()
             })
+            .groupBy(keySelector: {$0.map({$0.albumName}).value ?? defTitle})
+            .concatMap({(gObs) -> Observable<Album> in
+                let name = gObs.key
+                
+                return gObs.map({$0.value})
+                    .map({$0?.albumMedia ?? []})
+                    .reduce([], accumulator: +)
+                    .map({[weak self] in
+                        self?.createAlbum(from: $0, with: name) ?? .empty()
+                    })
+            })
+            .ofType(AlbumType.self)
+            .map(AlbumResult.init)
     }
     
     /// Load AlbumResult reactively, using a PHAssetCollection and PHFetchOptions.
@@ -138,7 +148,7 @@ public class LocalMediaDatabase: NSObject {
         -> Observable<AlbumResult>
     {
         let result = PHAsset.fetchAssets(in: collection, options: options)
-        let title = collection.localizedTitle ?? defaultAlbumName()
+        let title = collection.localizedTitle ?? messageProvider.defaultAlbumName
         
         return Observable<PHAsset>
             .create({[weak self] observer in
@@ -171,16 +181,19 @@ public class LocalMediaDatabase: NSObject {
     ///   - observer: An AnyObserver instance.
     func observeFetchResult(_ result: PHFetchResult<PHAsset>,
                             with observer: AnyObserver<PHAsset>) {
-        defer { observer.onCompleted() }
-        result.enumerateObjects({observer.onNext($0.0)})
-    }
-    
-    /// Get the default Album name that will be used when a PHAssetCollection
-    /// has no title.
-    ///
-    /// - Returns: A String value.
-    func defaultAlbumName() -> String {
-        return "media.title.untitled".localized
+        let count = result.count
+        
+        if count > 0 {
+            result.enumerateObjects({
+                observer.onNext($0.0)
+                
+                if $0.1 == count - 1 {
+                    observer.onCompleted()
+                }
+            })
+        } else {
+            observer.onCompleted()
+        }
     }
     
     /// Create a LocalMedia instance with PHAsset and album name.
@@ -267,13 +280,13 @@ public class LocalMediaDatabase: NSObject {
             return self
         }
         
-        /// Set the errorProvider instance.
+        /// Set the messageProvider instance.
         ///
-        /// - Parameter errorProvider: A MediaDatabaseErrorType instance.
+        /// - Parameter messageProvider: A MediaDatabaseMessageType instance.
         /// - Returns: The current Builder instance.
         @discardableResult
-        public func with(errorProvider: MediaDatabaseErrorType) -> Builder {
-            database.errorProvider = errorProvider
+        public func with(messageProvider: MediaDatabaseMessageType) -> Builder {
+            database.messageProvider = messageProvider
             return self
         }
         
@@ -306,7 +319,7 @@ fileprivate extension LocalMediaDatabase {
     fileprivate func startFetch<O: ObserverType>(
         for collection: PHAssetCollection,
         with observer: O
-    ) where O.E == PHAssetCollection {
+        ) where O.E == PHAssetCollection {
         observer.onNext(collection)
     }
     
@@ -370,8 +383,8 @@ public extension LocalMediaDatabase {
     
     /// Reload AlbumResult if the user has authorized access to PHPhotoLibrary.
     ///
-    /// This method should be called only once to load initial media data. 
-    /// Subsequently, changes should be handled by PHPhotoLibrary's listener 
+    /// This method should be called only once to load initial media data.
+    /// Subsequently, changes should be handled by PHPhotoLibrary's listener
     /// method.
     ///
     /// We first need to check for PHPhotoLibrary authorization.
@@ -408,7 +421,7 @@ public extension LocalMediaDatabase {
             PHPhotoLibrary.requestAuthorization(loadInitialMedia)
             
         default:
-            let error = Exception(errorProvider.permissionNotGranted)
+            let error = Exception(messageProvider.permissionNotGranted)
             databaseErrorListener.onNext(error)
         }
     }

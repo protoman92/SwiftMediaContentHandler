@@ -15,13 +15,13 @@
 		D328775D1F0139C700A788EC /* MediaResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D328775C1F0139C700A788EC /* MediaResult.swift */; };
 		D328775E1F0139FD00A788EC /* MediaResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D328775C1F0139C700A788EC /* MediaResult.swift */; };
 		D37182F21F00F98C00F9C0C0 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EB1F00F98C00F9C0C0 /* LocalMediaDatabase.swift */; };
-		D37182F31F00F98C00F9C0C0 /* MediaDatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EC1F00F98C00F9C0C0 /* MediaDatabaseError.swift */; };
+		D37182F31F00F98C00F9C0C0 /* MediaDatabaseMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EC1F00F98C00F9C0C0 /* MediaDatabaseMessage.swift */; };
 		D37182F41F00F98C00F9C0C0 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EE1F00F98C00F9C0C0 /* Album.swift */; };
 		D37182F51F00F98C00F9C0C0 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EF1F00F98C00F9C0C0 /* LocalMedia.swift */; };
 		D37182F61F00F98C00F9C0C0 /* MediaCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182F01F00F98C00F9C0C0 /* MediaCollectionType.swift */; };
 		D37182F71F00F98C00F9C0C0 /* MediaType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182F11F00F98C00F9C0C0 /* MediaType.swift */; };
 		D37182F81F00FC5A00F9C0C0 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EB1F00F98C00F9C0C0 /* LocalMediaDatabase.swift */; };
-		D37182F91F00FC5A00F9C0C0 /* MediaDatabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EC1F00F98C00F9C0C0 /* MediaDatabaseError.swift */; };
+		D37182F91F00FC5A00F9C0C0 /* MediaDatabaseMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EC1F00F98C00F9C0C0 /* MediaDatabaseMessage.swift */; };
 		D37182FA1F00FC5A00F9C0C0 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EE1F00F98C00F9C0C0 /* Album.swift */; };
 		D37182FB1F00FC5A00F9C0C0 /* LocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EF1F00F98C00F9C0C0 /* LocalMedia.swift */; };
 		D37182FC1F00FC5A00F9C0C0 /* MediaCollectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182F01F00F98C00F9C0C0 /* MediaCollectionType.swift */; };
@@ -58,7 +58,7 @@
 		D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestLocalMedia.swift; path = model/TestLocalMedia.swift; sourceTree = "<group>"; };
 		D328775C1F0139C700A788EC /* MediaResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaResult.swift; sourceTree = "<group>"; };
 		D37182EB1F00F98C00F9C0C0 /* LocalMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMediaDatabase.swift; sourceTree = "<group>"; };
-		D37182EC1F00F98C00F9C0C0 /* MediaDatabaseError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseError.swift; sourceTree = "<group>"; };
+		D37182EC1F00F98C00F9C0C0 /* MediaDatabaseMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseMessage.swift; sourceTree = "<group>"; };
 		D37182EE1F00F98C00F9C0C0 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		D37182EF1F00F98C00F9C0C0 /* LocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMedia.swift; sourceTree = "<group>"; };
 		D37182F01F00F98C00F9C0C0 /* MediaCollectionType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaCollectionType.swift; sourceTree = "<group>"; };
@@ -178,7 +178,7 @@
 			isa = PBXGroup;
 			children = (
 				D37182EB1F00F98C00F9C0C0 /* LocalMediaDatabase.swift */,
-				D37182EC1F00F98C00F9C0C0 /* MediaDatabaseError.swift */,
+				D37182EC1F00F98C00F9C0C0 /* MediaDatabaseMessage.swift */,
 			);
 			path = database;
 			sourceTree = "<group>";
@@ -425,7 +425,7 @@
 				D328775D1F0139C700A788EC /* MediaResult.swift in Sources */,
 				D37182F71F00F98C00F9C0C0 /* MediaType.swift in Sources */,
 				D37183011F01042A00F9C0C0 /* MediaSortMode.swift in Sources */,
-				D37182F31F00F98C00F9C0C0 /* MediaDatabaseError.swift in Sources */,
+				D37182F31F00F98C00F9C0C0 /* MediaDatabaseMessage.swift in Sources */,
 				D37182F21F00F98C00F9C0C0 /* LocalMediaDatabase.swift in Sources */,
 				D37182F51F00F98C00F9C0C0 /* LocalMedia.swift in Sources */,
 				D37182F61F00F98C00F9C0C0 /* MediaCollectionType.swift in Sources */,
@@ -440,7 +440,7 @@
 				D328775E1F0139FD00A788EC /* MediaResult.swift in Sources */,
 				D37182FF1F0102C600F9C0C0 /* TestPHAsset.swift in Sources */,
 				D37182F81F00FC5A00F9C0C0 /* LocalMediaDatabase.swift in Sources */,
-				D37182F91F00FC5A00F9C0C0 /* MediaDatabaseError.swift in Sources */,
+				D37182F91F00FC5A00F9C0C0 /* MediaDatabaseMessage.swift in Sources */,
 				D37182FA1F00FC5A00F9C0C0 /* Album.swift in Sources */,
 				D37182FB1F00FC5A00F9C0C0 /* LocalMedia.swift in Sources */,
 				D37182FC1F00FC5A00F9C0C0 /* MediaCollectionType.swift in Sources */,

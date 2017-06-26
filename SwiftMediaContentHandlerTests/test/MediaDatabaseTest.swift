@@ -13,7 +13,7 @@ import XCTest
 
 final class MediaDatabaseTest: XCTestCase {
     fileprivate let expectationTimeout: TimeInterval = 5
-    fileprivate let errorProvider = DefaultMediaError()
+    fileprivate let messageProvider = DefaultMediaMessage()
     fileprivate let tries = 100
     fileprivate var mediaDatabase: TestMediaDatabase!
     fileprivate var disposeBag: DisposeBag!
@@ -52,7 +52,7 @@ final class MediaDatabaseTest: XCTestCase {
             switch status {
             case .denied:
                 let error = lastElement.unsafelyUnwrapped
-                XCTAssertEqual(error.localizedDescription, errorProvider.permissionNotGranted)
+                XCTAssertEqual(error.localizedDescription, messageProvider.permissionNotGranted)
                 
             case .authorized:
                 XCTAssertNil(lastElement)
