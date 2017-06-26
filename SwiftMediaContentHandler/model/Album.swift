@@ -135,6 +135,13 @@ public extension Album {
     public static func builder() -> Builder {
         return Builder()
     }
+    
+    /// Get an empty Album.
+    ///
+    /// - Returns: An AlbumType instance.
+    public static func empty() -> AlbumType {
+        return builder().build()
+    }
 }
 
 extension Album: CustomStringConvertible {

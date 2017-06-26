@@ -13,6 +13,7 @@ import XCTest
 
 class MediaDatabaseTest: XCTestCase {
     fileprivate let expectationTimeout: TimeInterval = 5
+    fileprivate let tries = 100
     fileprivate var mediaDatabase: TestMediaDatabase!
     fileprivate var disposeBag: DisposeBag!
     fileprivate var scheduler: TestScheduler!
@@ -70,12 +71,11 @@ class MediaDatabaseTest: XCTestCase {
         // Then
         let nextElements = observer.nextElements()
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, typeCount)
-        XCTAssertEqual(nextElements.count, typeCount)
+        XCTAssertEqual(nextElements.count, typeCount * mediaDatabase.itemsPerAlbum)
     }
 
     public func test_mediaToAlbum_shouldSucceed() {
         // Setup
-        let tries = 1
         let typeCount = mediaDatabase.mediaTypes.count
         let totalTry = tries * typeCount
         let observer = scheduler.createObserver(AlbumType.self)
@@ -86,8 +86,8 @@ class MediaDatabaseTest: XCTestCase {
         /// Bool value.
         Observable.range(start: 1, count: tries)
             .flatMap({_ in self.mediaDatabase.rxa_loadMedia(from: PHAssetCollection())})
-            .toAlbum()
-            .logNext()
+            .cast(to: LocalMedia.self)
+            .toAlbums()
             .doOnDispose(expect.fulfill)
             .subscribe(observer)
             .addDisposableTo(disposeBag)
@@ -99,38 +99,29 @@ class MediaDatabaseTest: XCTestCase {
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, totalTry)
         nextElements.forEach({XCTAssertTrue($0.count > 0)})
     }
-//
-//    public func test_mock_randomErrorThrown_shouldStillSucceed() {
-//        // Setup
-//        mediaDatabase.throwRandomError = true
-//        let tries = 10
-//        let typeCount = mediaDatabase.mediaTypes.count
-//        let totalTry = tries * typeCount
-//        let expect = expectation(description: "Should have succeeded")
-//        
-//        // When
-//        /// We need to use a range due to includeEmptyAlbums using a random
-//        /// Bool value.
-//        _ = Observable.range(start: 1, count: tries)
-//            .flatMap({_ in self.mediaDatabase
-//                .rxLoadAlbums(collection: PHAssetCollection())})
-//            .filter({$0.isNotEmpty})
-//            .doOnDispose(expect.fulfill)
-//            .subscribe(observer)
-//        
-//        scheduler.start()
-//        
-//        // Then
-//        waitForExpectations(timeout: expectationTimeout, handler: nil)
-//        
-//        XCTAssertEqual(
-//            mediaDatabase.loadAlbum_withCollectionAndOptions.methodCount,
-//            totalTry
-//        )
-//        
-//        let events = observer.events
-//        print(events)
-//    }
+
+    public func test_randomErrorThrown_shouldStillSucceed() {
+        // Setup
+        mediaDatabase.throwRandomError = true
+        let typeCount = mediaDatabase.mediaTypes.count
+        let totalTry = tries * typeCount
+        let observer = scheduler.createObserver(LocalMediaType.self)
+        let expect = expectation(description: "Should have succeeded")
+        
+        // When
+        Observable.range(start: 1, count: tries)
+            .flatMap({_ in self.mediaDatabase.rxa_loadMedia(from: PHAssetCollection())})
+            .doOnDispose(expect.fulfill)
+            .subscribe(observer)
+            .addDisposableTo(disposeBag)
+        
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
+        
+        // Then
+        let nextElements = observer.nextElements()
+        XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, totalTry)
+        nextElements.forEach({XCTAssertTrue($0.hasLocalAsset())})
+    }
 }
 
 extension MediaDatabaseTest: MediaDatabaseErrorType {}

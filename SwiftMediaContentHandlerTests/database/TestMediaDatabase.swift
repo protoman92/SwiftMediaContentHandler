@@ -58,13 +58,15 @@ final class TestMediaDatabase: LocalMediaDatabase {
                                      with observer: AnyObserver<PHAsset>) {
         if throwRandomError && arc4random_uniform(2) == 0 {
             observer.onError(Exception("Failed to fetch Album"))
-        } else if returnValidMedia {
-            for _ in 0..<itemsPerAlbum {
-                observer.onNext(PHAsset())
+        } else {
+            if returnValidMedia {
+                for _ in 0..<itemsPerAlbum {
+                    observer.onNext(PHAsset())
+                }
             }
+            
+            observer.onCompleted()
         }
-        
-        observer.onCompleted()
     }
     
     override func createLocalMedia(with asset: PHAsset, with title: String)

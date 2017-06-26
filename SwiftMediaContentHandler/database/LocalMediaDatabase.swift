@@ -70,6 +70,7 @@ public class LocalMediaDatabase: NSObject {
     
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+        debugPrint("Deinitialized \(self)")
     }
     
     /// Check for PHPhotoLibrary permission, and then load LocalMedia reactively
@@ -85,6 +86,7 @@ public class LocalMediaDatabase: NSObject {
                     return Observable.empty()
                 }
             })
+            .filter({$0.hasLocalAsset()})
             .observeOn(MainScheduler.instance)
     }
     
@@ -110,6 +112,7 @@ public class LocalMediaDatabase: NSObject {
                     return Observable.empty()
                 }
             })
+            .filter({$0.hasLocalAsset()})
     }
     
     /// Load LocalMedia reactively, using a PHAssetCollection and PHFetchOptions.
@@ -137,7 +140,7 @@ public class LocalMediaDatabase: NSObject {
                     return LocalMedia.blank()
                 }
             })
-            .filter({$0.hasLocalAsset()})
+            .catchErrorJustReturn(LocalMedia.blank())
             .subscribeOn(qos: .background)
     }
     
@@ -380,19 +383,28 @@ public extension ObservableType where E == LocalMediaType {
     /// Convert LocalMedia emission into Album instance.
     ///
     /// - Returns: An Observable instance.
-    public func toAlbum() -> Observable<AlbumType> {
+    public func toAlbums() -> Observable<AlbumType> {
         return groupBy(keySelector: {$0.localAlbumName})
             .flatMap({(gObs) -> Observable<AlbumType> in
                 let albumName = gObs.key
                 
-                return gObs.asObservable().toArray()
+                return gObs.asObservable()
+                    .toArray()
                     .map({Album.builder()
                         .add(medias: $0)
                         .with(name: albumName)
                         .build()
                     })
-                    .subscribeOn(qos: .background)
             })
-            .observeOn(MainScheduler.instance)
+    }
+}
+
+public extension Observable where E: LocalMediaType {
+    
+    /// Same as above, but first we need to cast elements to LocalMediaType.
+    ///
+    /// - Returns: An Observable instance.
+    public func toAlbums() -> Observable<AlbumType> {
+        return ofType(LocalMediaType.self).toAlbums()
     }
 }

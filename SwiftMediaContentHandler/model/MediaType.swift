@@ -15,6 +15,7 @@ public enum MediaType {
     case video
     case audio
     
+    /// Get the associated PHAssetMediaType.
     public var assetType: PHAssetMediaType {
         switch self {
         case .image:

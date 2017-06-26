@@ -15,6 +15,7 @@ public enum MediaCollectionType {
     case moment
     case smartAlbum
     
+    /// Get the associated PHAssetCollectionType.
     public var collectionType: PHAssetCollectionType {
         switch self {
         case .album:

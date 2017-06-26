@@ -100,6 +100,10 @@ public class LocalMedia {
 }
 
 public extension LocalMedia {
+    
+    /// Get a Builder instance.
+    ///
+    /// - Returns: A Builder instance.
     public static func builder() -> Builder {
         return Builder()
     }
@@ -107,7 +111,7 @@ public extension LocalMedia {
 
 extension LocalMedia: CustomStringConvertible {
     public var description: String {
-        return String(describing: asset)
+        return "\(localAlbumName) - \(String(describing: asset))"
     }
 }
 
