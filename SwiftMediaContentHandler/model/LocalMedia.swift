@@ -35,7 +35,7 @@ public extension LocalMediaType {
 }
 
 /// This class hides PHAsset implementation.
-public class LocalMedia {
+public struct LocalMedia {
     
     /// Get a blank LocalMedia instance.
     ///
@@ -65,8 +65,8 @@ public class LocalMedia {
     }
     
     /// Builder class for LocalMedia.
-    public class Builder {
-        fileprivate let media: LocalMedia
+    public final class Builder {
+        fileprivate var media: LocalMedia
         
         fileprivate init() {
             media = LocalMedia()

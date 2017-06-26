@@ -11,7 +11,7 @@ import RxTest
 import RxSwift
 import XCTest
 
-class MediaDatabaseTest: XCTestCase {
+final class MediaDatabaseTest: XCTestCase {
     fileprivate let expectationTimeout: TimeInterval = 5
     fileprivate let tries = 100
     fileprivate var mediaDatabase: TestMediaDatabase!
@@ -56,12 +56,14 @@ class MediaDatabaseTest: XCTestCase {
     public func test_fetchWithPermission_shouldSucceed() {
         // Setup
         let typeCount = mediaDatabase.mediaTypes.count
-        let observer = scheduler.createObserver(LocalMediaType.self)
+        let observer = scheduler.createObserver(TestPHAsset.self)
         let expect = expectation(description: "Should have succeeded")
         
         // When
         mediaDatabase
             .rxa_loadMedia(from: PHAssetCollection())
+            .map({$0.localAsset})
+            .cast(to: TestPHAsset.self)
             .doOnDispose(expect.fulfill)
             .subscribe(observer)
             .addDisposableTo(disposeBag)
@@ -72,6 +74,14 @@ class MediaDatabaseTest: XCTestCase {
         let nextElements = observer.nextElements()
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, typeCount)
         XCTAssertEqual(nextElements.count, typeCount * mediaDatabase.itemsPerAlbum)
+        
+        /// Check that order is preserved
+        for (index, asset) in nextElements.enumerated() {
+            if index > 0 {
+                let previous = nextElements[index - 1]
+                XCTAssertTrue(asset.index > previous.index)
+            }
+        }
     }
 
     public func test_mediaToAlbum_shouldSucceed() {
@@ -87,7 +97,10 @@ class MediaDatabaseTest: XCTestCase {
         Observable.range(start: 1, count: tries)
             .flatMap({_ in self.mediaDatabase.rxa_loadMedia(from: PHAssetCollection())})
             .cast(to: LocalMedia.self)
-            .toAlbums()
+            .toUnsortedAlbums()
+            .toArray()
+            .map({$0.sorted(by: {$0.0.albumName > $0.1.albumName})})
+            .concatMap({Observable.from($0)})
             .doOnDispose(expect.fulfill)
             .subscribe(observer)
             .addDisposableTo(disposeBag)

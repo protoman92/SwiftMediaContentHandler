@@ -25,6 +25,9 @@ public class LocalMediaDatabase: NSObject {
     /// We can add media types to fetch with PHFetchRequest.
     fileprivate var mediaTypes: [MediaType]
     
+    /// Use this SortDescriptor to sort PHAsset while fetching.
+    fileprivate var sortDescriptor: SortDescriptor<PHAsset>
+    
     /// For each collection type, we should have a PHFetchResult instance.
     fileprivate var assetCollectionFetch: [PHFetchResult<PHAssetCollection>]
     
@@ -60,6 +63,7 @@ public class LocalMediaDatabase: NSObject {
         collectionTypes = []
         mediaTypes = []
         photoLibraryListener = PublishSubject<PHAssetCollection>()
+        sortDescriptor = .ascending(for: MediaSortMode.creationDate)
         
         // Placebo value - we will immediately update it after self has been
         // initialized successfully.
@@ -79,7 +83,7 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     public func rxa_loadMedia() -> Observable<LocalMediaType> {
         return mediaListener
-            .flatMap({[weak self] (collection) -> Observable<LocalMediaType> in
+            .concatMap({[weak self] (collection) -> Observable<LocalMediaType> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection)
                 } else {
@@ -105,7 +109,7 @@ public class LocalMediaDatabase: NSObject {
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
         return Observable.from(fetchOptions)
-            .flatMap({[weak self] (ops) -> Observable<LocalMediaType> in
+            .concatMap({[weak self] (ops) -> Observable<LocalMediaType> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection, with: ops)
                 } else {
@@ -231,6 +235,16 @@ public class LocalMediaDatabase: NSObject {
             return self
         }
         
+        /// Set the sortDescriptor instance.
+        ///
+        /// - Parameter sortDescriptor: A SortDescriptor instance.
+        /// - Returns: The current Builder instance.
+        @discardableResult
+        public func with(sortDescriptor: SortDescriptor<PHAsset>) -> Builder {
+            database.sortDescriptor = sortDescriptor
+            return self
+        }
+        
         /// Get the LocalMediaDatabase instance.
         ///
         /// - Returns: A LocalMediaDatabase instance.
@@ -274,6 +288,13 @@ fileprivate extension LocalMediaDatabase {
             self.startFetch(for: collection, with: mediaListener)
         })
     }
+    
+    /// Start fetch for all PHFetchResult.
+    fileprivate func startFetch() {
+        assetCollectionFetch.forEach({
+            $0.enumerateObjects({self.startFetch(for: $0.0)})
+        })
+    }
 }
 
 public extension LocalMediaDatabase {
@@ -303,11 +324,7 @@ fileprivate extension LocalMediaDatabase {
         let typeValue = type.assetType.rawValue
         let predicate = NSPredicate(format: "mediaType = %i", typeValue)
         fetchOptions.predicate = predicate
-        
-        fetchOptions.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: false)
-        ]
-        
+        fetchOptions.sortDescriptors = [sortDescriptor.descriptor()]
         return fetchOptions
     }
 }
@@ -349,9 +366,7 @@ public extension LocalMediaDatabase {
                     options: nil)
             })
             
-            assetCollectionFetch.forEach({
-                $0.enumerateObjects({self.startFetch(for: $0.0)})
-            })
+            startFetch()
             
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization(loadInitialMedia)
@@ -380,16 +395,16 @@ extension LocalMediaDatabase: MediaDatabaseErrorType {}
 
 public extension ObservableType where E == LocalMediaType {
     
-    /// Convert LocalMedia emission into Album instance.
+    /// Convert LocalMedia emissions into Album instances. The resulting
+    /// emissions are not sorted.
     ///
     /// - Returns: An Observable instance.
-    public func toAlbums() -> Observable<AlbumType> {
+    public func toUnsortedAlbums() -> Observable<AlbumType> {
         return groupBy(keySelector: {$0.localAlbumName})
             .flatMap({(gObs) -> Observable<AlbumType> in
                 let albumName = gObs.key
                 
-                return gObs.asObservable()
-                    .toArray()
+                return gObs.toArray()
                     .map({Album.builder()
                         .add(medias: $0)
                         .with(name: albumName)
@@ -404,7 +419,7 @@ public extension Observable where E: LocalMediaType {
     /// Same as above, but first we need to cast elements to LocalMediaType.
     ///
     /// - Returns: An Observable instance.
-    public func toAlbums() -> Observable<AlbumType> {
-        return ofType(LocalMediaType.self).toAlbums()
+    public func toUnsortedAlbums() -> Observable<AlbumType> {
+        return ofType(LocalMediaType.self).toUnsortedAlbums()
     }
 }

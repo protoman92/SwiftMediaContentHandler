@@ -11,7 +11,7 @@ import SwiftUtilities
 
 /// Classes that implement this protocol must be able to hold local media
 /// information.
-public protocol AlbumType: class {
+public protocol AlbumType {
     
     /// Get the album name.
     var albumName: String { get }
@@ -27,7 +27,7 @@ public protocol AlbumType: class {
 
 /// This class represents a collection of LocalMedia, and each instance has
 /// a name that can be used to identify itself.
-public class Album: Collection {
+public struct Album: Collection {
     public var startIndex: Int {
         return medias.startIndex
     }
@@ -83,7 +83,7 @@ public class Album: Collection {
     
     /// Builder for Album.
     public final class Builder {
-        fileprivate let album: Album
+        fileprivate var album: Album
         
         fileprivate init() {
             album = Album()

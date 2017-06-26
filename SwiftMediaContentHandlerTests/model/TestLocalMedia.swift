@@ -16,7 +16,7 @@ extension LocalMedia {
     /// - Returns: A LocalMedia instance.
     public static func fake() -> LocalMedia {
         return LocalMedia.builder()
-            .with(asset: PHAsset())
+            .with(asset: TestPHAsset())
             .with(albumName: String.random(withLength: 10))
             .build()
     }

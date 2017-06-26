@@ -61,7 +61,7 @@ final class TestMediaDatabase: LocalMediaDatabase {
         } else {
             if returnValidMedia {
                 for _ in 0..<itemsPerAlbum {
-                    observer.onNext(PHAsset())
+                    observer.onNext(TestPHAsset())
                 }
             }
             
