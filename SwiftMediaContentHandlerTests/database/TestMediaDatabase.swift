@@ -48,7 +48,7 @@ final class TestMediaDatabase: LocalMediaDatabase {
     
     override func rxa_loadMedia(from collection: PHAssetCollection,
                                 with options: PHFetchOptions)
-        -> Observable<LocalMediaType>
+        -> Observable<LMTEither>
     {
         loadwithCollectionAndOptions.onMethodCalled(withParameters: (collection, options))
         return super.rxa_loadMedia(from: collection, with: options)

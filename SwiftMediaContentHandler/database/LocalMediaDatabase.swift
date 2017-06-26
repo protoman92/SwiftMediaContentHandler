@@ -6,6 +6,7 @@
 //  Copyright © 2016 Swiften. All rights reserved.
 //
 
+import Either
 import Foundation
 import Photos
 import RxSwift
@@ -22,6 +23,9 @@ public class LocalMediaDatabase: NSObject {
     /// We can add collection types to fetch with PHFetchRequest.
     fileprivate var collectionTypes: [MediaCollectionType]
     
+    /// This is responsible for providing error messages.
+    fileprivate var errorProvider: MediaDatabaseErrorType
+    
     /// We can add media types to fetch with PHFetchRequest.
     fileprivate var mediaTypes: [MediaType]
     
@@ -34,9 +38,13 @@ public class LocalMediaDatabase: NSObject {
     /// When a Photo library change is detected, call onNext.
     fileprivate let photoLibraryListener: PublishSubject<PHAssetCollection>
     
+    /// When there is a database-wide Error. i.e. errors that affect the entire
+    /// fetch operation - such as permission error, call onNext.
+    fileprivate let databaseErrorListener: PublishSubject<Error>
+    
     /// When this Observable is subscribed to, it will emit data that it
     /// fetches from PHPhotoLibrary.
-    fileprivate var photoLibraryObservable: Observable<LocalMediaType>
+    fileprivate var photoLibraryObservable: Observable<LMTEither>
     
     /// Return mediaTypes, a MediaType Array.
     public var registeredMediaTypes: [MediaType] {
@@ -53,8 +61,13 @@ public class LocalMediaDatabase: NSObject {
         return photoLibraryListener
     }
     
+    /// Return databaseErrorListener
+    public var databaseErrorObservable: Observable<Error> {
+        return databaseErrorListener.asObservable()
+    }
+    
     /// Return photoLibraryObservable.
-    public var mediaObservable: Observable<LocalMediaType> {
+    public var mediaObservable: Observable<LMTEither> {
         return photoLibraryObservable
     }
     
@@ -63,7 +76,9 @@ public class LocalMediaDatabase: NSObject {
         collectionTypes = []
         mediaTypes = []
         photoLibraryListener = PublishSubject<PHAssetCollection>()
+        databaseErrorListener = PublishSubject<Error>()
         sortDescriptor = .ascending(for: MediaSortMode.creationDate)
+        errorProvider = DefaultMediaError()
         
         // Placebo value - we will immediately update it after self has been
         // initialized successfully.
@@ -77,49 +92,42 @@ public class LocalMediaDatabase: NSObject {
         debugPrint("Deinitialized \(self)")
     }
     
-    /// Check for PHPhotoLibrary permission, and then load LocalMedia reactively
+    /// Check for PHPhotoLibrary permission, and then load LMTEither reactively
     /// if authorized.
     ///
     /// - Returns: An Observable instance.
-    public func rxa_loadMedia() -> Observable<LocalMediaType> {
+    public func rxa_loadMedia() -> Observable<LMTEither> {
         return mediaListener
-            .concatMap({[weak self] (collection) -> Observable<LocalMediaType> in
+            .concatMap({[weak self] (collection) -> Observable<LMTEither> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection)
                 } else {
                     return Observable.empty()
                 }
             })
-            .filter({$0.hasLocalAsset()})
             .observeOn(MainScheduler.instance)
     }
     
-    /// Load LocalMedia reactively, using a PHAssetCollection.
+    /// Load LMTEither reactively, using a PHAssetCollection.
     ///
     /// - Parameter collection: The PHAssetCollection to get PHAsset instances.
     /// - Returns: An Observable instance.
-    func rxa_loadMedia(from collection: PHAssetCollection)
-        -> Observable<LocalMediaType>
-    {
-        if !isAuthorized() {
-            return Observable.error(permissionNotGranted)
-        }
-        
+    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<LMTEither> {
+        if !isAuthorized() { return Observable.empty() }
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
         return Observable.from(fetchOptions)
-            .concatMap({[weak self] (ops) -> Observable<LocalMediaType> in
+            .concatMap({[weak self] (ops) -> Observable<LMTEither> in
                 if let `self` = self {
                     return `self`.rxa_loadMedia(from: collection, with: ops)
                 } else {
                     return Observable.empty()
                 }
             })
-            .filter({$0.hasLocalAsset()})
     }
     
-    /// Load LocalMedia reactively, using a PHAssetCollection and PHFetchOptions.
+    /// Load LMTEither reactively, using a PHAssetCollection and PHFetchOptions.
     ///
     /// - Parameters:
     ///   - collection: The PHAssetCollection to get PHAsset instances.
@@ -127,7 +135,7 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     func rxa_loadMedia(from collection: PHAssetCollection,
                        with options: PHFetchOptions)
-        -> Observable<LocalMediaType>
+        -> Observable<LMTEither>
     {
         let result = PHAsset.fetchAssets(in: collection, options: options)
         let title = collection.localizedTitle ?? defaultAlbumName()
@@ -144,7 +152,9 @@ public class LocalMediaDatabase: NSObject {
                     return LocalMedia.blank()
                 }
             })
-            .catchErrorJustReturn(LocalMedia.blank())
+            .filter({$0.hasLocalAsset()})
+            .map(LMTEither.right)
+            .catchErrorJustReturn(LMTEither.left)
             .subscribeOn(qos: .background)
     }
     
@@ -175,9 +185,7 @@ public class LocalMediaDatabase: NSObject {
     ///   - asset: A PHAsset instance.
     ///   - title: A String value.
     /// - Returns: A LocalMedia instance.
-    func createLocalMedia(with asset: PHAsset, with title: String)
-        -> LocalMediaType
-    {
+    func createLocalMedia(with asset: PHAsset, with title: String) -> LocalMediaType {
         return LocalMedia.builder()
             .with(asset: asset)
             .with(albumName: title)
@@ -242,6 +250,16 @@ public class LocalMediaDatabase: NSObject {
         @discardableResult
         public func with(sortDescriptor: SortDescriptor<PHAsset>) -> Builder {
             database.sortDescriptor = sortDescriptor
+            return self
+        }
+        
+        /// Set the errorProvider instance.
+        ///
+        /// - Parameter errorProvider: A MediaDatabaseErrorType instance.
+        /// - Returns: The current Builder instance.
+        @discardableResult
+        public func with(errorProvider: MediaDatabaseErrorType) -> Builder {
+            database.errorProvider = errorProvider
             return self
         }
         
@@ -336,7 +354,7 @@ public extension LocalMediaDatabase {
         PHPhotoLibrary.shared().register(self)
     }
     
-    /// Reload LocalMedia if the user has authorized access to PHPhotoLibrary.
+    /// Reload LMTEither if the user has authorized access to PHPhotoLibrary.
     ///
     /// This method should be called only once to load initial media data. 
     /// Subsequently, changes should be handled by PHPhotoLibrary's listener 
@@ -347,7 +365,7 @@ public extension LocalMediaDatabase {
         loadInitialMedia(status: currentAuthorizationStatus)
     }
     
-    /// Reload LocalMedia after checking authorization status.
+    /// Reload LMTEither after checking authorization status.
     ///
     /// - Parameter status: PHPhotoLibrary authorization status.
     fileprivate func loadInitialMedia(status: PHAuthorizationStatus) {
@@ -372,7 +390,8 @@ public extension LocalMediaDatabase {
             PHPhotoLibrary.requestAuthorization(loadInitialMedia)
             
         default:
-            break
+            let error = Exception(errorProvider.permissionNotGranted)
+            databaseErrorListener.onNext(error)
         }
     }
 }
@@ -391,17 +410,15 @@ extension LocalMediaDatabase: PHPhotoLibraryChangeObserver {
     }
 }
 
-extension LocalMediaDatabase: MediaDatabaseErrorType {}
-
-public extension ObservableType where E == LocalMediaType {
+public extension ObservableType where E == LMTEither {
     
-    /// Convert LocalMedia emissions into Album instances. The resulting
+    /// Convert LMTEither emissions into Album instances. The resulting
     /// emissions are not sorted.
     ///
     /// - Returns: An Observable instance.
-    public func toUnsortedAlbums() -> Observable<AlbumType> {
-        return groupBy(keySelector: {$0.localAlbumName})
-            .flatMap({(gObs) -> Observable<AlbumType> in
+    public func toUnsortedAlbums() -> Observable<AlbumEither> {
+        return groupBy(keySelector: {$0.map({$0.localAlbumName}).right ?? ""})
+            .flatMap({(gObs) -> Observable<AlbumEither> in
                 let albumName = gObs.key
                 
                 return gObs.toArray()
@@ -410,16 +427,8 @@ public extension ObservableType where E == LocalMediaType {
                         .with(name: albumName)
                         .build()
                     })
+                    .map(AlbumEither.right)
+                    .catchErrorJustReturn(AlbumEither.left)
             })
-    }
-}
-
-public extension Observable where E: LocalMediaType {
-    
-    /// Same as above, but first we need to cast elements to LocalMediaType.
-    ///
-    /// - Returns: An Observable instance.
-    public func toUnsortedAlbums() -> Observable<AlbumType> {
-        return ofType(LocalMediaType.self).toUnsortedAlbums()
     }
 }

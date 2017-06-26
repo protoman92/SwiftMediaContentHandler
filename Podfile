@@ -7,6 +7,7 @@ target 'SwiftMediaContentHandler' do
 
   # Pods for SwiftMediaContentHandler
   pod 'SwiftUtilities/Main', :git => 'https://github.com/protoman92/SwiftUtilities.git'
+  pod 'Either', :git => 'https://github.com/robrix/Either.git'
 
   target 'SwiftMediaContentHandlerTests' do
     inherit! :search_paths

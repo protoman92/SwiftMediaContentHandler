@@ -13,6 +13,7 @@ import XCTest
 
 final class MediaDatabaseTest: XCTestCase {
     fileprivate let expectationTimeout: TimeInterval = 5
+    fileprivate let errorProvider = DefaultMediaError()
     fileprivate let tries = 100
     fileprivate var mediaDatabase: TestMediaDatabase!
     fileprivate var disposeBag: DisposeBag!
@@ -33,24 +34,22 @@ final class MediaDatabaseTest: XCTestCase {
     public func test_permissionNotGranted_shouldThrow() {
         // Setup
         mediaDatabase.authorizationStatus = .denied
-        let observer = scheduler.createObserver(LocalMediaType.self)
-        let expect = expectation(description: "Should have failed")
+        let observer = scheduler.createObserver(Error.self)
+        let expect = expectation(description: "Should have emitted error")
         
         // When
-        mediaDatabase
-            .rxa_loadMedia(from: PHAssetCollection())
-            .doOnDispose(expect.fulfill)
+        mediaDatabase.databaseErrorObservable
+            .doOnNext({_ in expect.fulfill()})
             .subscribe(observer)
             .addDisposableTo(disposeBag)
         
+        mediaDatabase.loadInitialMedia()
         waitForExpectations(timeout: expectationTimeout, handler: nil)
         
         // Then
-        let events = observer.events
-        let error = events.first!.value.error
+        let error = observer.nextElements().first!
         XCTAssertTrue(mediaDatabase.loadwithCollectionAndOptions.methodNotCalled)
-        XCTAssertNotNil(error)
-        XCTAssertEqual(error!.localizedDescription, permissionNotGranted)
+        XCTAssertEqual(error.localizedDescription, errorProvider.permissionNotGranted)
     }
     
     public func test_fetchWithPermission_shouldSucceed() {
@@ -62,7 +61,8 @@ final class MediaDatabaseTest: XCTestCase {
         // When
         mediaDatabase
             .rxa_loadMedia(from: PHAssetCollection())
-            .map({$0.localAsset})
+            .map({$0.right})
+            .map({$0?.localAsset})
             .cast(to: TestPHAsset.self)
             .doOnDispose(expect.fulfill)
             .subscribe(observer)
@@ -96,9 +96,9 @@ final class MediaDatabaseTest: XCTestCase {
         /// Bool value.
         Observable.range(start: 1, count: tries)
             .flatMap({_ in self.mediaDatabase.rxa_loadMedia(from: PHAssetCollection())})
-            .cast(to: LocalMedia.self)
             .toUnsortedAlbums()
             .toArray()
+            .map({$0.flatMap({$0.right})})
             .map({$0.sorted(by: {$0.0.albumName > $0.1.albumName})})
             .concatMap({Observable.from($0)})
             .doOnDispose(expect.fulfill)
@@ -118,7 +118,7 @@ final class MediaDatabaseTest: XCTestCase {
         mediaDatabase.throwRandomError = true
         let typeCount = mediaDatabase.mediaTypes.count
         let totalTry = tries * typeCount
-        let observer = scheduler.createObserver(LocalMediaType.self)
+        let observer = scheduler.createObserver(LMTEither.self)
         let expect = expectation(description: "Should have succeeded")
         
         // When
@@ -131,10 +131,6 @@ final class MediaDatabaseTest: XCTestCase {
         waitForExpectations(timeout: expectationTimeout, handler: nil)
         
         // Then
-        let nextElements = observer.nextElements()
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, totalTry)
-        nextElements.forEach({XCTAssertTrue($0.hasLocalAsset())})
     }
 }
-
-extension MediaDatabaseTest: MediaDatabaseErrorType {}
