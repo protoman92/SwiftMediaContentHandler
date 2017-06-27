@@ -19,6 +19,9 @@ import SwiftUtilities
 /// work - otherwise, its mediaListener will emit errors.
 public class LocalMediaDatabase: NSObject {
     
+    /// When a Photo library change is detected, call onNext.
+    let mediaListener: PublishSubject<PHAssetCollection>
+    
     /// We can add collection types to fetch with PHFetchRequest.
     fileprivate var collectionTypes: [MediaCollectionType]
     
@@ -34,17 +37,10 @@ public class LocalMediaDatabase: NSObject {
     /// For each collection type, we should have a PHFetchResult instance.
     fileprivate var assetCollectionFetch: [PHFetchResult<PHAssetCollection>]
     
-    /// When a Photo library change is detected, call onNext.
-    fileprivate let photoLibraryListener: PublishSubject<PHAssetCollection>
-    
     /// When there is a database-wide Error. i.e. errors that affect the entire
     /// fetch operation - such as permission error, call onNext.
     /// When the error is resolved, pass in an empty Optional.
     fileprivate let databaseErrorListener: PublishSubject<Optional<Error>>
-    
-    /// When this Observable is subscribed to, it will emit data that it
-    /// fetches from PHPhotoLibrary.
-    fileprivate var photoLibraryObservable: Observable<AlbumResult>
     
     /// Return mediaTypes, a MediaType Array.
     public var registeredMediaTypes: [MediaType] {
@@ -56,35 +52,34 @@ public class LocalMediaDatabase: NSObject {
         return collectionTypes
     }
     
-    /// Return photoLibraryListener
-    var mediaListener: PublishSubject<PHAssetCollection> {
-        return photoLibraryListener
-    }
-    
     /// Return databaseErrorListener
     public var databaseErrorObservable: Observable<Optional<Error>> {
         return databaseErrorListener.asObservable()
     }
     
-    /// Return photoLibraryObservable.
-    public var mediaObservable: Observable<AlbumResult> {
-        return photoLibraryObservable
+    /// When this Observable is subscribed to, it will emit Album instances 
+    /// that it fetches from PHPhotoLibrary.
+    public var albumObservable: Observable<AlbumResult> {
+        return rxa_loadMedia()
+    }
+    
+    /// When this Observable is subscribed to, it will emit LocalMedia
+    /// instances that it fetched from PHPhotoLibrary.
+    public var mediaObservable: Observable<LMTResult> {
+        return albumObservable
+            .map({$0.value?.albumMedia ?? []})
+            .concatMap({Observable.from($0)})
     }
     
     override init() {
         assetCollectionFetch = []
         collectionTypes = []
         mediaTypes = []
-        photoLibraryListener = PublishSubject<PHAssetCollection>()
+        mediaListener = PublishSubject<PHAssetCollection>()
         databaseErrorListener = PublishSubject<Optional<Error>>()
         sortDescriptor = .ascending(for: MediaSortMode.creationDate)
         messageProvider = DefaultMediaMessage()
-        
-        // Placebo value - we will immediately update it after self has been
-        // initialized successfully.
-        photoLibraryObservable = Observable.empty()
         super.init()
-        photoLibraryObservable = rxa_loadMedia()
     }
     
     deinit {

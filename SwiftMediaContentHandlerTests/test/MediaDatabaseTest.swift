@@ -9,12 +9,13 @@
 import Photos
 import RxTest
 import RxSwift
+import SwiftUtilities
 import XCTest
 
 final class MediaDatabaseTest: XCTestCase {
     fileprivate let expectationTimeout: TimeInterval = 5
     fileprivate let messageProvider = DefaultMediaMessage()
-    fileprivate let tries = 100
+    fileprivate let tries = 50
     fileprivate var mediaDatabase: TestMediaDatabase!
     fileprivate var disposeBag: DisposeBag!
     fileprivate var scheduler: TestScheduler!
@@ -32,11 +33,11 @@ final class MediaDatabaseTest: XCTestCase {
     }
     
     public func test_permissionNotGranted_shouldThrow() {
-        // Setup
+        /// Setup
         let statuses: [PHAuthorizationStatus] = [.denied, .authorized]
         let observer = scheduler.createObserver(Optional<Error>.self)
         
-        // When
+        /// When
         mediaDatabase.databaseErrorObservable
             .subscribe(observer)
             .addDisposableTo(disposeBag)
@@ -45,7 +46,7 @@ final class MediaDatabaseTest: XCTestCase {
             mediaDatabase.authorizationStatus = status
             mediaDatabase.loadInitialMedia()
             
-            // Then
+            /// Then
             let nextElements = observer.nextElements()
             let lastElement = nextElements.last!
             
@@ -66,12 +67,12 @@ final class MediaDatabaseTest: XCTestCase {
     }
     
     public func test_fetchWithPermission_shouldSucceed() {
-        // Setup
+        /// Setup
         let typeCount = mediaDatabase.mediaTypes.count
         let observer = scheduler.createObserver(TestPHAsset.self)
         let expect = expectation(description: "Should have succeeded")
         
-        // When
+        /// When
         mediaDatabase
             .rxa_loadMedia(from: PHAssetCollection())
             .map({$0.value})
@@ -86,12 +87,12 @@ final class MediaDatabaseTest: XCTestCase {
         
         waitForExpectations(timeout: expectationTimeout, handler: nil)
         
-        // Then
+        /// Then
         let nextElements = observer.nextElements()
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, typeCount)
         XCTAssertEqual(nextElements.count, typeCount * mediaDatabase.itemsPerAlbum)
         
-        /// Check that order is preserved
+        // Check that order is preserved
         for (index, asset) in nextElements.enumerated() {
             if index > 0 {
                 let previous = nextElements[index - 1]
@@ -99,16 +100,52 @@ final class MediaDatabaseTest: XCTestCase {
             }
         }
     }
+    
+    public func test_fetchWithListener_shouldSucceed() {
+        /// Setup
+        let listener = mediaDatabase.mediaListener
+        let timeout = expectationTimeout
+        let observer = scheduler.createObserver(LMTResult.self)
+        let typeCount = mediaDatabase.mediaTypes.count
+        let totalCount = tries * mediaDatabase.itemsPerAlbum * typeCount
+        let totalTry = tries * typeCount
+        let expect = expectation(description: "Should have succeeded")
+        
+        /// When
+        mediaDatabase.mediaObservable
+            .subscribe(observer)
+            .addDisposableTo(disposeBag)
+        
+        for _ in 0..<tries {
+            listener.onNext(PHAssetCollection())
+        }
+        
+        // Since we are not able to detect when the stream is stopped (as there
+        // is no onComplete notification), we need to wait and fulfill the
+        // expectation is a background thread.
+        background {
+            sleep(UInt32(timeout))
+            expect.fulfill()
+        }
+        
+        waitForExpectations(timeout: timeout + 1, handler: nil)
+        
+        /// Then
+        let nextElements = observer.nextElements()
+        print(observer.events)
+        XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, totalTry)
+        XCTAssertEqual(nextElements.count, totalCount)
+    }
 
     public func test_randomErrorThrown_shouldStillSucceed() {
-        // Setup
+        /// Setup
         mediaDatabase.throwRandomError = true
         let typeCount = mediaDatabase.mediaTypes.count
         let totalTry = tries * typeCount
         let observer = scheduler.createObserver(AlbumResult.self)
         let expect = expectation(description: "Should have succeeded")
         
-        // When
+        /// When
         Observable.range(start: 1, count: tries)
             .flatMap({_ in self.mediaDatabase.rxa_loadMedia(from: PHAssetCollection())})
             .doOnDispose(expect.fulfill)
@@ -117,7 +154,7 @@ final class MediaDatabaseTest: XCTestCase {
         
         waitForExpectations(timeout: expectationTimeout, handler: nil)
         
-        // Then
+        /// Then
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, totalTry)
     }
 }
