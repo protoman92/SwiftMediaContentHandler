@@ -119,8 +119,8 @@ public class LocalMediaDatabase: NSObject {
             .concatMap({(gObs) -> Observable<Album> in
                 let name = gObs.key
                 
-                return gObs.map({$0.value})
-                    .map({$0?.albumMedia ?? []})
+                return gObs.map({$0.value ?? Album.empty()})
+                    .map({$0.albumMedia})
                     .reduce([], accumulator: +)
                     .map({[weak self] in
                         self?.createAlbum(from: $0, with: name) ?? .empty()
@@ -207,8 +207,8 @@ public class LocalMediaDatabase: NSObject {
     ///   - medias: An Array of LMTResult.
     ///   - title: A String value.
     /// - Returns: An Album instance.
-    func createAlbum(from medias: [LMTResult], with title: String) -> Album {
-        return Album.builder().add(medias: medias).with(name: title).build()
+    func createAlbum(from media: [LMTResult], with title: String) -> Album {
+        return Album.builder().add(media: media).with(name: title).build()
     }
     
     /// Builder class for LocalMediaDatabase.

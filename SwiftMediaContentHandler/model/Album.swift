@@ -32,10 +32,31 @@ public extension AlbumType {
     
     /// Check if two Albums have the same name.
     ///
-    /// - Parameter album: An Album instance.
+    /// - Parameter album: An AlbumType instance.
+    /// - Returns: A Bool value.
+    public func hasSameName(as album: AlbumType) -> Bool {
+        return albumName == album.albumName
+    }
+    
+    /// Check if two Albums have the same name.
+    ///
+    /// - Parameter album: An AlbumType instance.
     /// - Returns: A Bool value.
     public func hasSameName<A: AlbumType>(as album: A) -> Bool {
-        return albumName == album.albumName
+        return hasSameName(as: album as AlbumType)
+    }
+    
+    /// Create a new AlbumType instance with media instances from both
+    /// AlbumType instances. The albumName will be the current AlbumType's name.
+    ///
+    /// - Parameter album: An AlbumType instance.
+    /// - Returns: An AlbumType instance.
+    public func appending(contentsOf album: AlbumType) -> AlbumType {
+        return Album.builder()
+            .with(name: albumName)
+            .add(media: albumMedia)
+            .add(media: album.albumMedia)
+            .build()
     }
 }
 
@@ -76,9 +97,19 @@ public struct Album {
         ///
         /// - Parameter photos: An Array of Photo instances.
         /// - Returns: The current Builder instance.
-        public func add(medias: [LMTResult]) -> Builder {
-            album.medias.append(contentsOf: medias)
+        public func add(media: [LMTResult]) -> Builder {
+            album.medias.append(contentsOf: media)
             return self
+        }
+        
+        /// Same as above, but uses a Sequence of LMTResult.
+        ///
+        /// - Parameter media: A Sequence of LMTResult.
+        /// - Returns: The current Builder instance.
+        public func add<S: Sequence>(media: S) -> Builder
+            where S.Iterator.Element == LMTResult
+        {
+            return add(media: media.map(eq))
         }
         
         /// Add assets, wrapped in Photo instances, to the album's photos 
@@ -87,7 +118,7 @@ public struct Album {
         /// - Parameter assets: An Array of PHAsset instances.
         /// - Returns: The current Builder instance.
         public func add(assets: [PHAsset]) -> Builder {
-            return add(medias: assets
+            return add(media: assets
                 .map({LocalMedia.builder().with(asset: $0).build()})
                 .map(LMTResult.init))
         }
