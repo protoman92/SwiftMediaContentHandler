@@ -16,21 +16,19 @@ public protocol LocalMediaType {
     var localAlbumName: String { get }
     
     /// Get the associated PHAsset instance.
-    var localAsset: PHAsset? { get }
+    var localAsset: PHAsset { get }
 }
 
 public extension LocalMediaType {
     
     /// Get the PHAsset id, if available.
     public var id: String {
-        return localAsset?.localIdentifier ?? ""
+        return localAsset.localIdentifier
     }
     
-    /// Check whether the PHAsset instance is available.
-    ///
-    /// - Returns: A Bool value.
-    public func hasLocalAsset() -> Bool {
-        return localAsset != nil
+    /// Get the PHAsset type.
+    var localAssetType: MediaType {
+        return .from(assetType: localAsset.mediaType)
     }
 }
 
@@ -49,16 +47,6 @@ public struct LocalMedia {
     
     /// A PHAsset instance. This can used to fetch local media.
     fileprivate var asset: PHAsset?
-    
-    /// Get albumName.
-    public var localAlbumName: String {
-        return albumName
-    }
-    
-    /// Get asset.
-    public var localAsset: PHAsset? {
-        return asset
-    }
     
     fileprivate init() {
         albumName = ""
@@ -115,7 +103,23 @@ extension LocalMedia: CustomStringConvertible {
     }
 }
 
-extension LocalMedia: LocalMediaType {}
+extension LocalMedia: LocalMediaType {
+    
+    /// Get albumName.
+    public var localAlbumName: String {
+        return albumName
+    }
+    
+    /// Get asset.
+    public var localAsset: PHAsset {
+        if let asset = asset {
+            return asset
+        } else {
+            debugException("Asset not found")
+            return PHAsset()
+        }
+    }
+}
 
 extension LocalMedia: CustomComparisonType {
     public func equals(object: LocalMedia?) -> Bool {

@@ -25,7 +25,9 @@ public class LocalMediaDatabase: NSObject {
     /// We can add collection types to fetch with PHFetchRequest.
     fileprivate var collectionTypes: [MediaCollectionType]
     
-    /// This is responsible for providing error messages.
+    /// This is responsible for providing messages. Default messages are
+    /// provided by DefaultMediaMessage, but if we need app-specific messages,
+    /// set this instance via the Builder.
     fileprivate var messageProvider: MediaDatabaseMessageType
     
     /// We can add media types to fetch with PHFetchRequest.
@@ -94,11 +96,7 @@ public class LocalMediaDatabase: NSObject {
     public func rxa_loadMedia() -> Observable<AlbumResult> {
         return mediaListener
             .concatMap({[weak self] (collection) -> Observable<AlbumResult> in
-                if let `self` = self {
-                    return `self`.rxa_loadMedia(from: collection)
-                } else {
-                    return Observable.empty()
-                }
+                self?.rxa_loadMedia(from: collection) ?? .empty()
             })
             .observeOn(MainScheduler.instance)
     }
@@ -153,7 +151,6 @@ public class LocalMediaDatabase: NSObject {
             .map({[weak self] in
                 self?.createMedia(with: $0, with: title) ?? .blank()
             })
-            .filter({$0.hasLocalAsset()})
             .map(LMTResult.init).toArray()
             .map({[weak self] in
                 self?.createAlbum(from: $0, with: title) ?? .empty()
@@ -313,8 +310,9 @@ fileprivate extension LocalMediaDatabase {
     ///   - observer: An Observer instance.
     fileprivate func startFetch<O: ObserverType>(
         for collection: PHAssetCollection,
-        with observer: O
-        ) where O.E == PHAssetCollection {
+        with observer: O)
+        where O.E == PHAssetCollection
+    {
         observer.onNext(collection)
     }
     
