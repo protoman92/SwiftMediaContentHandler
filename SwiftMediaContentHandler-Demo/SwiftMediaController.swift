@@ -1,6 +1,6 @@
 //
-//  GalleryController.swift
-//  TestApplication
+//  SwiftMediaController.swift
+//  SwiftMediaContentHandler-Demo
 //
 //  Created by Hai Pham on 4/16/17.
 //  Copyright © 2017 Swiften. All rights reserved.
@@ -9,19 +9,19 @@
 import Photos
 import RxSwift
 import RxCocoa
-import SwiftMediaContentHandler
 import SwiftUtilities
 import UIKit
+@testable import SwiftMediaContentHandler
 
 final class SwiftMediaController: UIViewController {
     @IBOutlet weak var collectionView1: UICollectionView!
     @IBOutlet weak var label1: UILabel!
 
+    fileprivate let albumHolder = AlbumHolder()
     fileprivate let disposeBag = DisposeBag()
     fileprivate let cellSpacing: CGFloat = 2
     fileprivate let imageManager = PHImageManager()
     fileprivate var mediaDatabase: LocalMediaDatabase!
-    fileprivate var albums = [AlbumType]()
     
     deinit {
         print("Deinit \(self)")
@@ -40,6 +40,7 @@ final class SwiftMediaController: UIViewController {
             .filter({$0.value != nil})
             .map({$0.value!})
             .startWith(Album.withErrorMedia(5) as AlbumType)
+            .map(AlbumResult.init)
             .share()
         
         let errorStream = mediaDatabase
@@ -69,11 +70,14 @@ final class SwiftMediaController: UIViewController {
         mediaDatabase.loadInitialMedia()
     }
     
-    fileprivate func albumReceived(_ album: AlbumType,
+    fileprivate func albumReceived(_ result: AlbumResult,
                                    with current: SwiftMediaController?) {
         if let current = current {
-            current.albums.append(album)
-            current.collectionView1.reloadData()
+            let collectionView = current.collectionView1
+
+            albumHolder.safeAppend(result) {_ in
+                collectionView?.reloadData()
+            }
         } else {
             fatalError()
         }
@@ -111,8 +115,8 @@ extension SwiftMediaController: UICollectionViewDelegateFlowLayout {
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let pFrame = collectionView.bounds
         
-        return CGSize(width: pFrame.width / 4 - cellSpacing,
-                      height: pFrame.width / 4 - cellSpacing)
+        return CGSize(width: pFrame.width / 5 - cellSpacing,
+                      height: pFrame.width / 5 - cellSpacing)
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -122,12 +126,12 @@ extension SwiftMediaController: UICollectionViewDelegateFlowLayout {
 
 extension SwiftMediaController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return albums.count
+        return albumHolder.count
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return albums.element(at: section)?.count ?? 0
+        return albumHolder.albumResults.element(at: section)?.value?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -141,8 +145,8 @@ extension SwiftMediaController: UICollectionViewDataSource {
         cell.backgroundColor = .lightGray
         cell.imageView1.backgroundColor = .black
         
-        if let lmt = albums
-            .element(at: indexPath.section)?
+        if let lmt = albumHolder.albumResults
+            .element(at: indexPath.section)?.value?
             .albumMedia
             .element(at: indexPath.row)
         {
@@ -153,7 +157,7 @@ extension SwiftMediaController: UICollectionViewDataSource {
                 
                 imageManager.requestImage(
                     for: asset,
-                    targetSize: CGSize(width: 500, height: 500),
+                    targetSize: CGSize(width: 200, height: 200),
                     contentMode: .aspectFit,
                     options: nil)
                 {

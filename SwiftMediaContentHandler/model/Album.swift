@@ -112,8 +112,25 @@ public struct Album {
             return add(media: media.map(eq))
         }
         
-        /// Add assets, wrapped in Photo instances, to the album's photos 
-        /// Array.
+        /// Add LocalMediaType, wrapped in LMTResult.
+        ///
+        /// - Parameter media: An Array of LocalMediaType.
+        /// - Returns: The current Builder instance.
+        public func add(media: [LocalMediaType]) -> Builder {
+            return add(media: media.map(LMTResult.init))
+        }
+        
+        /// Same as above, but uses a Sequence of LocalMediaType.
+        ///
+        /// - Parameter media: A Sequence of LocalMediaType.
+        /// - Returns: The current Builder instance.
+        public func add<S: Sequence>(media: S) -> Builder
+            where S.Iterator.Element == LocalMediaType
+        {
+            return add(media: media.map(eq))
+        }
+        
+        /// Add assets, wrapped in LocalMedia instances.
         ///
         /// - Parameter assets: An Array of PHAsset instances.
         /// - Returns: The current Builder instance.

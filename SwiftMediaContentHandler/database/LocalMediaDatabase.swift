@@ -326,13 +326,6 @@ fileprivate extension LocalMediaDatabase {
             self.startFetch(for: collection, with: mediaListener)
         })
     }
-    
-    /// Start fetch for all PHFetchResult.
-    fileprivate func startFetch() {
-        assetCollectionFetch.forEach({
-            $0.enumerateObjects({self.startFetch(for: $0.0)})
-        })
-    }
 }
 
 public extension LocalMediaDatabase {
@@ -401,14 +394,18 @@ public extension LocalMediaDatabase {
             // instance is first built. This is because doing this will
             // explicitly request permission - we only want to ask for
             // permission when the app first starts loading Albums.
-            assetCollectionFetch = registeredCollectionTypes.map({
+            let assetCollectionFetch = registeredCollectionTypes.map({
                 PHAssetCollection.fetchAssetCollections(
                     with: $0.collectionType,
                     subtype: .any,
                     options: nil)
             })
             
-            startFetch()
+            assetCollectionFetch.forEach({
+                $0.enumerateObjects({self.startFetch(for: $0.0)})
+            })
+            
+            self.assetCollectionFetch = assetCollectionFetch
             
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization(loadInitialMedia)

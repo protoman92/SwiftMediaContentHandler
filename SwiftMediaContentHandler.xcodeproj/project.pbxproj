@@ -8,13 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		59CAC75C7F574DD8369A6A69 /* Pods_SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EC7FDA16E624E604E71DEFF /* Pods_SwiftMediaContentHandler.framework */; };
+		5CF4703EA7A5093409E060EA /* Pods_SwiftMediaContentHandler_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC59BB0BA3975FF80299A49 /* Pods_SwiftMediaContentHandler_Demo.framework */; };
 		85B923ED0AE7A8EB847C3317 /* Pods_SwiftMediaContentHandlerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */; };
-		BF47CA5FEBF1559E577E0801 /* Pods_SwiftMediaContentHandler_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC59BB0BA3975FF80299A49 /* Pods_SwiftMediaContentHandler_Demo.framework */; };
 		D31285F21E9F356D00F2AB64 /* SwiftMediaContentHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */; };
 		D31285F91E9F356D00F2AB64 /* SwiftMediaContentHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = D31285EB1E9F356C00F2AB64 /* SwiftMediaContentHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D313E5CC1EA0C8A80063F91F /* TestLocalMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */; };
 		D328775D1F0139C700A788EC /* MediaResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D328775C1F0139C700A788EC /* MediaResult.swift */; };
 		D328775E1F0139FD00A788EC /* MediaResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D328775C1F0139C700A788EC /* MediaResult.swift */; };
+		D33862BB1F0413C60098EF41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33862B81F0413C60098EF41 /* AppDelegate.swift */; };
+		D33862BC1F0413C60098EF41 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D33862B91F0413C60098EF41 /* Info.plist */; };
+		D33862BD1F0413C60098EF41 /* SwiftMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33862BA1F0413C60098EF41 /* SwiftMediaController.swift */; };
+		D33862C01F0413CB0098EF41 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D33862BE1F0413CB0098EF41 /* Main.storyboard */; };
+		D33862C21F0413D00098EF41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D33862C11F0413D00098EF41 /* Assets.xcassets */; };
+		D33862C41F04192C0098EF41 /* AlbumHolderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33862C31F04192C0098EF41 /* AlbumHolderTest.swift */; };
 		D37182F21F00F98C00F9C0C0 /* LocalMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EB1F00F98C00F9C0C0 /* LocalMediaDatabase.swift */; };
 		D37182F31F00F98C00F9C0C0 /* MediaDatabaseMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EC1F00F98C00F9C0C0 /* MediaDatabaseMessage.swift */; };
 		D37182F41F00F98C00F9C0C0 /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37182EE1F00F98C00F9C0C0 /* Album.swift */; };
@@ -33,12 +39,8 @@
 		D38316981EA3EED8009706FF /* SwiftMediaContentHandler.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */; };
 		D3BFD2071EA30FB300582031 /* TestMediaDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */; };
 		D3D3CF8C1F003029009ABC03 /* MediaDatabaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D3CF8A1F002EBD009ABC03 /* MediaDatabaseTest.swift */; };
-		D3D5B38D1F0359C800C40C9A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D5B38B1F0359C800C40C9A /* AppDelegate.swift */; };
-		D3D5B38E1F0359C800C40C9A /* SwiftMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D5B38C1F0359C800C40C9A /* SwiftMediaController.swift */; };
-		D3D5B3911F0359CE00C40C9A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D3D5B38F1F0359CE00C40C9A /* Main.storyboard */; };
 		D3FDC6111F02CE330029047A /* AlbumHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FDC6101F02CE330029047A /* AlbumHolder.swift */; };
 		D3FDC6121F02CE330029047A /* AlbumHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FDC6101F02CE330029047A /* AlbumHolder.swift */; };
-		FFE77AE9BCA852583A4DA93A /* Pods_SwiftMediaContentHandler_SwiftMediaContentHandler_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E54D720A35EA15E63B985CA /* Pods_SwiftMediaContentHandler_SwiftMediaContentHandler_Demo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,13 @@
 		D31286161E9F36A800F2AB64 /* SwiftUtilitiesTests.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUtilitiesTests.framework; path = "Pods/../build/Debug-iphoneos/SwiftUtilitiesTests/SwiftUtilitiesTests.framework"; sourceTree = "<group>"; };
 		D313E5CB1EA0C8A80063F91F /* TestLocalMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TestLocalMedia.swift; path = model/TestLocalMedia.swift; sourceTree = "<group>"; };
 		D328775C1F0139C700A788EC /* MediaResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaResult.swift; sourceTree = "<group>"; };
+		D33862A61F0413500098EF41 /* SwiftMediaContentHandler-Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftMediaContentHandler-Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D33862B81F0413C60098EF41 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D33862B91F0413C60098EF41 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D33862BA1F0413C60098EF41 /* SwiftMediaController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMediaController.swift; sourceTree = "<group>"; };
+		D33862BF1F0413CB0098EF41 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D33862C11F0413D00098EF41 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D33862C31F04192C0098EF41 /* AlbumHolderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumHolderTest.swift; sourceTree = "<group>"; };
 		D37182EB1F00F98C00F9C0C0 /* LocalMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalMediaDatabase.swift; sourceTree = "<group>"; };
 		D37182EC1F00F98C00F9C0C0 /* MediaDatabaseMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseMessage.swift; sourceTree = "<group>"; };
 		D37182EE1F00F98C00F9C0C0 /* Album.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
@@ -80,11 +89,6 @@
 		D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwiftMediaContentHandler.podspec; sourceTree = "<group>"; };
 		D3BFD2061EA30FB300582031 /* TestMediaDatabase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestMediaDatabase.swift; sourceTree = "<group>"; };
 		D3D3CF8A1F002EBD009ABC03 /* MediaDatabaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaDatabaseTest.swift; sourceTree = "<group>"; };
-		D3D5B3791F03595C00C40C9A /* SwiftMediaContentHandler-Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftMediaContentHandler-Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D3D5B3871F03595C00C40C9A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D3D5B38B1F0359C800C40C9A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D3D5B38C1F0359C800C40C9A /* SwiftMediaController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftMediaController.swift; sourceTree = "<group>"; };
-		D3D5B3901F0359CE00C40C9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D3FDC6101F02CE330029047A /* AlbumHolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumHolder.swift; sourceTree = "<group>"; };
 		D9B249FF993F0AD07769504A /* Pods-SwiftMediaContentHandler-SwiftMediaContentHandler-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftMediaContentHandler-SwiftMediaContentHandler-Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftMediaContentHandler-SwiftMediaContentHandler-Demo/Pods-SwiftMediaContentHandler-SwiftMediaContentHandler-Demo.debug.xcconfig"; sourceTree = "<group>"; };
 		F4CD60B150ABD36A124DF28C /* Pods_SwiftMediaContentHandlerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftMediaContentHandlerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,12 +113,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D3D5B3761F03595C00C40C9A /* Frameworks */ = {
+		D33862A31F0413500098EF41 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF47CA5FEBF1559E577E0801 /* Pods_SwiftMediaContentHandler_Demo.framework in Frameworks */,
-				FFE77AE9BCA852583A4DA93A /* Pods_SwiftMediaContentHandler_SwiftMediaContentHandler_Demo.framework in Frameworks */,
+				5CF4703EA7A5093409E060EA /* Pods_SwiftMediaContentHandler_Demo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,7 +157,7 @@
 				D38316971EA3EED8009706FF /* SwiftMediaContentHandler.podspec */,
 				D31285EA1E9F356C00F2AB64 /* SwiftMediaContentHandler */,
 				D31285F51E9F356D00F2AB64 /* SwiftMediaContentHandlerTests */,
-				D3D5B37A1F03595C00C40C9A /* SwiftMediaContentHandler-Demo */,
+				D33862A71F0413500098EF41 /* SwiftMediaContentHandler-Demo */,
 				D31285E91E9F356C00F2AB64 /* Products */,
 				4D1147F6D96D59406936408B /* Pods */,
 				BBA3C751801715406A297F9E /* Frameworks */,
@@ -166,7 +169,7 @@
 			children = (
 				D31285E81E9F356C00F2AB64 /* SwiftMediaContentHandler.framework */,
 				D31285F11E9F356D00F2AB64 /* SwiftMediaContentHandlerTests.xctest */,
-				D3D5B3791F03595C00C40C9A /* SwiftMediaContentHandler-Demo.app */,
+				D33862A61F0413500098EF41 /* SwiftMediaContentHandler-Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -210,6 +213,18 @@
 			name = model;
 			sourceTree = "<group>";
 		};
+		D33862A71F0413500098EF41 /* SwiftMediaContentHandler-Demo */ = {
+			isa = PBXGroup;
+			children = (
+				D33862C11F0413D00098EF41 /* Assets.xcassets */,
+				D33862BE1F0413CB0098EF41 /* Main.storyboard */,
+				D33862B81F0413C60098EF41 /* AppDelegate.swift */,
+				D33862B91F0413C60098EF41 /* Info.plist */,
+				D33862BA1F0413C60098EF41 /* SwiftMediaController.swift */,
+			);
+			path = "SwiftMediaContentHandler-Demo";
+			sourceTree = "<group>";
+		};
 		D37182EA1F00F98C00F9C0C0 /* database */ = {
 			isa = PBXGroup;
 			children = (
@@ -237,19 +252,9 @@
 			isa = PBXGroup;
 			children = (
 				D3D3CF8A1F002EBD009ABC03 /* MediaDatabaseTest.swift */,
+				D33862C31F04192C0098EF41 /* AlbumHolderTest.swift */,
 			);
 			path = test;
-			sourceTree = "<group>";
-		};
-		D3D5B37A1F03595C00C40C9A /* SwiftMediaContentHandler-Demo */ = {
-			isa = PBXGroup;
-			children = (
-				D3D5B38F1F0359CE00C40C9A /* Main.storyboard */,
-				D3D5B38B1F0359C800C40C9A /* AppDelegate.swift */,
-				D3D5B38C1F0359C800C40C9A /* SwiftMediaController.swift */,
-				D3D5B3871F03595C00C40C9A /* Info.plist */,
-			);
-			path = "SwiftMediaContentHandler-Demo";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -307,16 +312,16 @@
 			productReference = D31285F11E9F356D00F2AB64 /* SwiftMediaContentHandlerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		D3D5B3781F03595C00C40C9A /* SwiftMediaContentHandler-Demo */ = {
+		D33862A51F0413500098EF41 /* SwiftMediaContentHandler-Demo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D3D5B38A1F03595C00C40C9A /* Build configuration list for PBXNativeTarget "SwiftMediaContentHandler-Demo" */;
+			buildConfigurationList = D33862B51F0413510098EF41 /* Build configuration list for PBXNativeTarget "SwiftMediaContentHandler-Demo" */;
 			buildPhases = (
-				455783C160AC687394413629 /* [CP] Check Pods Manifest.lock */,
-				D3D5B3751F03595C00C40C9A /* Sources */,
-				D3D5B3761F03595C00C40C9A /* Frameworks */,
-				D3D5B3771F03595C00C40C9A /* Resources */,
-				7D91134DD744704B1A7F2BB2 /* [CP] Embed Pods Frameworks */,
-				EB544DF4F61E34E5196DC14E /* [CP] Copy Pods Resources */,
+				08406FD32866424D52349AF6 /* [CP] Check Pods Manifest.lock */,
+				D33862A21F0413500098EF41 /* Sources */,
+				D33862A31F0413500098EF41 /* Frameworks */,
+				D33862A41F0413500098EF41 /* Resources */,
+				489B8903505C5E528DF1DFD3 /* [CP] Embed Pods Frameworks */,
+				5B127939A0CF6510334DCEFC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -324,7 +329,7 @@
 			);
 			name = "SwiftMediaContentHandler-Demo";
 			productName = "SwiftMediaContentHandler-Demo";
-			productReference = D3D5B3791F03595C00C40C9A /* SwiftMediaContentHandler-Demo.app */;
+			productReference = D33862A61F0413500098EF41 /* SwiftMediaContentHandler-Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -348,9 +353,9 @@
 						DevelopmentTeam = S3V9CCW695;
 						ProvisioningStyle = Automatic;
 					};
-					D3D5B3781F03595C00C40C9A = {
+					D33862A51F0413500098EF41 = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = 5FF785XRZ6;
+						DevelopmentTeam = S3V9CCW695;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
@@ -371,7 +376,7 @@
 			targets = (
 				D31285E71E9F356C00F2AB64 /* SwiftMediaContentHandler */,
 				D31285F01E9F356D00F2AB64 /* SwiftMediaContentHandlerTests */,
-				D3D5B3781F03595C00C40C9A /* SwiftMediaContentHandler-Demo */,
+				D33862A51F0413500098EF41 /* SwiftMediaContentHandler-Demo */,
 			);
 		};
 /* End PBXProject section */
@@ -392,17 +397,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D3D5B3771F03595C00C40C9A /* Resources */ = {
+		D33862A41F0413500098EF41 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3D5B3911F0359CE00C40C9A /* Main.storyboard in Resources */,
+				D33862BC1F0413C60098EF41 /* Info.plist in Resources */,
+				D33862C21F0413D00098EF41 /* Assets.xcassets in Resources */,
+				D33862C01F0413CB0098EF41 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		08406FD32866424D52349AF6 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SwiftMediaContentHandler-Demo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		3B05731FA69F3F75F1A1B068 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -418,7 +443,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		3E0401F6ED2043A67A0DD7EC /* [CP] Copy Pods Resources */ = {
@@ -436,19 +461,28 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandlerTests/Pods-SwiftMediaContentHandlerTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		455783C160AC687394413629 /* [CP] Check Pods Manifest.lock */ = {
+		489B8903505C5E528DF1DFD3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandler-Demo/Pods-SwiftMediaContentHandler-Demo-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftUtilities/SwiftUtilities.framework",
 			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftUtilities.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandler-Demo/Pods-SwiftMediaContentHandler-Demo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4DB478C4DCB947F208252CC0 /* [CP] Check Pods Manifest.lock */ = {
@@ -466,7 +500,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5B127939A0CF6510334DCEFC /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandler-Demo/Pods-SwiftMediaContentHandler-Demo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		6625A8E93616347D22748BA6 /* [CP] Embed Pods Frameworks */ = {
@@ -479,39 +528,24 @@
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftUtilities/SwiftUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/RxBlocking/RxBlocking.framework",
 				"${BUILT_PRODUCTS_DIR}/RxTest/RxTest.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftUtilitiesTests/SwiftUtilitiesTests.framework",
-				"${BUILT_PRODUCTS_DIR}/SwiftUtilities/SwiftUtilities.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxBlocking.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxTest.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftUtilitiesTests.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftUtilities.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandlerTests/Pods-SwiftMediaContentHandlerTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7D91134DD744704B1A7F2BB2 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandler-Demo/Pods-SwiftMediaContentHandler-Demo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8CCC1A85A724B1CD13E2B6E6 /* [CP] Copy Pods Resources */ = {
@@ -527,21 +561,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandler/Pods-SwiftMediaContentHandler-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EB544DF4F61E34E5196DC14E /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwiftMediaContentHandler-Demo/Pods-SwiftMediaContentHandler-Demo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -574,6 +593,7 @@
 				D37182FA1F00FC5A00F9C0C0 /* Album.swift in Sources */,
 				D37182FB1F00FC5A00F9C0C0 /* LocalMedia.swift in Sources */,
 				D37182FC1F00FC5A00F9C0C0 /* MediaCollectionType.swift in Sources */,
+				D33862C41F04192C0098EF41 /* AlbumHolderTest.swift in Sources */,
 				D37183021F01042A00F9C0C0 /* MediaSortMode.swift in Sources */,
 				D37182FD1F00FC5A00F9C0C0 /* MediaType.swift in Sources */,
 				D3D3CF8C1F003029009ABC03 /* MediaDatabaseTest.swift in Sources */,
@@ -583,12 +603,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D3D5B3751F03595C00C40C9A /* Sources */ = {
+		D33862A21F0413500098EF41 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3D5B38E1F0359C800C40C9A /* SwiftMediaController.swift in Sources */,
-				D3D5B38D1F0359C800C40C9A /* AppDelegate.swift in Sources */,
+				D33862BD1F0413C60098EF41 /* SwiftMediaController.swift in Sources */,
+				D33862BB1F0413C60098EF41 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -603,10 +623,10 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		D3D5B38F1F0359CE00C40C9A /* Main.storyboard */ = {
+		D33862BE1F0413CB0098EF41 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				D3D5B3901F0359CE00C40C9A /* Base */,
+				D33862BF1F0413CB0098EF41 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -796,13 +816,14 @@
 			};
 			name = Release;
 		};
-		D3D5B3881F03595C00C40C9A /* Debug */ = {
+		D33862B61F0413510098EF41 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9817AD0D68853EB9F8C23051 /* Pods-SwiftMediaContentHandler-Demo.debug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 5FF785XRZ6;
+				DEVELOPMENT_TEAM = S3V9CCW695;
 				INFOPLIST_FILE = "SwiftMediaContentHandler-Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -814,13 +835,14 @@
 			};
 			name = Debug;
 		};
-		D3D5B3891F03595C00C40C9A /* Release */ = {
+		D33862B71F0413510098EF41 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4DF524245A80AF343E852C00 /* Pods-SwiftMediaContentHandler-Demo.release.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 5FF785XRZ6;
+				DEVELOPMENT_TEAM = S3V9CCW695;
 				INFOPLIST_FILE = "SwiftMediaContentHandler-Demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -860,13 +882,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D3D5B38A1F03595C00C40C9A /* Build configuration list for PBXNativeTarget "SwiftMediaContentHandler-Demo" */ = {
+		D33862B51F0413510098EF41 /* Build configuration list for PBXNativeTarget "SwiftMediaContentHandler-Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D3D5B3881F03595C00C40C9A /* Debug */,
-				D3D5B3891F03595C00C40C9A /* Release */,
+				D33862B61F0413510098EF41 /* Debug */,
+				D33862B71F0413510098EF41 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

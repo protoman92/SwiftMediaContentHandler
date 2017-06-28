@@ -13,7 +13,7 @@ import SwiftUtilities
 import XCTest
 
 final class MediaDatabaseTest: XCTestCase {
-    fileprivate let expectationTimeout: TimeInterval = 5
+    fileprivate let expectationTimeout: TimeInterval = 20
     fileprivate let messageProvider = DefaultMediaMessage()
     fileprivate let tries = 50
     fileprivate var mediaDatabase: TestMediaDatabase!
@@ -104,7 +104,6 @@ final class MediaDatabaseTest: XCTestCase {
     public func test_fetchWithListener_shouldSucceed() {
         /// Setup
         let listener = mediaDatabase.mediaListener
-        let timeout = expectationTimeout
         let observer = scheduler.createObserver(LMTResult.self)
         let typeCount = mediaDatabase.mediaTypes.count
         let totalCount = tries * mediaDatabase.itemsPerAlbum * typeCount
@@ -113,6 +112,8 @@ final class MediaDatabaseTest: XCTestCase {
         
         /// When
         mediaDatabase.mediaStream
+            .take(totalCount)
+            .doOnDispose(expect.fulfill)
             .subscribe(observer)
             .addDisposableTo(disposeBag)
         
@@ -120,19 +121,10 @@ final class MediaDatabaseTest: XCTestCase {
             listener.onNext(PHAssetCollection())
         }
         
-        // Since we are not able to detect when the stream is stopped (as there
-        // is no onComplete notification), we need to wait and fulfill the
-        // expectation is a background thread.
-        background {
-            sleep(UInt32(timeout))
-            expect.fulfill()
-        }
-        
-        waitForExpectations(timeout: timeout + 1, handler: nil)
+        waitForExpectations(timeout: expectationTimeout, handler: nil)
         
         /// Then
         let nextElements = observer.nextElements()
-        print(observer.events)
         XCTAssertEqual(mediaDatabase.loadwithCollectionAndOptions.methodCount, totalTry)
         XCTAssertEqual(nextElements.count, totalCount)
     }

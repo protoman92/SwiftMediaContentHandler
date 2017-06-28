@@ -18,6 +18,7 @@ target 'SwiftMediaContentHandler' do
     
     # Pods for testing
     allPods
+    pod 'SwiftUtilitiesTests/Main', :git => 'https://github.com/protoman92/SwiftUtilities.git'
   end
   
   target 'SwiftMediaContentHandler-Demo' do

@@ -38,7 +38,7 @@ final class TestMediaDatabase: LocalMediaDatabase {
         loadwithCollectionAndOptions = FakeDetails.builder().build()
         authorizationStatus = .authorized
         fetchActualData = true
-        itemsPerAlbum = 10
+        itemsPerAlbum = 1000
         returnValidMedia = true
         collectionTypes = [.album, .moment, .smartAlbum]
         mediaTypes = [.audio, .image, .video]

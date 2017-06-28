@@ -1,32 +1,51 @@
 PODS:
   - Result (3.0.0)
+  - RxBlocking (3.5.0):
+    - RxSwift (~> 3.4)
   - RxCocoa (3.5.0):
     - RxSwift (~> 3.4)
   - RxSwift (3.5.0)
+  - RxTest (3.5.0):
+    - RxSwift (~> 3.4)
   - SwiftUtilities/Main (1.4.1):
     - Result (~> 3.0.0)
     - RxCocoa (~> 3.0)
     - RxSwift (~> 3.0)
+  - SwiftUtilitiesTests/Main (1.4.1):
+    - Result (~> 3.0.0)
+    - RxBlocking (~> 3.0)
+    - RxCocoa (~> 3.0)
+    - RxSwift (~> 3.0)
+    - RxTest (~> 3.0)
 
 DEPENDENCIES:
   - Result (~> 3.0.0)
   - SwiftUtilities/Main (from `https://github.com/protoman92/SwiftUtilities.git`)
+  - SwiftUtilitiesTests/Main (from `https://github.com/protoman92/SwiftUtilities.git`)
 
 EXTERNAL SOURCES:
   SwiftUtilities:
+    :git: https://github.com/protoman92/SwiftUtilities.git
+  SwiftUtilitiesTests:
     :git: https://github.com/protoman92/SwiftUtilities.git
 
 CHECKOUT OPTIONS:
   SwiftUtilities:
     :commit: 1946486a3384d12a505c0441898ce295ccbb9a7a
     :git: https://github.com/protoman92/SwiftUtilities.git
+  SwiftUtilitiesTests:
+    :commit: 1946486a3384d12a505c0441898ce295ccbb9a7a
+    :git: https://github.com/protoman92/SwiftUtilities.git
 
 SPEC CHECKSUMS:
   Result: 1b3e431f37cbcd3ad89c6aa9ab0ae55515fae3b6
+  RxBlocking: 471315e18b87c5ed4b9d0c69a57dfdbca5c01af1
   RxCocoa: a0a09f45d0e5b48ecb6a4a7b4b4c89c88d3f633f
   RxSwift: 18ee9d78b45edb3b0b7e79916b47a116e6dbc842
+  RxTest: 1763765fd0e2282b0eb44c9050effdd7fe7156d4
   SwiftUtilities: b0662402fda25b563af9d1e7e08c41dac85122ef
+  SwiftUtilitiesTests: 6466282e33e7ba7fb97afa5abe188d82c0c6720b
 
-PODFILE CHECKSUM: 48b2e694223068bf2aa5783d3abeb0220ac2b978
+PODFILE CHECKSUM: eee2ca0a18189877cbb55a46ae1918fbe132efd5
 
-COCOAPODS: 1.3.0.beta.1
+COCOAPODS: 1.3.0.beta.2
