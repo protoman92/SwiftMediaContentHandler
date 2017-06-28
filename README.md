@@ -32,7 +32,3 @@ This library requires CocoaPods. Please use:
 > pod 'SwiftMediaContentHandler'
 
 for the appropriate build targets.
-
-# Demonstration
-
-Please visit **TestApplication-iOS** [https://github.com/protoman92/TestApplication-iOS.git] for a quick demonstration (esp. **GalleryController**).
