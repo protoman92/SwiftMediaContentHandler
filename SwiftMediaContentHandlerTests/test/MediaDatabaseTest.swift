@@ -38,7 +38,7 @@ final class MediaDatabaseTest: XCTestCase {
         let observer = scheduler.createObserver(Optional<Error>.self)
         
         /// When
-        mediaDatabase.databaseErrorObservable
+        mediaDatabase.databaseErrorStream
             .subscribe(observer)
             .addDisposableTo(disposeBag)
         
@@ -112,7 +112,7 @@ final class MediaDatabaseTest: XCTestCase {
         let expect = expectation(description: "Should have succeeded")
         
         /// When
-        mediaDatabase.mediaObservable
+        mediaDatabase.mediaStream
             .subscribe(observer)
             .addDisposableTo(disposeBag)
         

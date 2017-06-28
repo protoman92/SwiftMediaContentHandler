@@ -55,20 +55,20 @@ public class LocalMediaDatabase: NSObject {
     }
     
     /// Return databaseErrorListener
-    public var databaseErrorObservable: Observable<Optional<Error>> {
+    public var databaseErrorStream: Observable<Optional<Error>> {
         return databaseErrorListener.asObservable()
     }
     
     /// When this Observable is subscribed to, it will emit Album instances 
     /// that it fetches from PHPhotoLibrary.
-    public var albumObservable: Observable<AlbumResult> {
+    public var albumStream: Observable<AlbumResult> {
         return rxa_loadMedia()
     }
     
     /// When this Observable is subscribed to, it will emit LocalMedia
     /// instances that it fetched from PHPhotoLibrary.
-    public var mediaObservable: Observable<LMTResult> {
-        return albumObservable
+    public var mediaStream: Observable<LMTResult> {
+        return albumStream
             .map({$0.value?.albumMedia ?? []})
             .concatMap({Observable.from($0)})
     }
@@ -144,8 +144,8 @@ public class LocalMediaDatabase: NSObject {
         let title = collection.localizedTitle ?? messageProvider.defaultAlbumName
         
         return Observable<PHAsset>
-            .create({[weak self] observer in
-                self?.observeFetchResult(result, with: observer)
+            .create({[weak self] in
+                self?.observeFetchResult(result, with: $0)
                 return Disposables.create()
             })
             .map({[weak self] in
