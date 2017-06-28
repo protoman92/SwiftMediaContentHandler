@@ -35,14 +35,14 @@ final class SwiftMediaController: UIViewController {
             .add(mediaTypes: .image, .video, .audio)
             .build()
         
-        let albumObservable = mediaDatabase
+        let albumStream = mediaDatabase
             .albumStream
             .filter({$0.value != nil})
             .map({$0.value!})
             .startWith(Album.withErrorMedia(5) as AlbumType)
             .share()
         
-        let errorObservable = mediaDatabase
+        let errorStream = mediaDatabase
             .databaseErrorStream
             .map({$0?.localizedDescription ?? ""})
             .share()
@@ -51,16 +51,16 @@ final class SwiftMediaController: UIViewController {
         collectionView1.rx.setDataSource(self).addDisposableTo(disposeBag)
         collectionView1.rx.setDelegate(self).addDisposableTo(disposeBag)
         
-        albumObservable
+        albumStream
             .doOnNext({[weak self] in self?.albumReceived($0, with: self)})
             .subscribe()
             .addDisposableTo(disposeBag)
         
-        errorObservable
+        errorStream
             .bind(to: label1.rx.text)
             .addDisposableTo(disposeBag)
         
-        errorObservable
+        errorStream
             .map({$0.isNotEmpty})
             .bind(to: collectionView1.rx.isHidden)
             .addDisposableTo(disposeBag)
