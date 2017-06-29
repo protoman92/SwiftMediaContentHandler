@@ -31,10 +31,10 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   SwiftUtilities:
-    :commit: 1946486a3384d12a505c0441898ce295ccbb9a7a
+    :commit: 5b99a5835e7c2b2365c3639213fbc061625ed075
     :git: https://github.com/protoman92/SwiftUtilities.git
   SwiftUtilitiesTests:
-    :commit: 1946486a3384d12a505c0441898ce295ccbb9a7a
+    :commit: 5b99a5835e7c2b2365c3639213fbc061625ed075
     :git: https://github.com/protoman92/SwiftUtilities.git
 
 SPEC CHECKSUMS:
@@ -48,4 +48,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: eee2ca0a18189877cbb55a46ae1918fbe132efd5
 
-COCOAPODS: 1.3.0.beta.2
+COCOAPODS: 1.3.0.beta.1

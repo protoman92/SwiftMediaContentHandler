@@ -104,7 +104,7 @@ final class MediaDatabaseTest: XCTestCase {
     public func test_fetchWithListener_shouldSucceed() {
         /// Setup
         let listener = mediaDatabase.mediaListener
-        let observer = scheduler.createObserver(LMTResult.self)
+        let observer = scheduler.createObserver(LMTEither.self)
         let typeCount = mediaDatabase.mediaTypes.count
         let totalCount = tries * mediaDatabase.itemsPerAlbum * typeCount
         let totalTry = tries * typeCount
@@ -134,7 +134,7 @@ final class MediaDatabaseTest: XCTestCase {
         mediaDatabase.throwRandomError = true
         let typeCount = mediaDatabase.mediaTypes.count
         let totalTry = tries * typeCount
-        let observer = scheduler.createObserver(AlbumResult.self)
+        let observer = scheduler.createObserver(AlbumEither.self)
         let expect = expectation(description: "Should have succeeded")
         
         /// When

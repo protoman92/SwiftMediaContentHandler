@@ -17,7 +17,7 @@ public protocol AlbumType {
     var albumName: String { get }
     
     /// Get the album's media instances.
-    var albumMedia: [LMTResult] { get }
+    var albumMedia: [LMTEither] { get }
     
     /// Get the number of LocalMediaType instances.
     var count: Int { get }
@@ -69,7 +69,7 @@ public struct Album {
     
     
     /// The Album's PHAsset instances, wrapped in LocalMedia.
-    fileprivate var medias: [LMTResult]
+    fileprivate var medias: [LMTEither]
     
     fileprivate init() {
         name = ""
@@ -97,27 +97,27 @@ public struct Album {
         ///
         /// - Parameter photos: An Array of Photo instances.
         /// - Returns: The current Builder instance.
-        public func add(media: [LMTResult]) -> Builder {
+        public func add(media: [LMTEither]) -> Builder {
             album.medias.append(contentsOf: media)
             return self
         }
         
-        /// Same as above, but uses a Sequence of LMTResult.
+        /// Same as above, but uses a Sequence of LMTEither.
         ///
-        /// - Parameter media: A Sequence of LMTResult.
+        /// - Parameter media: A Sequence of LMTEither.
         /// - Returns: The current Builder instance.
         public func add<S: Sequence>(media: S) -> Builder
-            where S.Iterator.Element == LMTResult
+            where S.Iterator.Element == LMTEither
         {
             return add(media: media.map(eq))
         }
         
-        /// Add LocalMediaType, wrapped in LMTResult.
+        /// Add LocalMediaType, wrapped in LMTEither.
         ///
         /// - Parameter media: An Array of LocalMediaType.
         /// - Returns: The current Builder instance.
         public func add(media: [LocalMediaType]) -> Builder {
-            return add(media: media.map(LMTResult.init))
+            return add(media: media.map(LMTEither.right))
         }
         
         /// Same as above, but uses a Sequence of LocalMediaType.
@@ -137,7 +137,7 @@ public struct Album {
         public func add(assets: [PHAsset]) -> Builder {
             return add(media: assets
                 .map({LocalMedia.builder().with(asset: $0).build()})
-                .map(LMTResult.init))
+                .map(LMTEither.right))
         }
         
         /// Get album.
@@ -179,7 +179,7 @@ extension Album: Collection {
         return Swift.min(i + 1, endIndex)
     }
     
-    public subscript(index: Int) -> LMTResult {
+    public subscript(index: Int) -> LMTEither {
         return medias[index]
     }
 }
@@ -192,9 +192,9 @@ extension Album: AlbumType {
         return name
     }
     
-    /// This getter is used to hide the Album's medias field, so that it
+    /// This getter is used to hide the Album's media field, so that it
     /// cannot be changed dynamically.
-    public var albumMedia: [LMTResult] {
+    public var albumMedia: [LMTEither] {
         return medias
     }
 }

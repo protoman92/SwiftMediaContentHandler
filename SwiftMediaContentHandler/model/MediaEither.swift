@@ -6,11 +6,10 @@
 //  Copyright © 2017 Swiften. All rights reserved.
 //
 
-import Result
 import SwiftUtilities
 
 public typealias MediaError = Exception
 
-public typealias LMTResult = Result<LocalMediaType,MediaError>
+public typealias LMTEither = Either<MediaError,LocalMediaType>
 
-public typealias AlbumResult = Result<AlbumType,MediaError>
+public typealias AlbumEither = Either<MediaError,AlbumType>

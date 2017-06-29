@@ -11,7 +11,6 @@ import RxSwift
 import RxCocoa
 import SwiftUtilities
 import UIKit
-@testable import SwiftMediaContentHandler
 
 final class SwiftMediaController: UIViewController {
     @IBOutlet weak var collectionView1: UICollectionView!
@@ -40,7 +39,7 @@ final class SwiftMediaController: UIViewController {
             .filter({$0.value != nil})
             .map({$0.value!})
             .startWith(Album.withErrorMedia(5) as AlbumType)
-            .map(AlbumResult.init)
+            .map(AlbumEither.right)
             .share()
         
         let errorStream = mediaDatabase
@@ -70,7 +69,7 @@ final class SwiftMediaController: UIViewController {
         mediaDatabase.loadInitialMedia()
     }
     
-    fileprivate func albumReceived(_ result: AlbumResult,
+    fileprivate func albumReceived(_ result: AlbumEither,
                                    with current: SwiftMediaController?) {
         if let current = current {
             let collectionView = current.collectionView1
@@ -131,7 +130,7 @@ extension SwiftMediaController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return albumHolder.albumResults.element(at: section)?.value?.count ?? 0
+        return albumHolder.albumEithers.element(at: section)?.value?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -145,7 +144,7 @@ extension SwiftMediaController: UICollectionViewDataSource {
         cell.backgroundColor = .lightGray
         cell.imageView1.backgroundColor = .black
         
-        if let lmt = albumHolder.albumResults
+        if let lmt = albumHolder.albumEithers
             .element(at: indexPath.section)?.value?
             .albumMedia
             .element(at: indexPath.row)
@@ -184,7 +183,7 @@ extension Album {
         let media = (0..<count)
             .map({_ in "Error"})
             .map(MediaError.init)
-            .map(LMTResult.init)
+            .map(LMTEither.left)
         
         return Album.builder()
             .with(name: "Error media")

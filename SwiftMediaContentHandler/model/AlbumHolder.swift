@@ -8,65 +8,65 @@
 
 import SwiftUtilities
 
-/// This class provides some convenient methods to handle multiple AlbumResult.
+/// This class provides some convenient methods to handle multiple AlbumEither.
 public final class AlbumHolder {
-    fileprivate var results: [AlbumResult]
+    fileprivate var eithers: [AlbumEither]
     
     /// Get all valid AlbumType instances.
     public var albums: [AlbumType] {
-        return results.flatMap({$0.value})
+        return eithers.flatMap({$0.value})
     }
     
     /// Get results.
-    public var albumResults: [AlbumResult] {
-        return results
+    public var albumEithers: [AlbumEither] {
+        return eithers
     }
     
     /// Get all valid album names.
     public var albumNames: [String] {
-        return results.flatMap({$0.value}).map({$0.albumName})
+        return eithers.flatMap({$0.value}).map({$0.albumName})
     }
     
-    /// Get the total number of LMTResult instances.
+    /// Get the total number of LMTEither instances.
     public var mediaCount: Int {
-        return results.flatMap({$0.value}).map({$0.count}).reduce(0, +)
+        return eithers.flatMap({$0.value}).map({$0.count}).reduce(0, +)
     }
     
     public init() {
-        results = [AlbumResult]()
+        eithers = [AlbumEither]()
     }
     
-    /// Append a new AlbumResult with lock.
+    /// Append a new AlbumEither with lock.
     ///
     /// - Parameters:
-    ///   - result: An AlbumResult instance.
+    ///   - result: An AlbumEither instance.
     ///   - completion: A closure that accepts Int as parameter.
-    public func safeAppend(_ result: AlbumResult,
+    public func safeAppend(_ result: AlbumEither,
                            completion: ((Int) -> Void) = toVoid) {
         synchronized(self, then: {
             completion(append(result))
         })
     }
     
-    /// Append a new AlbumResult, or replace an existing one if applicable.
+    /// Append a new AlbumEither, or replace an existing one if applicable.
     ///
-    /// - Parameter result: An AlbumResult instance.
+    /// - Parameter either: An AlbumEither instance.
     /// - Returns: An Int value indicating the index at which the new 
-    ///            AlbumResult is inserted/appended. We can use it to update
+    ///            AlbumEither is inserted/appended. We can use it to update
     ///            the relevant UI components.
     @discardableResult
-    func append(_ result: AlbumResult) -> Int {
+    func append(_ either: AlbumEither) -> Int {
         let albums = self.albums
         
-        if let album = result.value, let index = albums.index(where: {
+        if let album = either.value, let index = albums.index(where: {
             $0.hasSameName(as: album)
         }), let existing = albums.element(at: index) {
             let newAlbum = existing.appending(contentsOf: album)
-            results[index] = AlbumResult(newAlbum)
+            eithers[index] = AlbumEither.right(newAlbum)
             return index
         } else {
-            let oldCount = results.count
-            results.append(result)
+            let oldCount = eithers.count
+            eithers.append(either)
             return oldCount
         }
     }
@@ -74,18 +74,18 @@ public final class AlbumHolder {
 
 extension AlbumHolder: Collection {
     public var startIndex: Int {
-        return results.startIndex
+        return eithers.startIndex
     }
     
     public var endIndex: Int {
-        return results.endIndex
+        return eithers.endIndex
     }
     
     public func index(after i: Int) -> Int {
         return Swift.min(i + 1, endIndex)
     }
     
-    public subscript(index: Int) -> AlbumResult {
-        return results[index]
+    public subscript(index: Int) -> AlbumEither {
+        return eithers[index]
     }
 }

@@ -61,13 +61,13 @@ public class LocalMediaDatabase: NSObject {
     
     /// When this Observable is subscribed to, it will emit Album instances 
     /// that it fetches from PHPhotoLibrary.
-    public var albumStream: Observable<AlbumResult> {
+    public var albumStream: Observable<AlbumEither> {
         return rxa_loadMedia()
     }
     
     /// When this Observable is subscribed to, it will emit LocalMedia
     /// instances that it fetched from PHPhotoLibrary.
-    public var mediaStream: Observable<LMTResult> {
+    public var mediaStream: Observable<LMTEither> {
         return albumStream
             .map({$0.value?.albumMedia ?? []})
             .concatMap({Observable.from($0)})
@@ -89,30 +89,30 @@ public class LocalMediaDatabase: NSObject {
         debugPrint("Deinitialized \(self)")
     }
     
-    /// Check for PHPhotoLibrary permission, and then load AlbumResult reactively
+    /// Check for PHPhotoLibrary permission, and then load AlbumEither reactively
     /// if authorized.
     ///
     /// - Returns: An Observable instance.
-    public func rxa_loadMedia() -> Observable<AlbumResult> {
+    public func rxa_loadMedia() -> Observable<AlbumEither> {
         return mediaListener
-            .concatMap({[weak self] (collection) -> Observable<AlbumResult> in
+            .concatMap({[weak self] (collection) -> Observable<AlbumEither> in
                 self?.rxa_loadMedia(from: collection) ?? .empty()
             })
             .observeOn(MainScheduler.instance)
     }
     
-    /// Load AlbumResult reactively, using a PHAssetCollection.
+    /// Load AlbumEither reactively, using a PHAssetCollection.
     ///
     /// - Parameter collection: The PHAssetCollection to get PHAsset instances.
     /// - Returns: An Observable instance.
-    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<AlbumResult> {
+    func rxa_loadMedia(from collection: PHAssetCollection) -> Observable<AlbumEither> {
         if !isAuthorized() { return Observable.empty() }
         let fetchOptions = registeredMediaTypes.map(self.fetchOptions)
         let defTitle = messageProvider.defaultAlbumName
         
         // For each registered MediaType, we provide a separate PHFetchOptions.
         return Observable.from(fetchOptions)
-            .concatMap({[weak self] (ops) -> Observable<AlbumResult> in
+            .concatMap({[weak self] (ops) -> Observable<AlbumEither> in
                 self?.rxa_loadMedia(from: collection, with: ops) ?? .empty()
             })
             .groupBy(keySelector: {$0.map({$0.albumName}).value ?? defTitle})
@@ -127,10 +127,10 @@ public class LocalMediaDatabase: NSObject {
                     })
             })
             .ofType(AlbumType.self)
-            .map(AlbumResult.init)
+            .map(AlbumEither.right)
     }
     
-    /// Load AlbumResult reactively, using a PHAssetCollection and PHFetchOptions.
+    /// Load AlbumEither reactively, using a PHAssetCollection and PHFetchOptions.
     ///
     /// - Parameters:
     ///   - collection: The PHAssetCollection to get PHAsset instances.
@@ -138,7 +138,7 @@ public class LocalMediaDatabase: NSObject {
     /// - Returns: An Observable instance.
     func rxa_loadMedia(from collection: PHAssetCollection,
                        with options: PHFetchOptions)
-        -> Observable<AlbumResult>
+        -> Observable<AlbumEither>
     {
         let result = PHAsset.fetchAssets(in: collection, options: options)
         let title = collection.localizedTitle ?? messageProvider.defaultAlbumName
@@ -151,15 +151,15 @@ public class LocalMediaDatabase: NSObject {
             .map({[weak self] in
                 self?.createMedia(with: $0, with: title) ?? .blank()
             })
-            .map(LMTResult.init).toArray()
+            .map(LMTEither.right).toArray()
             .map({[weak self] in
                 self?.createAlbum(from: $0, with: title) ?? .empty()
             })
             .ofType(AlbumType.self)
-            .map(AlbumResult.init)
+            .map(AlbumEither.right)
             .catchErrorJustReturn({
                 let message = $0.localizedDescription
-                return AlbumResult(error: MediaError(message))
+                return AlbumEither.left(MediaError(message))
             })
             .subscribeOn(qos: .background)
     }
@@ -201,13 +201,13 @@ public class LocalMediaDatabase: NSObject {
             .build()
     }
     
-    /// Create an Album instance with LMTResult and album name.
+    /// Create an Album instance with LMTEither and album name.
     ///
     /// - Parameters:
-    ///   - medias: An Array of LMTResult.
+    ///   - media: An Array of LMTEither.
     ///   - title: A String value.
     /// - Returns: An Album instance.
-    func createAlbum(from media: [LMTResult], with title: String) -> Album {
+    func createAlbum(from media: [LMTEither], with title: String) -> Album {
         return Album.builder().add(media: media).with(name: title).build()
     }
     
@@ -367,7 +367,7 @@ public extension LocalMediaDatabase {
         PHPhotoLibrary.shared().register(self)
     }
     
-    /// Reload AlbumResult if the user has authorized access to PHPhotoLibrary.
+    /// Reload AlbumEither if the user has authorized access to PHPhotoLibrary.
     ///
     /// This method should be called only once to load initial media data.
     /// Subsequently, changes should be handled by PHPhotoLibrary's listener
@@ -378,7 +378,7 @@ public extension LocalMediaDatabase {
         loadInitialMedia(status: currentAuthorizationStatus)
     }
     
-    /// Reload AlbumResult after checking authorization status.
+    /// Reload AlbumEither after checking authorization status.
     ///
     /// - Parameter status: PHPhotoLibrary authorization status.
     fileprivate func loadInitialMedia(status: PHAuthorizationStatus) {

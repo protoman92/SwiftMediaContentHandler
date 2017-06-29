@@ -25,7 +25,7 @@ final class AlbumHolderTest: XCTestCase {
                 LocalMedia.fake()}, for: itemsPerAlbum
             ))})
             .map({$0.build()})
-            .map(AlbumResult.init)
+            .map(AlbumEither.right)
         
         let expect = expectation(description: "Should have succeeded")
         
